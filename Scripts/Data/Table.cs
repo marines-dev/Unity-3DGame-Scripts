@@ -42,7 +42,7 @@ namespace Table
 
             string tableName    = this.GetType().Name;
             string path         = $"Data/Table/{tableName}";
-            TextAsset textAsset = Managers.Resource.LoadResource<TextAsset>(path);
+            TextAsset textAsset = GlobalScene.ResourceMng.LoadResource<TextAsset>(path);
             if (textAsset == null)
             {
                 Debug.LogWarning("Failed : ");

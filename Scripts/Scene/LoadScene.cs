@@ -3,37 +3,37 @@ using UnityEngine;
 
 public class LoadScene : BaseScene
 {
-    protected override IEnumerator LoadingProcessRoutine()
+    protected override void OnAwake()
+    {
+        // Load UI
+        {
+        }
+    }
+
+    protected override void OnStart() 
     {
         // ResetManager
         {
             // Base
-            Managers.Game.ResetData();
-            Managers.CameraEX.ResetData();
-            Managers.Resource.ResetData();
-            Managers.Table.ResetData();
-            Managers.UI.ResetData();
-            Managers.GUI.ResetData();
+            //GlobalScene.SceneMng.Initialize();
+            GlobalScene.GameMng.Initialize();
+            GlobalScene.CameraMng.Initialize();
+            GlobalScene.ResourceMng.Initialize();
+            GlobalScene.TableMng.Initialize();
+            GlobalScene.UIMng.Initialize();
+            GlobalScene.GUIMng.Initialize();
 
             // Server
-            Managers.Backend.ResetData();
-            Managers.GPGS.ResetData();
-            Managers.LogIn.ResetData();
+            GlobalScene.BackendMng.Initialize();
+            GlobalScene.GPGSMng.Initialize();
+            GlobalScene.LogInMng.Initialize();
 
             //
-            Managers.User.ResetData();
+            GlobalScene.UserMng.Initialize();
             //Managers.Input.Init();
-            Managers.Spawn.ResetData();
+            GlobalScene.SpawnMng.Initialize();
         }
-        yield return null;
-
-        // Load UI
-        {
-
-        }
-        yield return null;
     }
 
-    protected override void OpenScene() { }
-    protected override void CloseScene() { }
+    protected override void OnDestroy_() { }
 }

@@ -17,7 +17,7 @@ public class TableManager : BaseManager
     // public Dictionary<int, Data.StatData> StatDict { get; private set; } = new Dictionary<int, Data.StatData>();
 
 
-    protected override void InitDataProcess()
+    protected override void OnAwake()
     {
         //spawning = new Table.Spawning();
         //spawner = new Table.Spawner();
@@ -27,7 +27,7 @@ public class TableManager : BaseManager
         //StatDict = LoadJson<Data.Stat, int, Data.StatData>("StatData_Test").MakeDict();
     }
 
-    protected override void ResetDataProcess()
+    protected override void OnInit()
     {
         DeleteTable<Table.Spawning>();
         DeleteTable<Table.Spawner>();

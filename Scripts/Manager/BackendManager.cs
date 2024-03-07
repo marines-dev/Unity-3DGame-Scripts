@@ -10,8 +10,8 @@ public class BackendManager : BaseManager
     //
     BackendReturnObject bro = null;
 
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess()
+    protected override void OnAwake() { }
+    protected override void OnInit()
     {
         gameDataRowInDate = string.Empty;
     }
@@ -69,7 +69,7 @@ public class BackendManager : BaseManager
         }
         else
         {
-            Managers.Backend.DeleteGuestInfo();
+            GlobalScene.BackendMng.DeleteGuestInfo();
 
             Debug.LogError($"Failed : GuestLogIn - {bro}");
             return false;

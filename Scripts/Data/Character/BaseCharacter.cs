@@ -191,7 +191,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
         //
         characterID = pCharacterID;
 
-        Table.Character.Data characterData = Managers.Table.GetTable<Table.Character>().GetTableData(characterID);
+        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(characterID);
         SetStat(characterData.level);
 
         transPosition = Vector3.zero;
@@ -234,7 +234,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
 
     protected void DespawnCharacter()
     {
-        Managers.Spawn.DespawnCharacter(gameObject);
+        GlobalScene.SpawnMng.DespawnCharacter(gameObject);
     }
 
     void SetWeaponPos(Vector3 pPos, Quaternion pRot, bool pEnable)
@@ -256,8 +256,8 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     [Obsolete("레벨업 스탯 구현 필요")]
     protected void SetStat(int pLevel)
     {
-        Table.Character.Data    characterData = Managers.Table.GetTable<Table.Character>().GetTableData(characterID);
-        Table.Stat.Data         statData      = Managers.Table.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data    characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(characterID);
+        Table.Stat.Data         statData      = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
 
         stat_.maxHp     = statData.maxHp;
         stat_.currentHp = statData.maxHp;
@@ -565,7 +565,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
         }
 
         string tempPath = $"Prefabs/Weapon/SM_Wep_Watergun_02";
-        GameObject go = Managers.Resource.InstantiateResource(tempPath, weponTrans);
+        GameObject go = GlobalScene.ResourceMng.InstantiateResource(tempPath, weponTrans);
         if(go == null)
         {
             Debug.LogWarning("Failed : ");
@@ -579,7 +579,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     {
         if (weapon != null)
         {
-            Managers.Resource.DestroyGameObject(weapon.gameObject);
+            GlobalScene.ResourceMng.DestroyGameObject(weapon.gameObject);
             weapon = null;
         }
     }
@@ -588,7 +588,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     {
         DestroyHPBarUI();
 
-        hPBarUI = Managers.UI.CreateWorldSpaceUI<HPBarUI>(transform);
+        hPBarUI = GlobalScene.UIMng.CreateWorldSpaceUI<HPBarUI>(transform);
         hPBarUI.OpenUI();
     }
 
@@ -596,7 +596,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     {
         if (hPBarUI != null)
         {
-            Managers.Resource.DestroyGameObject(hPBarUI.gameObject);
+            GlobalScene.ResourceMng.DestroyGameObject(hPBarUI.gameObject);
             hPBarUI = null;
         }
     }

@@ -12,7 +12,7 @@ public class GameManagerEX : BaseManager
     {
         get
         {
-            bool isWorldScene = Managers.Scene.currentSceneType == Define.Scene.WorldScene;
+            bool isWorldScene = GlobalScene.SceneMng.currentSceneType == Define.Scene.WorldScene;
             bool isSpawnPlayer = gamePlayer != null;
             bool isLivePlayer = gamePlayer != null && gamePlayer.baseStateType != Define.BaseState.Die;
 
@@ -34,7 +34,7 @@ public class GameManagerEX : BaseManager
     {
         get
         {
-            if (!Managers.Game.IsGamePlay)
+            if (!GlobalScene.GameMng.IsGamePlay)
             {
                 Debug.LogWarning("Failed : ");
                 return null;
@@ -46,8 +46,8 @@ public class GameManagerEX : BaseManager
     GamePlayer gamePlayer = null;
 
 
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess()
+    protected override void OnAwake() { }
+    protected override void OnInit()
     {
         gamePlayer = null;
     }
@@ -64,8 +64,8 @@ public class GameManagerEX : BaseManager
 
         // Respawn
         //Managers.Spawn.SpawnCharacter(Managers.User.SpawnerID);
-        Managers.User.UpdateUserData();
-        Managers.Scene.LoadScene<WorldScene>(); // WorldScene을 재로드 합니다.
+        GlobalScene.UserMng.UpdateUserData();
+        GlobalScene.SceneMng.LoadScene<WorldScene>(); // WorldScene을 재로드 합니다.
     }
 
     #endregion Player
@@ -93,8 +93,8 @@ public class GameManagerEX : BaseManager
         if (pause) // 앱이 비활성화 되었을 때 처리
         {
             isPaused = true;
-            if (Managers.Scene.currentSceneType == Define.Scene.None)
-                Managers.User.UpdateUserData();
+            if (GlobalScene.SceneMng.currentSceneType == Define.Scene.None)
+                GlobalScene.UserMng.UpdateUserData();
         }
         else // 앱이 활성화 되었을 때 처리
         {
@@ -108,7 +108,7 @@ public class GameManagerEX : BaseManager
     [Obsolete("테스트 중")]
     void OnApplicationQuit() // 앱이 종료 될 때 처리
     {
-        if (Managers.Scene.currentSceneType == Define.Scene.WorldScene)
-            Managers.User.UpdateUserData(); //Managers.User.SaveUserData();
+        if (GlobalScene.SceneMng.currentSceneType == Define.Scene.WorldScene)
+            GlobalScene.UserMng.UpdateUserData(); //Managers.User.SaveUserData();
     }
 }

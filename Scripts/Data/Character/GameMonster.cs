@@ -35,8 +35,8 @@ public class GameMonster : BaseCharacter
         }
 
         // 플레이어 Exp 증가
-        if (Managers.Game.IsGamePlay)
-            Managers.Game.playerCtrl.IncreaseExp(stat.maxExp);
+        if (GlobalScene.GameMng.IsGamePlay)
+            GlobalScene.GameMng.playerCtrl.IncreaseExp(stat.maxExp);
 
         navMeshAgent.isStopped = true;
         navMeshAgent.velocity = Vector3.zero;
@@ -165,7 +165,7 @@ public class GameMonster : BaseCharacter
     }
     protected override void OnHitEvent()
     {
-        if (Managers.Game.IsGamePlay)
+        if (GlobalScene.GameMng.IsGamePlay)
         {
             GamePlayer target = null;
             Collider[] hitColliders = Physics.OverlapBox(transform.position + (transform.forward / 2f) + transform.up, transform.localScale, Quaternion.identity);
@@ -238,14 +238,14 @@ public class GameMonster : BaseCharacter
     {
         float distance = 0f;
 
-        if (Managers.Game.IsGamePlay)
+        if (GlobalScene.GameMng.IsGamePlay)
         {
             if(upperStateType == Define.UpperState.Attack)
             {
                 return;
             }
 
-            destPos = Managers.Game.playerCtrl.transPosition;
+            destPos = GlobalScene.GameMng.playerCtrl.transPosition;
             distance = (destPos - transPosition).magnitude;
             if (distance <= scanRange && CalculateNavMeshPath(destPos))
             {
@@ -270,9 +270,9 @@ public class GameMonster : BaseCharacter
     {
         float distance = 0f;
         //행동 변경 검사 : 공격 범위 이내이면 -> Attack
-        if (Managers.Game.IsGamePlay /*&& target != null*/)
+        if (GlobalScene.GameMng.IsGamePlay /*&& target != null*/)
         {
-            distance = (Managers.Game.playerCtrl.transPosition - transPosition).magnitude;
+            distance = (GlobalScene.GameMng.playerCtrl.transPosition - transPosition).magnitude;
             if (distance <= attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
             {
                 navMeshAgent.SetDestination(transform.position);
@@ -296,9 +296,9 @@ public class GameMonster : BaseCharacter
 
     void UpdateUpperReady()
     {
-        if (Managers.Game.IsGamePlay)
+        if (GlobalScene.GameMng.IsGamePlay)
         {
-            float distance = (Managers.Game.playerCtrl.transPosition - transPosition).magnitude;
+            float distance = (GlobalScene.GameMng.playerCtrl.transPosition - transPosition).magnitude;
             if (distance <= attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
             {
                 SetUpperStateType(Define.UpperState.Attack);
@@ -309,16 +309,16 @@ public class GameMonster : BaseCharacter
 
     void UpdateUpperAttack()
     {
-        if (Managers.Game.IsGamePlay)
+        if (GlobalScene.GameMng.IsGamePlay)
         {
-            float distance = (Managers.Game.playerCtrl.transPosition - transPosition).magnitude;
+            float distance = (GlobalScene.GameMng.playerCtrl.transPosition - transPosition).magnitude;
             if (distance > attackRange)
             {
                 SetUpperStateType(Define.UpperState.Ready);
                 return;
             }
 
-            Vector3 dir = Managers.Game.playerCtrl.transPosition - transPosition;
+            Vector3 dir = GlobalScene.GameMng.playerCtrl.transPosition - transPosition;
             Quaternion quat = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
         }
@@ -331,7 +331,7 @@ public class GameMonster : BaseCharacter
     [Obsolete("테스트")]
     Vector3 RandomPos()
     {
-        Table.Spawner.Data spawnerData = Managers.Table.GetTable<Table.Spawner>().GetTableData(2);
+        Table.Spawner.Data spawnerData = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(2);
         Vector3 randDir = UnityEngine.Random.insideUnitSphere * UnityEngine.Random.Range(0, spawnerData.spawnRadius);
         randDir.y       = 0;
         Vector3 randPos = spawnerData.spawnPos + randDir;

@@ -6,8 +6,8 @@ using UnityEngine;
 [Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
 public class GPGSManager : BaseManager
 {
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess() { }
+    protected override void OnAwake() { }
+    protected override void OnInit() { }
 
     public void InitGPGSAuth()
     {

@@ -12,8 +12,8 @@ public class CameraManager : BaseManager
     Camera  camera = null;
     IEnumerator lateUpdateQuarterViewCamCoroutine = null;
 
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess()
+    protected override void OnAwake() { }
+    protected override void OnInit()
     {
         ClearLateUpdateQuarterCameraCoroutine();
 
@@ -24,7 +24,7 @@ public class CameraManager : BaseManager
 
     public void SetWorldSceneCamera()
     {
-        if(Managers.Scene.currentSceneType != Define.Scene.WorldScene)
+        if(GlobalScene.SceneMng.currentSceneType != Define.Scene.WorldScene)
         {
             Debug.LogWarning("");
             return;
@@ -64,18 +64,18 @@ public class CameraManager : BaseManager
     {
         while (true)
         {
-            if(Managers.Game.IsGamePlay) //임시 : 게임 종료 처리 시 수정
+            if(GlobalScene.GameMng.IsGamePlay) //임시 : 게임 종료 처리 시 수정
             {
                 RaycastHit hit;
-                if (Physics.Raycast(Managers.Game.playerCtrl.transPosition, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
+                if (Physics.Raycast(GlobalScene.GameMng.playerCtrl.transPosition, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
                 {
-                    float dist = (hit.point - Managers.Game.playerCtrl.transPosition).magnitude * 0.8f;
-                    camera.transform.position = Managers.Game.playerCtrl.transPosition + deltaPos.normalized * dist;
+                    float dist = (hit.point - GlobalScene.GameMng.playerCtrl.transPosition).magnitude * 0.8f;
+                    camera.transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos.normalized * dist;
                 }
                 else
                 {
-                    camera.transform.position = Managers.Game.playerCtrl.transPosition + deltaPos;
-                    camera.transform.LookAt(Managers.Game.playerCtrl.transPosition);
+                    camera.transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos;
+                    camera.transform.LookAt(GlobalScene.GameMng.playerCtrl.transPosition);
                 }
             }
 

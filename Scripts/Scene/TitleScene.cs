@@ -22,8 +22,8 @@ public class TitleScene : BaseScene
         {
             if (titleUI_ == null)
             {
-                Managers.UI.LoadUI<TitleUI>();
-                titleUI_ = Managers.UI.GetBaseUI<TitleUI>();
+                GlobalScene.UIMng.LoadUI<TitleUI>();
+                titleUI_ = GlobalScene.UIMng.GetBaseUI<TitleUI>();
             }
             return titleUI_;
         }
@@ -33,18 +33,17 @@ public class TitleScene : BaseScene
     [Obsolete("테스트")] IEnumerator testDebugProcessCoroutine = null;
 
 
-    protected override IEnumerator LoadingProcessRoutine()
+    protected override void OnAwake()
     {
-        yield return null;
     }
 
-    protected override void OpenScene()
+    protected override void OnStart()
     {
         TitleProcess();
         TestDebugProcess();
     }
 
-    protected override void CloseScene()
+    protected override void OnDestroy_()
     {
         if (titleProcessCoroutine != null)
         {
@@ -114,9 +113,9 @@ public class TitleScene : BaseScene
     IEnumerator InitDataProcessCoroutine()
     {
         // Server
-        Managers.Backend.InitBackendSDK();
-        Managers.GPGS.InitGPGSAuth();
-        Managers.LogIn.InitLogInState();
+        GlobalScene.BackendMng.InitBackendSDK();
+        GlobalScene.GPGSMng.InitGPGSAuth();
+        GlobalScene.LogInMng.InitLogInState();
         yield return null;
     }
 
@@ -124,7 +123,7 @@ public class TitleScene : BaseScene
     {
         titleUI.SetTitleUI(currTitleProcessType);
         titleUI.Set_OnLogInState(OnLogInState);
-        yield return new WaitUntil(() => Managers.LogIn.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
+        yield return new WaitUntil(() => GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
     }
 
     void OnLogInState()
@@ -133,14 +132,14 @@ public class TitleScene : BaseScene
         {
             case TitleProcessType.LogIn:
                 {
-                    switch (Managers.LogIn.currLogInProcessType)
+                    switch (GlobalScene.LogInMng.currLogInProcessType)
                     {
                         case LogInManager.LogInProcessType.UserLogOut:
                             {
                                 if (titleUI.selectAccountType == LogInManager.AccountType.None)
                                     return;
 
-                                bool isSignUp = Managers.LogIn.SetSignUp(titleUI.selectAccountType);
+                                bool isSignUp = GlobalScene.LogInMng.SetSignUp(titleUI.selectAccountType);
                                 if(isSignUp)
                                 {
                                     TitleProcess();
@@ -156,7 +155,7 @@ public class TitleScene : BaseScene
 
                         case LogInManager.LogInProcessType.AccountAuth:
                             {
-                                Managers.LogIn.SetUserLogIn();
+                                GlobalScene.LogInMng.SetUserLogIn();
                             }
                             break;
 
@@ -164,7 +163,7 @@ public class TitleScene : BaseScene
                             {
                                 if (string.IsNullOrEmpty(titleUI.inputNickname) == false)
                                 {
-                                    Managers.LogIn.SetUpdateNickname(titleUI.inputNickname);
+                                    GlobalScene.LogInMng.SetUpdateNickname(titleUI.inputNickname);
                                 }
 
                                 TitleProcess();
@@ -177,7 +176,7 @@ public class TitleScene : BaseScene
             case TitleProcessType.LoadUserData:
                 {
                     Debug.LogWarning("Debug 테스트용");
-                    Managers.LogIn.SetUserLogOut();
+                    GlobalScene.LogInMng.SetUserLogOut();
 
                     TitleProcess();
                 }
@@ -191,16 +190,16 @@ public class TitleScene : BaseScene
         titleUI.SetTitleUI(currTitleProcessType);
         yield return new WaitForSeconds(2f); // 테스트 코드
 
-        if (Managers.User.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
+        if (GlobalScene.UserMng.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
         {
             // 유저 데이터 생성 및 저장
-            Managers.User.CreateUserData();
+            GlobalScene.UserMng.CreateUserData();
         }
     }
 
     IEnumerator LoadGameSceneProcessCoroutine()
     {
-        Managers.Scene.LoadScene<WorldScene>();
+        GlobalScene.SceneMng.LoadScene<WorldScene>();
         yield return null;
 
         titleUI.CloseUI();
@@ -231,12 +230,12 @@ public class TitleScene : BaseScene
     {
         try
         {
-            string inData = Managers.Backend.GetInData();
-            string nickname = Managers.Backend.GetNickname();
+            string inData = GlobalScene.BackendMng.GetInData();
+            string nickname = GlobalScene.BackendMng.GetNickname();
             string format = string.Format(
                 "[TitleProcess] " + currTitleProcessType.ToString() + '\n' +
-                "[LoginProcess] " + Managers.LogIn.currLogInProcessType.ToString() + '\n' +
-                "[AccountType] " + Managers.LogIn.currAccountType.ToString() + '\n' +
+                "[LoginProcess] " + GlobalScene.LogInMng.currLogInProcessType.ToString() + '\n' +
+                "[AccountType] " + GlobalScene.LogInMng.currAccountType.ToString() + '\n' +
                 "[InData] " + inData + '\n' +
                 "[nickname] " + nickname + '\n');
 

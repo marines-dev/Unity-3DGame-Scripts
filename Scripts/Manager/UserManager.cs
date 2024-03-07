@@ -24,8 +24,8 @@ namespace ServerData
 public class UserManager : BaseManager
 {
     // Backend
-    string InData { get { return Managers.Backend.GetInData(); } }
-    string NickName { get { return Managers.Backend.GetNickname(); } }
+    string InData { get { return GlobalScene.BackendMng.GetInData(); } }
+    string NickName { get { return GlobalScene.BackendMng.GetNickname(); } }
 
     // ServerData.UserData
     ServerData.UserData userData = new ServerData.UserData();
@@ -39,13 +39,13 @@ public class UserManager : BaseManager
     public int WeaponID { get { return userData.weaponID; } }
 
 
-    protected override void InitDataProcess()
+    protected override void OnAwake()
     {
         if (userData == null)
             userData = new ServerData.UserData();
     }
 
-    protected override void ResetDataProcess() { }
+    protected override void OnInit() { }
 
     // Debug.Log(ToString())
     [Obsolete("테스트 : 데이터 디버깅")]
@@ -107,8 +107,8 @@ public class UserManager : BaseManager
             return userData.hpValue;
         }
 
-        Table.Character.Data characterData = Managers.Table.GetTable<Table.Character>().GetTableData(userData.characterID);
-        Table.Stat.Data statData = Managers.Table.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(userData.characterID);
+        Table.Stat.Data statData = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
         if (pHpValue > statData.maxHp)
         {
             Debug.Log($"Warning : HP({pHpValue}) 값 초과로 MaxHP({statData.maxHp})으로 저장합니다.");
@@ -143,8 +143,8 @@ public class UserManager : BaseManager
             return userData.expValue;
         }
 
-        Table.Character.Data characterData = Managers.Table.GetTable<Table.Character>().GetTableData(userData.characterID);
-        Table.Stat.Data statData = Managers.Table.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(userData.characterID);
+        Table.Stat.Data statData = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
         if (pExpValue > statData.maxExp)
         {
             Debug.Log($"Warning : exp({pExpValue}) 값 초과로 MaxExp({statData.maxExp})으로 저장합니다.");
@@ -172,8 +172,8 @@ public class UserManager : BaseManager
     [Obsolete("임시")]
     public int SetUserLevelUp()
     {
-        Table.Character.Data characterData = Managers.Table.GetTable<Table.Character>().GetTableData(userData.characterID);
-        Table.Stat.Data statData = Managers.Table.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(userData.characterID);
+        Table.Stat.Data statData = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
         if (userData.expValue < statData.maxExp)
         {
             Debug.LogWarning($"Failed : 유저의 Exp({userData.expValue})가 MaxExp({statData.maxExp})보다 작아 LevelUp할 수 없습니다.");
@@ -272,7 +272,7 @@ public class UserManager : BaseManager
         //Managers.Backend.SaveBackendData<List<string>>("level", test_equipment);
 
         // SaveBackend
-        Managers.Backend.SaveBackendData(Config.user_tableName, ref param);
+        GlobalScene.BackendMng.SaveBackendData(Config.user_tableName, ref param);
     }
 
     [Obsolete("테스트 필요 : 서버 저장 방식 확인")]
@@ -297,12 +297,12 @@ public class UserManager : BaseManager
         param.Add("weaponID", userData.weaponID.ToString());
 
         // UpdateBackend
-        Managers.Backend.UpdateBackendData(Config.user_tableName, ref param);
+        GlobalScene.BackendMng.UpdateBackendData(Config.user_tableName, ref param);
     }
 
     public bool LoadUserData() // Backend 데이터를 불러옵니다.
     {
-        LitJson.JsonData gameDataJson = Managers.Backend.LoadBackendData(Config.user_tableName);
+        LitJson.JsonData gameDataJson = GlobalScene.BackendMng.LoadBackendData(Config.user_tableName);
         if (gameDataJson == null)
         {
             Debug.LogWarning($"유저 데이터가 존재하지 않습니다.");

@@ -55,7 +55,7 @@ public class Spawner : MonoBehaviour
             return;
         }
 
-        spawnerData = Managers.Table.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
+        spawnerData = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
         prefabType = pPrefabType;
         prefabID = pPrefabID;
         if (pSpawnEventAction != null)
@@ -165,20 +165,20 @@ public class SpawnManager : BaseManager
     Dictionary<int, Spawner> spawner_dic = new Dictionary<int, Spawner>();
 
 
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess()
+    protected override void OnAwake() { }
+    protected override void OnInit()
     {
         DestroyAllSpawner();
     }
 
     public void SetPlayerSpawner()
     {
-        SetCharacterSpawner(Managers.User.SpawnerID, Managers.User.PrefabType, Managers.User.CharacterID, OnSpawnedPlayerAction);
+        SetCharacterSpawner(GlobalScene.UserMng.SpawnerID, GlobalScene.UserMng.PrefabType, GlobalScene.UserMng.CharacterID, OnSpawnedPlayerAction);
     }
 
     public void SetMonsterSpawner(int pSpawningID)
     {
-        Table.Spawning.Data spawningData = Managers.Table.GetTable<Table.Spawning>().GetTableData(pSpawningID);
+        Table.Spawning.Data spawningData = GlobalScene.TableMng.GetTable<Table.Spawning>().GetTableData(pSpawningID);
 
         SetCharacterSpawner(spawningData.spawnerID, spawningData.prefabType, spawningData.prefabID, OnSpawnedMonsterAction);
     }
@@ -217,8 +217,8 @@ public class SpawnManager : BaseManager
             return;
         }
 
-        Table.Spawner.Data   spawnerData    = Managers.Table.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
-        Table.Character.Data characterData  = Managers.Table.GetTable<Table.Character>().GetTableData(pPrefabID);
+        Table.Spawner.Data   spawnerData    = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
+        Table.Character.Data characterData  = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(pPrefabID);
 
         Type type = Type.GetType(characterData.characterType.ToString());
         BaseCharacter character = pPooledObj.gameObject.GetComponent(type) as BaseCharacter;
@@ -260,8 +260,8 @@ public class SpawnManager : BaseManager
             return;
         }
 
-        Table.Spawner.Data   spawnerData    = Managers.Table.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
-        Table.Character.Data characterData  = Managers.Table.GetTable<Table.Character>().GetTableData(pPrefabID);
+        Table.Spawner.Data   spawnerData    = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
+        Table.Character.Data characterData  = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(pPrefabID);
 
         Type type = Type.GetType(characterData.characterType.ToString());
         BaseCharacter character = pPooledObj.gameObject.GetComponent(type) as BaseCharacter;
@@ -281,7 +281,7 @@ public class SpawnManager : BaseManager
         character.transRotation = Quaternion.identity;
 
         // GameManager : 플레이어 등록
-        Managers.Game.SetPalyer(character as GamePlayer);
+        GlobalScene.GameMng.SetPalyer(character as GamePlayer);
     }
 
     Spawner CreateSpawner(int pSpawnerID)
@@ -289,7 +289,7 @@ public class SpawnManager : BaseManager
         DestroySpawner(pSpawnerID);
 
         string go_name = $"@Spawner{pSpawnerID}";
-        Spawner spawner = Managers.Resource.CreateComponentObject<Spawner>(go_name);
+        Spawner spawner = GlobalScene.ResourceMng.CreateComponentObject<Spawner>(go_name);
 
         spawner_dic.Add(pSpawnerID, spawner);
         return spawner;
@@ -301,7 +301,7 @@ public class SpawnManager : BaseManager
         if (spawner == null)
             return;
         //
-        Managers.Resource.DestroyGameObject(spawner.gameObject);
+        GlobalScene.ResourceMng.DestroyGameObject(spawner.gameObject);
         spawner_dic.Remove(pSpawnerID);
     }
 

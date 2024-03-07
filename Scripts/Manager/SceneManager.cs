@@ -37,6 +37,7 @@ public class SceneManager : BaseManager
             return baseScene;
         }
     }
+
     LoadingUI loadingUI_ = null;
     LoadingUI loadingUI
     {
@@ -44,8 +45,8 @@ public class SceneManager : BaseManager
         {
             if(loadingUI_ == null)
             {
-                Managers.UI.LoadUI<LoadingUI>();
-                loadingUI_ = Managers.UI.GetBaseUI<LoadingUI>();
+                GlobalScene.UIMng.LoadUI<LoadingUI>();
+                loadingUI_ = GlobalScene.UIMng.GetBaseUI<LoadingUI>();
             }
             return loadingUI_;
         }
@@ -55,12 +56,12 @@ public class SceneManager : BaseManager
     IEnumerator loadSceneAsyncRoutine   = null;
 
 
-    protected override void InitDataProcess() { }
+    protected override void OnAwake() { }
 
     /// <summary>
     /// 예외 : SceneManager는 씬 로딩 완료 후에 리셋 합니다.
     /// </summary>
-    protected override void ResetDataProcess()
+    protected override void OnInit()
     {
         ClearLoadingProcess();
 
@@ -85,35 +86,6 @@ public class SceneManager : BaseManager
         //}
 
         LoadingProcess<T>();
-    }
-
-    bool CompleteLoadProcess()
-    {
-        if (isIoading == false || loadingSceneType != currentSceneType || currentScene == null)
-        {
-            string loadingSceneName = loadingSceneType.ToString();
-            Debug.LogWarning($"Failed : 현재 씬은 로딩 씬({loadingSceneName})이 아닙니다.");
-            return false;
-        }
-        else
-        {
-            string loadingSceneName = loadingSceneType.ToString();
-            string currentSceneName = currentScene.GetType().Name;
-            if (loadingSceneName != currentScene.GetType().Name)
-            {
-                Debug.LogWarning($"Failed : 현재 씬은 로딩 씬({loadingSceneName})이 아닙니다.");
-                return false;
-            }
-        }
-        
-        bool doLoadProcss = currentScene.DoLoadProcess();
-        if(doLoadProcss)
-        {
-            Debug.Log($"Success : {currentScene.GetType().Name} 씬의 로딩이 완료되었습니다.");
-            loadingSceneType = Define.Scene.None;
-        }
-
-        return doLoadProcss;
     }
 
     void LoadingProcess<T>()
@@ -146,7 +118,7 @@ public class SceneManager : BaseManager
         isIoading     = true;
         nextSceneType = GetStringToSceneType(_type.Name);
 
-        Managers.UI.CloseBaseUIAll();
+        GlobalScene.UIMng.CloseBaseUIAll();
         loadingUI.OpenUI();
         yield return null;
 
@@ -154,20 +126,18 @@ public class SceneManager : BaseManager
         loadingSceneType        = GetStringToSceneType(typeof(LoadScene).Name);
         string laodingSceneName = loadingSceneType.ToString();
         yield return LoadSceneAsyncRoutine(laodingSceneName);
-        yield return new WaitUntil(() => CompleteLoadProcess()); //  LaodScene 씬에서 로드 완료 시 true
 
         // NextScene
         loadingSceneType = nextSceneType;
         laodingSceneName = loadingSceneType.ToString();
         yield return LoadSceneAsyncRoutine(laodingSceneName);
-        yield return new WaitUntil(() => CompleteLoadProcess()); // 다음 씬에서 로드 완료 시 true
 
         // Complete
         Debug.Log($"Success : {currentScene.GetType().Name} 씬 로드를 완료했습니다.");
-        Managers.UI.CloseBaseUI<LoadingUI>();
+        GlobalScene.UIMng.CloseBaseUI<LoadingUI>();
 
         // 로딩 완료 후 SceneManager 리셋
-        ResetData();
+        Initialize();
     }
 
     /// <summary>

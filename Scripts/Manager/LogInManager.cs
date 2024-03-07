@@ -26,8 +26,8 @@ public class LogInManager : BaseManager
     public AccountType      currAccountType { get; private set; }       = AccountType.None;
     public bool isDone { get; private set; } = false;
 
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess() { }
+    protected override void OnAwake() { }
+    protected override void OnInit() { }
 
 
     public void InitLogInState()
@@ -35,10 +35,10 @@ public class LogInManager : BaseManager
         currLogInProcessType = LogInProcessType.InitLogIn;
         currAccountType = AccountType.None;
 
-        isDone = Managers.Backend.TokenLogin();
+        isDone = GlobalScene.BackendMng.TokenLogin();
         if (isDone)
         {
-            string nickname = Managers.Backend.GetNickname();
+            string nickname = GlobalScene.BackendMng.GetNickname();
             isDone = CheckNickname(nickname);
             if (isDone)
             {
@@ -73,7 +73,7 @@ public class LogInManager : BaseManager
         {
             case AccountType.Guest:
                 {
-                    isDone = Managers.Backend.GuestLogIn();
+                    isDone = GlobalScene.BackendMng.GuestLogIn();
                     currAccountType = GetAccountType();
                 }
                 break;
@@ -86,11 +86,11 @@ public class LogInManager : BaseManager
                         return isDone;
                     }
 
-                    isDone = Managers.Backend.CheckFederationAccount();
+                    isDone = GlobalScene.BackendMng.CheckFederationAccount();
 
                     if (isDone)
                     {
-                        isDone = Managers.Backend.AuthorizeFederation();
+                        isDone = GlobalScene.BackendMng.AuthorizeFederation();
                     }
                 }
                 break;
@@ -105,7 +105,7 @@ public class LogInManager : BaseManager
 
     public bool SetUpdateNickname(string _updateNickname)
     {
-        isDone = Managers.Backend.CreateNickname(_updateNickname);
+        isDone = GlobalScene.BackendMng.CreateNickname(_updateNickname);
 
         return isDone;
     }
@@ -124,18 +124,18 @@ public class LogInManager : BaseManager
         {
             case AccountType.Guest:
                 {
-                    isDone = Managers.Backend.SignOut();
+                    isDone = GlobalScene.BackendMng.SignOut();
 
                     if(isDone)
                     {
-                        Managers.Backend.DeleteGuestInfo();
+                        GlobalScene.BackendMng.DeleteGuestInfo();
                     }
                 }
                 break;
 
             case AccountType.Google:
                 {
-                    isDone = Managers.Backend.LogOut();
+                    isDone = GlobalScene.BackendMng.LogOut();
                 }
                 break;
 
@@ -147,7 +147,7 @@ public class LogInManager : BaseManager
 
     private AccountType GetAccountType()
     {
-        string subscriptionType = Managers.Backend.GetSubscriptionType();
+        string subscriptionType = GlobalScene.BackendMng.GetSubscriptionType();
         switch (subscriptionType)
         {
             case "customSignUp":

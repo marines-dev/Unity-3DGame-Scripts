@@ -20,8 +20,8 @@ public class GUIManager : BaseManager
 
     #region Override
 
-    protected override void InitDataProcess() { }
-    protected override void ResetDataProcess()
+    protected override void OnAwake() { }
+    protected override void OnInit()
     {
         ExitJoystickController();
         DestroyController();
@@ -33,7 +33,7 @@ public class GUIManager : BaseManager
 
     public void SetWorldSceneController()
     {
-        if(Managers.Game.playerCtrl == null)
+        if(GlobalScene.GameMng.playerCtrl == null)
         {
             Debug.LogWarning("Failed : ");
             return;
@@ -52,7 +52,7 @@ public class GUIManager : BaseManager
 
     public void StartJoystickController()
     {
-        if (Managers.Game.IsGamePlay == false)
+        if (GlobalScene.GameMng.IsGamePlay == false)
         {
             Debug.Log($"Failed : {typeof(Controller).Name}를 실행할 수 없습니다.");
             return;
@@ -88,7 +88,7 @@ public class GUIManager : BaseManager
 
         //DestroyController();
         string name = $"@{typeof(Controller).Name}";
-        controller_go = Managers.Resource.CreateComponentObject<Controller>(name, null);
+        controller_go = GlobalScene.ResourceMng.CreateComponentObject<Controller>(name, null);
     }
 
     void DestroyController()
@@ -99,7 +99,7 @@ public class GUIManager : BaseManager
             return;
         }
 
-        Managers.Resource.DestroyGameObject(controller_go.gameObject);
+        GlobalScene.ResourceMng.DestroyGameObject(controller_go.gameObject);
         controller_go = null;
     }
 

@@ -3,11 +3,7 @@ using UnityEngine;
 
 public class SampleScene : BaseScene
 {
-    protected override IEnumerator LoadingProcessRoutine()
-    {
-        yield return null;
-    }
-
-    protected override void OpenScene() { }
-    protected override void CloseScene() { }
+    protected override void OnAwake() { }
+    protected override void OnStart() { }
+    protected override void OnDestroy_() { }
 }

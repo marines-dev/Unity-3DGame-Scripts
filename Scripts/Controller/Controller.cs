@@ -29,8 +29,8 @@ public class Controller : MonoBehaviour, IJoystickHandler
         {
             if (joystickUI_ == null)
             {
-                Managers.UI.LoadUI<JoystickUI>();
-                joystickUI_ = Managers.UI.GetBaseUI<JoystickUI>();
+                GlobalScene.UIMng.LoadUI<JoystickUI>();
+                joystickUI_ = GlobalScene.UIMng.GetBaseUI<JoystickUI>();
             }
             return joystickUI_;
         }
@@ -41,7 +41,7 @@ public class Controller : MonoBehaviour, IJoystickHandler
 
     void Start()
     {
-        joystickUI_ = Managers.UI.GetBaseUI<JoystickUI>();
+        joystickUI_ = GlobalScene.UIMng.GetBaseUI<JoystickUI>();
         joystickUI_.CloseUI();
 
         //
@@ -65,11 +65,11 @@ public class Controller : MonoBehaviour, IJoystickHandler
     {
         if (pIsDown)
         {
-            Managers.Game.playerCtrl.OnAttack();
+            GlobalScene.GameMng.playerCtrl.OnAttack();
         }
         else
         {
-            Managers.Game.playerCtrl.OnReady();
+            GlobalScene.GameMng.playerCtrl.OnReady();
         }
     }
 
@@ -107,7 +107,7 @@ public class Controller : MonoBehaviour, IJoystickHandler
     {
         while (true)
         {
-            if (Managers.Game.IsGamePlay)
+            if (GlobalScene.GameMng.IsGamePlay)
             {
                 if (Vector2.Distance(joystickUI.dragPos, joystickUI.beginPos) > 10) // Move
                 {
@@ -117,11 +117,11 @@ public class Controller : MonoBehaviour, IJoystickHandler
                     //angle = angle < 0 ? 360 + angle : angle;
                     //Vector3 eulerAngles = new Vector3(0, Camera.main.transform.eulerAngles.y + angle, 0);
                     //Managers.Game.playerCtrl.OnMove(eulerAngles);
-                    Managers.Game.playerCtrl.OnMove(dir);
+                    GlobalScene.GameMng.playerCtrl.OnMove(dir);
                 }
                 else // Stop
                 {
-                    Managers.Game.playerCtrl.OnStop();
+                    GlobalScene.GameMng.playerCtrl.OnStop();
                 }
             }
 

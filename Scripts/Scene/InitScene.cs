@@ -1,35 +1,30 @@
-﻿using System;
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class InitScene : BaseScene
 {
-    protected override IEnumerator LoadingProcessRoutine()
+    public static bool IsInitSceneLoaded { get; private set; } = false;
+
+
+    protected override void OnAwake()
     {
-        Managers.InitData();
-        Managers.Game.InitData();
-        Managers.CameraEX.InitData();
-        Managers.Resource.InitData();
-        Managers.Table.InitData();
-        Managers.UI.InitData();
-        Managers.GUI.InitData();
+        /// CreateGlobalScene
+        GlobalScene.CreateGlobalScene();
 
         // ResisteredUI
-        Managers.UI.ResisteredBaseUI();
+        GlobalScene.UIMng.ResisteredBaseUI();
 
         // LoadData
-        Managers.UI.LoadUI<LoadingUI>();
-        yield return null;
+        GlobalScene.UIMng.LoadUI<LoadingUI>();
 
-        CompleteInitSceneLoading();
+        IsInitSceneLoaded = true;
     }
 
-    protected override void OpenScene()
+    protected override void OnStart()
     {
-        Managers.Scene.LoadScene<TitleScene>();
+        GlobalScene.SceneMng.LoadScene<TitleScene>();
     }
 
-    protected override void CloseScene()
+    protected override void OnDestroy_()
     {
     }
 }

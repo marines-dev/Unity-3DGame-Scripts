@@ -49,7 +49,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
         {
             if (hitCollider.tag == "Monster")
             {
-                ITargetHandler tempTarget = Managers.Game.GetTargetCharacter(hitCollider.gameObject);
+                ITargetHandler tempTarget = GlobalScene.GameMng.GetTargetCharacter(hitCollider.gameObject);
                 if(tempTarget != null && tempTarget.baseStateType != Define.BaseState.Die)
                 {
                     if (target != null) //가까운 타겟팅
@@ -85,9 +85,9 @@ public class GamePlayer : BaseCharacter, IControllHandler
         gameObject.tag = "Player"; //임시
         hitTime = 0.4f; //임시
 
-        userExpValue = Managers.User.ExpValue;
-        userLevelValue = Managers.User.LevelValue;
-        int currentHp = Managers.User.HpValue;
+        userExpValue = GlobalScene.UserMng.ExpValue;
+        userLevelValue = GlobalScene.UserMng.LevelValue;
+        int currentHp = GlobalScene.UserMng.HpValue;
 
         SetStat(userLevelValue);
         SetHP(currentHp);
@@ -103,7 +103,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
         }
 
         // maxHP로 초기화 합니다.
-        int currentHp = Managers.User.SetUserHP(stat.maxHp);
+        int currentHp = GlobalScene.UserMng.SetUserHP(stat.maxHp);
         SetHP(currentHp);
 
         navMeshAgent.isStopped = true;
@@ -140,7 +140,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
         //
         SetMateriasColorAlpha(1f);
         DespawnCharacter();
-        Managers.Game.SetPlayerRespawn();
+        GlobalScene.GameMng.SetPlayerRespawn();
     }
     protected override IEnumerator BaseIdleStateProcecssCoroutine()
     {
@@ -316,7 +316,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
         int expValue = userExpValue + pAddExpValue;
         if (expValue < stat.maxExp)
         {
-            userExpValue = Managers.User.SetUserExp(expValue);
+            userExpValue = GlobalScene.UserMng.SetUserExp(expValue);
             Debug.Log($"userExpValue 증가 : {userExpValue}");
         }
         else
@@ -349,9 +349,9 @@ public class GamePlayer : BaseCharacter, IControllHandler
             return;
         }
 
-        Managers.User.SetUserLevelUp();
-        userExpValue    = Managers.User.ExpValue;
-        userLevelValue  = Managers.User.LevelValue;
+        GlobalScene.UserMng.SetUserLevelUp();
+        userExpValue    = GlobalScene.UserMng.ExpValue;
+        userLevelValue  = GlobalScene.UserMng.LevelValue;
 
         Debug.Log($"Success : Level Up! : {userLevelValue}(exp : {userExpValue})");
 

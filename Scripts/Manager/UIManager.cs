@@ -52,14 +52,14 @@ public class UIManager : BaseManager
     }
 
 
-    protected override void InitDataProcess()
+    protected override void OnAwake()
     {
         LoadCanvas();
         LoadEventSystem();
         LoadUIStorage();
     }
 
-    protected override void ResetDataProcess() { }
+    protected override void OnInit() { }
 
     #region BaseUI
 
@@ -88,7 +88,7 @@ public class UIManager : BaseManager
         }
 
         string path = $"Prefabs/UI/{baseUI_name}";
-        GameObject resource = Managers.Resource.InstantiateResource(path, uiIStorage_go.transform);
+        GameObject resource = GlobalScene.ResourceMng.InstantiateResource(path, uiIStorage_go.transform);
         SetBaseUI(resource.gameObject);
     }
 
@@ -98,7 +98,7 @@ public class UIManager : BaseManager
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.InstantiateResource($"Prefabs/UI/WorldSpace/{name}");
+        GameObject go = GlobalScene.ResourceMng.InstantiateResource($"Prefabs/UI/WorldSpace/{name}");
         if (parent != null)
             go.transform.SetParent(parent);
 
@@ -310,7 +310,7 @@ public class UIManager : BaseManager
         canvas_go_ = GameObject.FindObjectOfType<Canvas>();
         if (canvas_go_ == null)
         {
-            canvas_go_ = Managers.Resource.InstantiateResource("Prefabs/UI/Canvas").GetComponent<Canvas>();
+            canvas_go_ = GlobalScene.ResourceMng.InstantiateResource("Prefabs/UI/Canvas").GetComponent<Canvas>();
 
         }
 
@@ -331,7 +331,7 @@ public class UIManager : BaseManager
         eventSystem_go_ = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
         if (eventSystem_go_ == null)
         {
-            eventSystem_go_ = Managers.Resource.InstantiateResource("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystem_go_ = GlobalScene.ResourceMng.InstantiateResource("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
         }
 
         string go_name = $"@{typeof(UnityEngine.EventSystems.EventSystem).Name}";
@@ -350,7 +350,7 @@ public class UIManager : BaseManager
         uiStorage_go_ = canvas_go.transform.Find(Config.ui_uiStorageName).gameObject;
         if (uiStorage_go_ == null)
         {
-            uiStorage_go_ = Managers.Resource.CreateGameObject(Config.ui_uiStorageName, canvas_go.transform);
+            uiStorage_go_ = GlobalScene.ResourceMng.CreateGameObject(Config.ui_uiStorageName, canvas_go.transform);
         }
 
         //

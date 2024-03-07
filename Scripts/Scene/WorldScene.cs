@@ -5,54 +5,54 @@ using UnityEngine;
 
 public class WorldScene : BaseScene
 {
-    protected override IEnumerator LoadingProcessRoutine()
+    protected override void OnAwake()
     {
-        // LoadTable
-        {
-            Managers.Table.LoadTable<Table.Spawning>();
-            Managers.Table.LoadTable<Table.Spawner>();
-            Managers.Table.LoadTable<Table.Character>();
-            Managers.Table.LoadTable<Table.Stat>();
-        }
+        //// LoadTable
+        //{
+        //    GlobalScene.TableMng.LoadTable<Table.Spawning>();
+        //    GlobalScene.TableMng.LoadTable<Table.Spawner>();
+        //    GlobalScene.TableMng.LoadTable<Table.Character>();
+        //    GlobalScene.TableMng.LoadTable<Table.Stat>();
+        //}
 
-        // SetUI
-        {
-            // Joystick
-            Managers.UI.LoadUI<JoystickUI>();
-            JoystickUI joystickUI = Managers.UI.GetBaseUI<JoystickUI>();
-            joystickUI.CloseUI();
-        }
+        //// SetUI
+        //{
+        //    // Joystick
+        //    GlobalScene.UIMng.LoadUI<JoystickUI>();
+        //    JoystickUI joystickUI = GlobalScene.UIMng.GetBaseUI<JoystickUI>();
+        //    joystickUI.CloseUI();
+        //}
 
-        // Cursor
-        //gameObject.GetOrAddComponent<CursorController>();
+        //// Cursor
+        ////gameObject.GetOrAddComponent<CursorController>();
 
-        // Player
+        //// Player
 
-        //Dictionary<int, Data.StatData> dict = Managers.Data.StatDict;
-        Managers.User.LoadUserData();
-        Managers.Spawn.SetPlayerSpawner();
-        Managers.Spawn.SpawnCharacter(Managers.User.SpawnerID);
-        yield return new WaitUntil(() => Managers.Game.IsGamePlay); // 플레이어가 저장되면 다음 구문으로 이동
+        ////Dictionary<int, Data.StatData> dict = Managers.Data.StatDict;
+        //GlobalScene.UserMng.LoadUserData();
+        //GlobalScene.SpawnMng.SetPlayerSpawner();
+        //GlobalScene.SpawnMng.SpawnCharacter(GlobalScene.UserMng.SpawnerID);
+        //yield return new WaitUntil(() => GlobalScene.GameMng.IsGamePlay); // 플레이어가 저장되면 다음 구문으로 이동
 
-        // Controller
-        Managers.GUI.SetWorldSceneController();
-        yield return null;
+        //// Controller
+        //GlobalScene.GUIMng.SetWorldSceneController();
+        //yield return null;
 
-        // Camera
-        Managers.CameraEX.SetWorldSceneCamera();
-        yield return null;
+        //// Camera
+        //GlobalScene.CameraMng.SetWorldSceneCamera();
+        //yield return null;
 
-        // Monster
-        int tempSpawnerID = 1;
-        Managers.Spawn.SetMonsterSpawner(tempSpawnerID);
+        //// Monster
+        //int tempSpawnerID = 1;
+        //GlobalScene.SpawnMng.SetMonsterSpawner(tempSpawnerID);
     }
 
-    protected override void OpenScene()
+    protected override void OnStart()
     {
-        Managers.GUI.StartJoystickController();
+        GlobalScene.GUIMng.StartJoystickController();
     }
 
-    protected override void CloseScene()
+    protected override void OnDestroy_()
     {
     }
 
