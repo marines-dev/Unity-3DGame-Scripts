@@ -47,7 +47,7 @@ class ScreenCoverUI : BaseUI
         base.InitUI();
     }
 
-    protected override void OpenUIProcess()
+    protected override void OnOpen()
     {
         //yield return null;
         
@@ -55,7 +55,7 @@ class ScreenCoverUI : BaseUI
         UpdateScreenCoverUI(ScreenCoverType.TuchBlocking);
     }
 
-    protected override void CloseUIProcess()
+    protected override void OnClose()
     {
         //yield return null;
 

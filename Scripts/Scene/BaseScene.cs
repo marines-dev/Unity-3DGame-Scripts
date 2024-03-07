@@ -9,14 +9,17 @@ public abstract class BaseScene : MonoBehaviour
 
     protected virtual void Awake()
     {
-        //if (! InitScene.IsInitSceneLoaded && GlobalScene.SceneMng.currentSceneType != Define.Scene.InitScene)
-        //{
-        //    Debug.LogWarning($"게임 초기화를 위해 {typeof(InitScene).Name} 씬으로 이동합니다.");
-
-        //    string sceneName = Define.Scene.InitScene.ToString();
-        //    UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
-        //    return;
-        //}
+        if (!InitScene.IsInitSceneLoaded)
+        {
+            string activeSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            string initSceneName = typeof(InitScene).Name;
+            if(activeSceneName != initSceneName)
+            {
+                Debug.LogWarning($"Failed : 게임 초기화를 위해 {typeof(InitScene).Name} 씬으로 이동합니다.");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(initSceneName);
+                return;
+            }
+        }
 
         OnAwake();
     }

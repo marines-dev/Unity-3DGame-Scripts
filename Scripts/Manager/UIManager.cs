@@ -83,7 +83,7 @@ public class UIManager : BaseManager
         string baseUI_name = typeof(TBaseUI).Name;
         if (baseUI != null)
         {
-            Debug.LogWarning(string.Format("{0} 타입의 BaseUI는 이미 존재합니다.", baseUI_name));
+            Debug.LogWarning($"{baseUI_name} 타입의 BaseUI는 이미 존재합니다.");
             return;
         }
 
@@ -109,7 +109,7 @@ public class UIManager : BaseManager
         BaseUI uiBase = go.GetOrAddComponent<T>();
 
         uiBase.Initialized();
-        uiBase.CloseUI();
+        uiBase.Close();
 
         return Util.GetOrAddComponent<T>(go);
     }
@@ -161,7 +161,7 @@ public class UIManager : BaseManager
         Type type = Type.GetType(_ui_obj.name);
         if (type == null)
         {
-            Debug.LogError(string.Format("{0}는 존재하지 않는 UI 이름입니다.", _ui_obj.name));
+            Debug.LogError($"{_ui_obj.name}는 존재하지 않는 UI 이름입니다.");
             return;
         }
 
@@ -192,7 +192,7 @@ public class UIManager : BaseManager
 
         if (baseUI == null)
         {
-            Debug.LogWarning($"Failed: {typeof(T).Name}의 BaseUI는 등록되어 있지 않습니다. 먼저 {typeof(T).Name}를 로드해 주세요.");
+            Debug.LogWarning($"Failed : {typeof(T).Name}의 BaseUI는 등록되어 있지 않습니다. 먼저 {typeof(T).Name}를 로드해 주세요.");
             return null;
         }
 
@@ -206,7 +206,7 @@ public class UIManager : BaseManager
 
         if (baseUI == null)
         {
-            Debug.LogWarning("얻기 실패 : UIPanel을 찾을 수 없습니다.");
+            Debug.LogWarning("Failed : 얻기 실패 : UIPanel을 찾을 수 없습니다.");
             return null;
         }
 
@@ -239,11 +239,11 @@ public class UIManager : BaseManager
 
         if (uiBase == null)
         {
-            Debug.LogWarning(string.Format("Failed : 열기 위한 {0}의 UI를 찾을 수 없습니다.", _uiName));
+            Debug.LogWarning("Failed : 열기 위한 {0}의 UI를 찾을 수 없습니다.");
             return;
         }
 
-        uiBase.OpenUI();
+        uiBase.Open();
     }
 
     public void CloseBaseUI<T>() where T : BaseUI
@@ -261,7 +261,7 @@ public class UIManager : BaseManager
             return;
         }
 
-        uiBase.CloseUI();
+        uiBase.Close();
     }
 
     public void OpenBaseUIAll()
@@ -276,7 +276,7 @@ public class UIManager : BaseManager
         {
             if (uiBase.gameObject != null)
             {
-                uiBase.OpenUI();
+                uiBase.Open();
             }
         }
     }
@@ -293,7 +293,7 @@ public class UIManager : BaseManager
         {
             if (uiBase != null && uiBase.gameObject != null)
             {
-                uiBase.CloseUI();
+                uiBase.Close();
             }
         }
     }

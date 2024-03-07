@@ -69,7 +69,7 @@ public class TitleScene : BaseScene
         //SetUI
         {
             // TitleUI
-            titleUI.OpenUI();
+            titleUI.Open();
             titleUI.SetTitleUI(currTitleProcessType);
         }
 
@@ -199,10 +199,10 @@ public class TitleScene : BaseScene
 
     IEnumerator LoadGameSceneProcessCoroutine()
     {
-        GlobalScene.SceneMng.LoadScene<WorldScene>();
+        GlobalScene.SceneMng.LoadBaseScene<WorldScene>();
         yield return null;
 
-        titleUI.CloseUI();
+        titleUI.Close();
     }
 
     [Obsolete("테스트")]

@@ -43,7 +43,7 @@ class SampleUI : BaseUI
     }
 
     // Open할 때 실행할 프로세스입니다.
-    protected override void OpenUIProcess()
+    protected override void OnOpen()
     {
         //yield return null;
 
@@ -51,7 +51,7 @@ class SampleUI : BaseUI
     }
 
     // Close할 때 실행할 프로세스입니다.
-    protected override void CloseUIProcess()
+    protected override void OnClose()
     {
         //yield return null;
 

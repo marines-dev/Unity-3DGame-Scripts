@@ -155,7 +155,7 @@ class TitleUI : BaseUI
         base.InitUI();
     }
 
-    protected override void OpenUIProcess()
+    protected override void OnOpen()
     {
         selectAccountType   = LogInManager.AccountType.None;
         debugSelectAble     = true;
@@ -171,7 +171,7 @@ class TitleUI : BaseUI
         OpenTitleUI_Panel_DebugTestPopup();
     }
 
-    protected override void CloseUIProcess()
+    protected override void OnClose()
     {
         //yield return null;
     }

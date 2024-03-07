@@ -24,7 +24,7 @@ public class CameraManager : BaseManager
 
     public void SetWorldSceneCamera()
     {
-        if(GlobalScene.SceneMng.currentSceneType != Define.Scene.WorldScene)
+        if(GlobalScene.SceneMng.IsActiveScene<WorldScene>())
         {
             Debug.LogWarning("");
             return;

@@ -1,22 +1,27 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 
 [Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
 public class SceneManager : BaseManager
 {
-    public Define.Scene currentSceneType { get { return GetStringToSceneType(GetActiveSceneName()); } }
-    public Define.Scene loadingSceneType { get; private set; } = Define.Scene.None;
-    Define.Scene nextSceneType = Define.Scene.None;
+    public string PreSceneName { get; private set; } = string.Empty;
+    public string NextSceneName { get; private set; } = string.Empty;
 
-    public bool isIoading { get; private set; } = false;
+    public string ActiveSceneName { get { return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name; } }
+    //public string LoadSceneName { get { return typeof(LoadScene).Name; } }
+
+    //public bool IsBaseSceneLoading { get; private set; } = false;
+    bool IsBaseSceneLoading  = false;
+
+    //string loadingSceneType = string.Empty;
 
     BaseScene currentScene
     {
         get
         {
-            Type type = Type.GetType(GetActiveSceneName());
+            Type type = Type.GetType(ActiveSceneName);
 
             if (type == null || typeof(BaseScene) != type.BaseType)
             {
@@ -38,24 +43,6 @@ public class SceneManager : BaseManager
         }
     }
 
-    LoadingUI loadingUI_ = null;
-    LoadingUI loadingUI
-    {
-        get
-        {
-            if(loadingUI_ == null)
-            {
-                GlobalScene.UIMng.LoadUI<LoadingUI>();
-                loadingUI_ = GlobalScene.UIMng.GetBaseUI<LoadingUI>();
-            }
-            return loadingUI_;
-        }
-    }
-
-    IEnumerator loadingProcessCoroutine = null;
-    IEnumerator loadSceneAsyncRoutine   = null;
-
-
     protected override void OnAwake() { }
 
     /// <summary>
@@ -63,127 +50,146 @@ public class SceneManager : BaseManager
     /// </summary>
     protected override void OnInit()
     {
-        ClearLoadingProcess();
-
-        //
-        nextSceneType    = Define.Scene.None;
-        loadingSceneType = Define.Scene.None;
-        isIoading = false;
+        PreSceneName = string.Empty;
+        NextSceneName = string.Empty;
+        IsBaseSceneLoading = false;
     }
 
-    public void LoadScene<T>() where T : BaseScene
+    public void LoadBaseScene<TScene>() where TScene : BaseScene
     {
-        if (isIoading)
+        if (IsBaseSceneLoading)
         {
-            Debug.LogWarning("Failed : 씬 로딩 중");
+            Debug.LogWarning($"Failed : 씬 로딩 중");
             return;
         }
 
-        //if (CurrentScene != null && typeof(T) == CurrentScene.GetType())
-        //{
-        //    Debug.LogWarning($"Failed : 로드할 {typeof(T).Name} 씬이 현재 씬과 같습니다.");
-        //    return;
-        //}
+        PreSceneName = ActiveSceneName;
+        NextSceneName = GetBaseSceneToString<TScene>();
 
-        LoadingProcess<T>();
+        string loadSceneName = typeof(LoadScene).Name;
+        UnityEngine.SceneManagement.SceneManager.LoadScene(loadSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
     }
 
-    void LoadingProcess<T>()
+    public bool IsActiveScene<TScene>() where TScene : BaseScene
     {
-        ClearLoadingProcess();
-
-        loadingProcessCoroutine = LoadingProcessCoroutine(typeof(T));
-        StartCoroutine(loadingProcessCoroutine);
+        string sceneName = GetBaseSceneToString<TScene>();
+        return sceneName == ActiveSceneName;
     }
 
-    void ClearLoadingProcess()
+    string GetBaseSceneToString<TScene>() where TScene : BaseScene
     {
-        if (loadingProcessCoroutine != null)
-        {
-            StopCoroutine(loadingProcessCoroutine);
-            loadingProcessCoroutine = null;
-        }
-
-        if(loadSceneAsyncRoutine != null)
-        {
-            StopCoroutine(loadSceneAsyncRoutine);
-            loadSceneAsyncRoutine = null;
-        }
+        return typeof(TScene).Name;
     }
 
-    [Obsolete("테스트 중")]
-    IEnumerator LoadingProcessCoroutine(Type _type)
-    {
-        // Start
-        isIoading     = true;
-        nextSceneType = GetStringToSceneType(_type.Name);
+    //public void LoadScene<T>() where T : BaseScene
+    //{
+    //    if (isIoading)
+    //    {
+    //        Debug.LogWarning("Failed : 씬 로딩 중");
+    //        return;
+    //    }
 
-        GlobalScene.UIMng.CloseBaseUIAll();
-        loadingUI.OpenUI();
-        yield return null;
+    //    //if (CurrentScene != null && typeof(T) == CurrentScene.GetType())
+    //    //{
+    //    //    Debug.LogWarning($"Failed : 로드할 {typeof(T).Name} 씬이 현재 씬과 같습니다.");
+    //    //    return;
+    //    //}
 
-        // LoadScene
-        loadingSceneType        = GetStringToSceneType(typeof(LoadScene).Name);
-        string laodingSceneName = loadingSceneType.ToString();
-        yield return LoadSceneAsyncRoutine(laodingSceneName);
+    //    LoadingProcess<T>();
+    //}
 
-        // NextScene
-        loadingSceneType = nextSceneType;
-        laodingSceneName = loadingSceneType.ToString();
-        yield return LoadSceneAsyncRoutine(laodingSceneName);
+    //void LoadingProcess<T>()
+    //{
+    //    ClearLoadingProcess();
 
-        // Complete
-        Debug.Log($"Success : {currentScene.GetType().Name} 씬 로드를 완료했습니다.");
-        GlobalScene.UIMng.CloseBaseUI<LoadingUI>();
+    //    loadingProcessCoroutine = LoadingProcessCoroutine(typeof(T));
+    //    StartCoroutine(loadingProcessCoroutine);
+    //}
 
-        // 로딩 완료 후 SceneManager 리셋
-        Initialize();
-    }
+    //void ClearLoadingProcess()
+    //{
+    //    if (loadingProcessCoroutine != null)
+    //    {
+    //        StopCoroutine(loadingProcessCoroutine);
+    //        loadingProcessCoroutine = null;
+    //    }
 
-    /// <summary>
-    /// 비동기 방식 씬 로드 함수 입니다.
-    /// </summary>
-    /// <param name="pSceneName"></param>
-    /// <returns></returns>
-    IEnumerator LoadSceneAsyncRoutine(string pSceneName)
-    {
-        //UnityEngine.SceneManagement.SceneManager.LoadScene(_type.Name);
-        AsyncOperation asyncOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(pSceneName);
-        asyncOperation.allowSceneActivation = false;
-        yield return null;
+    //    if(loadSceneAsyncRoutine != null)
+    //    {
+    //        StopCoroutine(loadSceneAsyncRoutine);
+    //        loadSceneAsyncRoutine = null;
+    //    }
+    //}
 
-        Debug.Log($"{pSceneName} | LoadingProgress(Start) : {asyncOperation.progress * 100}%");
-        while (!asyncOperation.isDone)
-        {
-            if (asyncOperation.progress >= 0.9f)
-                asyncOperation.allowSceneActivation = true;
+    //[Obsolete("테스트 중")]
+    //IEnumerator LoadingProcessCoroutine(Type _type)
+    //{
+    //    // Start
+    //    isIoading     = true;
+    //    nextSceneName = _type.Name;
 
-            Debug.Log($"{pSceneName} | LoadProgress(Loading) : {asyncOperation.progress * 100}%");
-            yield return null;
-        }
+    //    GlobalScene.UIMng.CloseBaseUIAll();
+    //    loadingUI.OpenUI();
+    //    yield return null;
 
-        Debug.Log($"{pSceneName} | LoadProgress(Complete) : {asyncOperation.progress * 100}%");
-    }
+    //    // LoadScene
+    //    loadingSceneType = LoadSceneName;
+    //    string laodingSceneName = loadingSceneType.ToString();
+    //    yield return LoadSceneAsyncRoutine(laodingSceneName);
 
-    string GetActiveSceneName()
-    {
-        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-    }
+    //    // NextScene
+    //    loadingSceneType = nextSceneName;
+    //    laodingSceneName = loadingSceneType.ToString();
+    //    yield return LoadSceneAsyncRoutine(laodingSceneName);
 
-    Define.Scene GetStringToSceneType(string pSceneName)
-    {
-        Define.Scene sceneType = Define.Scene.None;
-        try
-        {
-            sceneType = (Define.Scene)Enum.Parse(typeof(Define.Scene), pSceneName);
-        }
-        catch
-        {
-            Debug.LogWarning($"현재 씬은 정의되지 않은 SceneType으로 {currentSceneType.ToString()}입니다.");
-        }
+    //    // Complete
+    //    Debug.Log($"Success : {currentScene.GetType().Name} 씬 로드를 완료했습니다.");
+    //    GlobalScene.UIMng.CloseBaseUI<LoadingUI>();
 
-        return sceneType;
-    }
+    //    // 로딩 완료 후 SceneManager 리셋
+    //    Initialize();
+    //}
+
+    ///// <summary>
+    ///// 비동기 방식 씬 로드 함수 입니다.
+    ///// </summary>
+    ///// <param name="pSceneName"></param>
+    ///// <returns></returns>
+    //IEnumerator LoadSceneAsyncRoutine(string pSceneName)
+    //{
+    //    //UnityEngine.SceneManagement.SceneManager.LoadScene(_type.Name);
+    //    AsyncOperation asyncOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(pSceneName);
+    //    asyncOperation.allowSceneActivation = false;
+    //    yield return null;
+
+    //    Debug.Log($"{pSceneName} | LoadingProgress(Start) : {asyncOperation.progress * 100}%");
+    //    while (!asyncOperation.isDone)
+    //    {
+    //        if (asyncOperation.progress >= 0.9f)
+    //            asyncOperation.allowSceneActivation = true;
+
+    //        Debug.Log($"{pSceneName} | LoadProgress(Loading) : {asyncOperation.progress * 100}%");
+    //        yield return null;
+    //    }
+
+    //    Debug.Log($"{pSceneName} | LoadProgress(Complete) : {asyncOperation.progress * 100}%");
+    //}
+
+
+    //Define.Scene GetStringToSceneType(string pSceneName)
+    //{
+    //    Define.Scene sceneType = Define.Scene.None;
+    //    try
+    //    {
+    //        sceneType = (Define.Scene)Enum.Parse(typeof(Define.Scene), pSceneName);
+    //    }
+    //    catch
+    //    {
+    //        Debug.LogWarning($"현재 씬은 정의되지 않은 SceneType으로 {ActiveSceneName.ToString()}입니다.");
+    //    }
+
+    //    return sceneType;
+    //}
 
     //BaseScene GetCurrentBaseScene()
     //{

@@ -39,14 +39,14 @@ class LoadingUI : BaseUI
         base.InitUI();
     }
 
-    protected override void OpenUIProcess()
+    protected override void OnOpen()
     {
         //yield return null;
 
         //
     }
 
-    protected override void CloseUIProcess()
+    protected override void OnClose()
     {
         //yield return null;
 

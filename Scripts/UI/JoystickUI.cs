@@ -66,7 +66,7 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
         base.InitUI();
     }
 
-    protected override void OpenUIProcess()
+    protected override void OnOpen()
     {
         //
         RectTransform joystickRectTrans = GetControlComponent<RectTransform>(Control.JoystickUI_Image_JoystickArea);
@@ -89,7 +89,7 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
     }
 
     // Close할 때 실행할 프로세스입니다.
-    protected override void CloseUIProcess()
+    protected override void OnClose()
     {
         isAttackButtonPressed   = false;
         beginPos                = Vector3.zero;

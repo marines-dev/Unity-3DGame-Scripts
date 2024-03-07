@@ -15,7 +15,7 @@ public abstract class BaseUI : MonoBehaviour
     GameObject uiObj = null;
     IEnumerator openUICoroutine = null;
 
-    public void OpenUI()
+    public void Open()
     {
         if (gameObject.activeSelf == false)
         {
@@ -25,12 +25,12 @@ public abstract class BaseUI : MonoBehaviour
         //UIManager_Test.instance.OpenUI<ScreenCoverUI>();
         //UIManager_Test.instance.GetUI<ScreenCoverUI>().SetScreeConverUI(ScreenCoverUI.ScreenCoverType.LoadingData);
 
-        OpenUIProcess();
+        OnOpen();
 
         //UIManager_Test.instance.CloseUI<ScreenCoverUI>();
     }
 
-    public void CloseUI()
+    public void Close()
     {
         if (gameObject.activeSelf == true)
         {
@@ -40,7 +40,7 @@ public abstract class BaseUI : MonoBehaviour
         //UIManager_Test.instance.OpenUI<ScreenCoverUI>();
         //UIManager_Test.instance.GetUI<ScreenCoverUI>().SetScreeConverUI(ScreenCoverUI.ScreenCoverType.LoadingData);
 
-        CloseUIProcess();
+        OnClose();
 
         //UIManager_Test.instance.CloseUI<ScreenCoverUI>();
     }
@@ -82,8 +82,8 @@ public abstract class BaseUI : MonoBehaviour
     }
 
     protected virtual void InitUI() { }
-    protected abstract void OpenUIProcess();
-    protected abstract void CloseUIProcess();
+    protected abstract void OnOpen();
+    protected abstract void OnClose();
     protected Transform GetControlTrans(Define _enum)
     {
         int uiIndex = Convert.ToInt32(_enum);

@@ -21,7 +21,7 @@ public class InitScene : BaseScene
 
     protected override void OnStart()
     {
-        GlobalScene.SceneMng.LoadScene<TitleScene>();
+        GlobalScene.SceneMng.LoadBaseScene<TitleScene>();
     }
 
     protected override void OnDestroy_()

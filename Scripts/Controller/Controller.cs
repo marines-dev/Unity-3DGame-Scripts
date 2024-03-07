@@ -42,7 +42,7 @@ public class Controller : MonoBehaviour, IJoystickHandler
     void Start()
     {
         joystickUI_ = GlobalScene.UIMng.GetBaseUI<JoystickUI>();
-        joystickUI_.CloseUI();
+        joystickUI_.Close();
 
         //
         joystickUI_.SetJoystickController(OnJoystickAttackButtionAction);
@@ -54,7 +54,7 @@ public class Controller : MonoBehaviour, IJoystickHandler
 
         if (joystickUI_ != null)
         {
-            joystickUI_.CloseUI();
+            joystickUI_.Close();
             joystickUI_ = null;
         }
     }
@@ -75,13 +75,13 @@ public class Controller : MonoBehaviour, IJoystickHandler
 
     public void StartController()
     {
-        joystickUI.OpenUI();
+        joystickUI.Open();
         FixedUpdateJoystickController();
     }
 
     public void ExitController()
     {
-        joystickUI.CloseUI();
+        joystickUI.Close();
         ClearFixedUpdateJoystickControllerCoroutine();
     }
 
@@ -132,7 +132,7 @@ public class Controller : MonoBehaviour, IJoystickHandler
 
         //
         Debug.Log("JoystickController Á¾·á");
-        joystickUI.CloseUI();
+        joystickUI.Close();
     }
 
     #endregion Joystick

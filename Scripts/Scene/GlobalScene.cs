@@ -1,5 +1,29 @@
+using System.Collections.Generic;
 using UnityEngine;
 
+public class ManagerLoader : MonoBehaviour
+{
+    static HashSet<BaseManager> manager_hashSet = new HashSet<BaseManager>();
+
+    public T CreateManager<T>() where T : BaseManager
+    {
+        T manager = GlobalScene.CreateGlobalHandler<T>(transform);
+        manager_hashSet.Add(manager);
+
+        return manager;
+    }
+
+    public void InitManagers()
+    {
+        foreach (BaseManager manager in manager_hashSet)
+        {
+            if (manager != null)
+            {
+                manager.Initialize();
+            }
+        }
+    }
+}
 
 public class GlobalScene : BaseScene
 {
@@ -13,170 +37,184 @@ public class GlobalScene : BaseScene
         }
     }
 
+    private ManagerLoader mngLoader = null;
+    public static ManagerLoader MngLoader
+    {
+        get
+        {
+            if (Instance.mngLoader == null)
+            {
+                Instance.mngLoader = CreateGlobalHandler<ManagerLoader>();
+            }
+
+            return Instance.mngLoader;
+        }
+    }
+
     #region Manager
 
-    SceneManager sceneMng = null;
+    private SceneManager sceneMng = null;
     public static SceneManager SceneMng
     {
         get
         {
             if (Instance.sceneMng == null)
             {
-                Instance.sceneMng = Instance.CreateGlobalManager<SceneManager>();
+                Instance.sceneMng = Instance.mngLoader.CreateManager<SceneManager>();
             }
 
             return Instance.sceneMng;
         }
     }
 
-    CameraManager cameraMng = null;
+    private CameraManager cameraMng = null;
     public static CameraManager CameraMng
     {
         get
         {
             if (Instance.cameraMng == null)
             {
-                Instance.cameraMng = Instance.CreateGlobalManager<CameraManager>();
+                Instance.cameraMng = Instance.mngLoader.CreateManager<CameraManager>();
             }
 
             return Instance.cameraMng;
         }
     }
 
-    GameManagerEX gameMng = null;
+    private GameManagerEX gameMng = null;
     public static GameManagerEX GameMng
     {
         get
         {
             if (Instance.gameMng == null)
             {
-                Instance.gameMng = Instance.CreateGlobalManager<GameManagerEX>();
+                Instance.gameMng = Instance.mngLoader.CreateManager<GameManagerEX>();
             }
 
             return Instance.gameMng;
         }
     }
 
-    ResourceManager resourceMng = null;
+    private ResourceManager resourceMng = null;
     public static ResourceManager ResourceMng
     {
         get
         {
             if (Instance.resourceMng == null)
             {
-                Instance.resourceMng = Instance.CreateGlobalManager<ResourceManager>();
+                Instance.resourceMng = Instance.mngLoader.CreateManager<ResourceManager>();
             }
 
             return Instance.resourceMng;
         }
     }
 
-    UIManager uiMng = null;
+    private UIManager uiMng = null;
     public static UIManager UIMng
     {
         get
         {
             if (Instance.uiMng == null)
             {
-                Instance.uiMng = Instance.CreateGlobalManager<UIManager>();
+                Instance.uiMng = Instance.mngLoader.CreateManager<UIManager>();
             }
 
             return Instance.uiMng;
         }
     }
 
-    BackendManager backendMng = null;
+    private BackendManager backendMng = null;
     public static BackendManager BackendMng
     {
         get
         {
             if (Instance.backendMng == null)
             {
-                Instance.backendMng = Instance.CreateGlobalManager<BackendManager>();
+                Instance.backendMng = Instance.mngLoader.CreateManager<BackendManager>();
             }
 
             return Instance.backendMng;
         }
     }
 
-    GPGSManager gpgsMng = null;
+    private GPGSManager gpgsMng = null;
     public static GPGSManager GPGSMng
     {
         get
         {
             if (Instance.gpgsMng == null)
             {
-                Instance.gpgsMng = Instance.CreateGlobalManager<GPGSManager>();
+                Instance.gpgsMng = Instance.mngLoader.CreateManager<GPGSManager>();
             }
 
             return Instance.gpgsMng;
         }
     }
 
-    LogInManager logInMng = null;
+    private LogInManager logInMng = null;
     public static LogInManager LogInMng
     {
         get
         {
             if (Instance.logInMng == null)
             {
-                Instance.logInMng = Instance.CreateGlobalManager<LogInManager>();
+                Instance.logInMng = Instance.mngLoader.CreateManager<LogInManager>();
             }
 
             return Instance.logInMng;
         }
     }
 
-    TableManager tableMng = null;
+    private TableManager tableMng = null;
     public static TableManager TableMng
     {
         get
         {
             if (Instance.tableMng == null)
             {
-                Instance.tableMng = Instance.CreateGlobalManager<TableManager>();
+                Instance.tableMng = Instance.mngLoader.CreateManager<TableManager>();
             }
 
             return Instance.tableMng;
         }
     }
 
-    SpawnManager spawnMng = null;
+    private SpawnManager spawnMng = null;
     public static SpawnManager SpawnMng
     {
         get
         {
             if (Instance.spawnMng == null)
             {
-                Instance.spawnMng = Instance.CreateGlobalManager<SpawnManager>();
+                Instance.spawnMng = Instance.mngLoader.CreateManager<SpawnManager>();
             }
 
             return Instance.spawnMng;
         }
     }
 
-    UserManager userMng = null;
+    private UserManager userMng = null;
     public static UserManager UserMng
     {
         get
         {
             if (Instance.userMng == null)
             {
-                Instance.userMng = Instance.CreateGlobalManager<UserManager>();
+                Instance.userMng = Instance.mngLoader.CreateManager<UserManager>();
             }
 
             return Instance.userMng;
         }
     }
 
-    GUIManager guiMng = null;
+    private GUIManager guiMng = null;
     public static GUIManager GUIMng
     {
         get
         {
             if (Instance.guiMng == null)
             {
-                Instance.guiMng = Instance.CreateGlobalManager<GUIManager>();
+                Instance.guiMng = Instance.mngLoader.CreateManager<GUIManager>();
             }
 
             return Instance.guiMng;
@@ -201,21 +239,46 @@ public class GlobalScene : BaseScene
 
     public static void CreateGlobalScene()
     {
-        instance = FindObjectOfType<GlobalScene>();
-        // Destroy(InitScene에 진입했을 때 GlobalScene을 다시 생성하기 위함)
-        if (instance != null && instance.gameObject != null)
+        instance = CreateGlobalHandler<GlobalScene>();
+    }
+
+    public static T CreateGlobalHandler<T>(Transform pTran = null) where T : Component
+    {
+        T handler = FindObjectOfType<T>();
+        if (handler != null && handler.gameObject != null)
         {
-            Destroy(instance.gameObject);
+            Destroy(handler.gameObject);
         }
 
-        string name = $"@{typeof(GlobalScene).Name}";
-        instance = new GameObject(name).AddComponent<GlobalScene>();
+        string handlerName = $"@{typeof(T).Name}";
+        handler = new GameObject(handlerName).AddComponent<T>();
+        // Global
+        DontDestroyOnLoad(handler);
 
-        DontDestroyOnLoad(instance);
+        handler.transform.localPosition = Vector3.zero;
+        handler.transform.localRotation = Quaternion.identity;
+        handler.transform.SetParent(pTran);
+
+        handler.gameObject.SetActive(true);
+
+        return handler;
     }
+
+    //public static Component CreateHandler(Type pType, Transform pTran = null)
+    //{
+    //    string handlerName = $"@{pType}";
+    //    GameObject go = new GameObject(handlerName);
+    //    go.transform.SetParent(pTran);
+    //    go.transform.localPosition = Vector3.zero;
+    //    go.transform.localRotation = Quaternion.identity;
+    //    go.SetActive(true);
+
+    //    return go.AddComponent(pType);
+    //}
 
     protected override void Awake()
     {
+        // Instance
         lock (lockObject)
         {
             if (instance == null)
@@ -233,25 +296,26 @@ public class GlobalScene : BaseScene
 
     protected override void OnAwake()
     {
-        sceneMng = CreateGlobalManager<SceneManager>();
+        // LoadMngRepository
+        mngLoader = CreateGlobalHandler<ManagerLoader>();
+
+        // ResisteredManagers
+        sceneMng = mngLoader.CreateManager<SceneManager>();
+        gameMng = mngLoader.CreateManager<GameManagerEX>();
+        cameraMng = mngLoader.CreateManager<CameraManager>();
+        resourceMng = mngLoader.CreateManager<ResourceManager>();
+        tableMng = mngLoader.CreateManager<TableManager>();
+        uiMng = mngLoader.CreateManager<UIManager>();
+        guiMng = mngLoader.CreateManager<GUIManager>();
+        backendMng = mngLoader.CreateManager<BackendManager>();
+        gpgsMng = mngLoader.CreateManager<GPGSManager>();
+        logInMng = mngLoader.CreateManager<LogInManager>();
+        userMng = mngLoader.CreateManager<UserManager>();
+        //inputMng = mngLoader.CreateManager<InputManager>();
+        spawnMng = mngLoader.CreateManager<SpawnManager>();
+
     }
 
     protected override void OnStart() { }
     protected override void OnDestroy_() { }
-
-    T CreateGlobalManager<T>() where T : BaseManager
-    {
-        T manager = GameObject.FindObjectOfType<T>();
-        if (manager != null && manager.gameObject != null)
-        {
-            Destroy(manager.gameObject);
-        }
-
-        string name = $"@{typeof(T).Name}";
-        manager = new GameObject(name).AddComponent<T>();
-
-        manager.transform.SetParent(Instance.transform);
-
-        return manager;
-    }
 }

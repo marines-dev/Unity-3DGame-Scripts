@@ -249,7 +249,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
 
     void SetHPBarUI()
     {
-        hPBarUI.OpenUI();
+        hPBarUI.Open();
         FixedUpdateHPBarProcess();
     }
 
@@ -383,7 +383,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
         //
         ClearFixedUpdateHPBarPorcess();
         if (hPBarUI != null)
-            hPBarUI.CloseUI();
+            hPBarUI.Close();
     }
 
     void ClearFixedUpdateHPBarPorcess()
@@ -589,7 +589,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
         DestroyHPBarUI();
 
         hPBarUI = GlobalScene.UIMng.CreateWorldSpaceUI<HPBarUI>(transform);
-        hPBarUI.OpenUI();
+        hPBarUI.Open();
     }
 
     void DestroyHPBarUI()

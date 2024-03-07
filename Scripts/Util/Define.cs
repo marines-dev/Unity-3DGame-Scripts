@@ -2,17 +2,17 @@
 
 public class Define
 {
-    public enum Scene
-    {
-        // ※씬 이름과 동일해야 합니다.
-        None,
-        InitScene,
-        LoadScene,
-        TitleScene,
-        WorldScene,
-        Login,
-        //SampleScene,
-    }
+    //public enum Scene
+    //{
+    //    // ※씬 이름과 동일해야 합니다.
+    //    None,
+    //    InitScene,
+    //    LoadScene,
+    //    TitleScene,
+    //    WorldScene,
+    //    Login,
+    //    //SampleScene,
+    //}
 
     public enum Prefabs
     {
