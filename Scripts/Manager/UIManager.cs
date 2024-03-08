@@ -11,56 +11,21 @@ public class UIManager : BaseManager
     Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
     //List<BaseUI> LoadedBaseUI_list = new List<BaseUI>();
 
-    Canvas canvas = null;
-    public Canvas Canvas
-    {
-        get
-        {
-            if (canvas == null)
-            {
-                LoadCanvas();
-            }
-            return canvas;
-        }
-    }
-
-    UnityEngine.EventSystems.EventSystem eventSystem_go_ = null;
-    public UnityEngine.EventSystems.EventSystem eventSystem_go
-    {
-        get
-        {
-            if (eventSystem_go_ == null)
-            {
-                LoadEventSystem();
-            }
-
-            return eventSystem_go_;
-        }
-    }
-
-    GameObject uiStorage_go_;
-    GameObject UIStorage
-    {
-        get
-        {
-            if (uiStorage_go_ == null)
-            {
-                LoadUIStorage();
-            }
-
-            return uiStorage_go_;
-        }
-    }
+    Canvas canvas_ref = null;
+    UnityEngine.EventSystems.EventSystem eventSystem_ref = null;
 
 
     protected override void OnAwake()
     {
-        LoadCanvas();
-        LoadEventSystem();
-        LoadUIStorage();
     }
 
     protected override void OnInit() { }
+
+    public void SetUIManager(Canvas pCanvas, UnityEngine.EventSystems.EventSystem pEventSystem)
+    {
+        canvas_ref = pCanvas;
+        eventSystem_ref = pEventSystem;
+    }
 
     #region BaseUI
 
@@ -74,7 +39,7 @@ public class UIManager : BaseManager
 
         string uiName = typeof(T).Name;
         string path = $"Prefabs/UI/{uiName}";
-        baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas.transform).GetOrAddComponent<T>();
+        baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas_ref.transform).GetOrAddComponent<T>();
         baseUI.Close();
 
         baseUI_dic.Add(uiName, baseUI);
@@ -95,7 +60,7 @@ public class UIManager : BaseManager
             return baseUI;
         }
 
-        baseUI = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/{pType}", canvas.transform).GetOrAddComponent(pType) as IBaseUI;
+        baseUI = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/{pType}", canvas_ref.transform).GetOrAddComponent(pType) as IBaseUI;
         baseUI.Close();
 
         string uiName = pType.Name;
@@ -182,61 +147,6 @@ public class UIManager : BaseManager
 
     #region Load
 
-    void LoadCanvas()
-    {
-        if (canvas != null)
-            return;
-
-        canvas = GameObject.FindObjectOfType<Canvas>();
-        if (canvas == null)
-        {
-            canvas = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/Canvas").GetComponent<Canvas>();
-
-        }
-
-        string go_name = $"@{typeof(Canvas).Name}";
-        canvas.gameObject.name = go_name;
-        canvas.gameObject.SetActive(true);
-
-        //
-        DontDestroyOnLoad(canvas);
-    }
-
-    [Obsolete("테스트 중")]
-    void LoadEventSystem()
-    {
-        if (eventSystem_go_ != null)
-            return;
-
-        eventSystem_go_ = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
-        if (eventSystem_go_ == null)
-        {
-            eventSystem_go_ = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
-        }
-
-        string go_name = $"@{typeof(UnityEngine.EventSystems.EventSystem).Name}";
-        eventSystem_go_.gameObject.name = go_name;
-        eventSystem_go_.gameObject.SetActive(true);
-
-        //
-        DontDestroyOnLoad(eventSystem_go_);
-    }
-
-    void LoadUIStorage()
-    {
-        if (uiStorage_go_ != null)
-            return;
-
-        uiStorage_go_ = Canvas.transform.Find(Config.ui_uiStorageName).gameObject;
-        if (uiStorage_go_ == null)
-        {
-            uiStorage_go_ = GlobalScene.ResourceMng.CreateGameObject(Config.ui_uiStorageName, Canvas.transform);
-        }
-
-        //
-        DontDestroyOnLoad(uiStorage_go_);
-    }
-
     //string FindBaseUIPath(Define.Resource pResourceType, string pResourceName)
     //{
     //    switch (pResourceType)
@@ -263,6 +173,46 @@ public class UIManager : BaseManager
 
     //    Debug.LogWarning($"Failed : ");
     //    return string.Empty;
+    //}
+
+    //void LoadCanvas()
+    //{
+    //    if (canvas != null)
+    //        return;
+
+    //    canvas = GameObject.FindObjectOfType<Canvas>();
+    //    if (canvas == null)
+    //    {
+    //        canvas = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/Canvas").GetComponent<Canvas>();
+
+    //    }
+
+    //    string go_name = $"@{typeof(Canvas).Name}";
+    //    canvas.gameObject.name = go_name;
+    //    canvas.gameObject.SetActive(true);
+
+    //    //
+    //    DontDestroyOnLoad(canvas);
+    //}
+
+    //[Obsolete("테스트 중")]
+    //void LoadEventSystem()
+    //{
+    //    if (eventSystem_go_ != null)
+    //        return;
+
+    //    eventSystem_go_ = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+    //    if (eventSystem_go_ == null)
+    //    {
+    //        eventSystem_go_ = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
+    //    }
+
+    //    string go_name = $"@{typeof(UnityEngine.EventSystems.EventSystem).Name}";
+    //    eventSystem_go_.gameObject.name = go_name;
+    //    eventSystem_go_.gameObject.SetActive(true);
+
+    //    //
+    //    DontDestroyOnLoad(eventSystem_go_);
     //}
 
     #endregion Load

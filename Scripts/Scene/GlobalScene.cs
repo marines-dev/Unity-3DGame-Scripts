@@ -39,19 +39,75 @@ public class GlobalScene : BaseScene
     }
 
     /// <summary>
-    /// Manager
+    /// GlobalObject
     /// </summary>
-    private ManagerLoader mngLoader = null;
-    public static ManagerLoader MngLoader
+    Camera mainCamera = null;
+    Camera MainCamera
     {
         get
         {
-            if (Instance.mngLoader == null)
+            if (mainCamera == null)
             {
-                Instance.mngLoader = CreateGlobalObject<ManagerLoader>();
+                mainCamera = ResisteredGlobalObject<Camera>(mainCamera);
+            }
+            return mainCamera;
+        }
+    }
+
+
+    Canvas mainCanvas = null;
+    Canvas MainCanvas
+    {
+        get
+        {
+            if (mainCanvas == null)
+            {
+                mainCanvas = ResisteredGlobalObject<Canvas>(mainCanvas);
+            }
+            return mainCanvas;
+        }
+    }
+
+    UnityEngine.EventSystems.EventSystem mainEventSystem = null;
+    UnityEngine.EventSystems.EventSystem MainEventSystem
+    {
+        get
+        {
+            if (mainEventSystem == null)
+            {
+                mainEventSystem = ResisteredGlobalObject<UnityEngine.EventSystems.EventSystem>(mainEventSystem);
+            }
+            return mainEventSystem;
+        }
+    }
+
+    Light mainLight = null;
+    [Obsolete("임시")] Light MainLight
+    {
+        get
+        {
+            if (mainLight == null)
+            {
+                mainLight = ResisteredGlobalObject<Light>(mainLight);
+            }
+            return mainLight;
+        }
+    }
+
+    /// <summary>
+    /// Manager
+    /// </summary>
+    private ManagerLoader mngLoader = null;
+    private ManagerLoader MngLoader
+    {
+        get
+        {
+            if (mngLoader == null)
+            {
+                mngLoader = CreateGlobalObject<ManagerLoader>();
             }
 
-            return Instance.mngLoader;
+            return mngLoader;
         }
     }
 
@@ -281,18 +337,22 @@ public class GlobalScene : BaseScene
 
     protected override void OnAwake()
     {
-        // LoadMngRepository
+        ///
+        ResisteredGlobalObjs();
+
+        /// LoadMngRepository
         mngLoader = CreateGlobalObject<ManagerLoader>();
 
-        // ResisteredManagers
+        /// ResisteredManagers
         sceneMng = mngLoader.CreateManager<SceneManager>();
-        SceneMng.SetSceneManager(UnloadEvent, LoadEvent);
+        //SceneMng.SetSceneManager(UnloadEvent, LoadEvent);
         gameMng = mngLoader.CreateManager<GameManagerEX>();
         cameraMng = mngLoader.CreateManager<CameraManager>();
+        CameraMng.SetCameraManager(MainCamera);
         resourceMng = mngLoader.CreateManager<ResourceManager>();
         tableMng = mngLoader.CreateManager<TableManager>();
         uiMng = mngLoader.CreateManager<UIManager>();
-        //uiMng.SetUIManager(MainCanvas);
+        uiMng.SetUIManager(MainCanvas, MainEventSystem);
         guiMng = mngLoader.CreateManager<GUIManager>();
         backendMng = mngLoader.CreateManager<BackendManager>();
         gpgsMng = mngLoader.CreateManager<GPGSManager>();
@@ -301,27 +361,66 @@ public class GlobalScene : BaseScene
         //inputMng = mngLoader.CreateManager<InputManager>();
         spawnMng = mngLoader.CreateManager<SpawnManager>();
 
+        /// SceneMng
+        SceneMng.RemoveSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
+        SceneMng.AddSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
     }
 
     protected override void OnStart() { }
     protected override void OnDestroy_() { }
 
-    void UnloadEvent()
+    void OnSceneUnloaded(UnityEngine.SceneManagement.Scene pScene)
     {
         MngLoader.InitManagers();
+        Debug.Log("Success : OnSceneUnloaded");
     }
 
-    void LoadEvent()
+    void OnSceneLoaded(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
     {
-        //Camera[] allCameras = Camera.allCameras;
-        //Debug.Log($"Test1 : 카메라 개수 - {allCameras.Length}");
-        //foreach (Camera camera in allCameras)
-        //{
-        //    Destroy(camera.gameObject);
-        //}
-        //Debug.Log($"Test2 : 카메라 개수 - {allCameras.Length}");
+        ResisteredGlobalObjs();
+        Debug.Log("Success : OnSceneLoaded");
+    }
 
-        //GameObject newCameraObject = new GameObject("@Main Camera");
-        //Camera newCamera = newCameraObject.AddComponent<Camera>();
+    //void UnloadEvent()
+    //{
+    //    MngLoader.InitManagers();
+    //}
+
+    //void LoadEvent()
+    //{
+    //    ResisteredGlobalObjs();
+    //}
+
+    void ResisteredGlobalObjs()
+    {
+        mainCamera = ResisteredGlobalObject<Camera>(mainCamera);
+        mainCanvas = ResisteredGlobalObject<Canvas>(mainCanvas);
+        mainEventSystem = ResisteredGlobalObject<UnityEngine.EventSystems.EventSystem>(mainEventSystem);
+        mainLight = ResisteredGlobalObject<Light>(mainLight);
+    }
+
+    T ResisteredGlobalObject<T>(T pGlobalObj) where T : Component
+    {
+        if (pGlobalObj == null)
+        {
+            pGlobalObj = FindObjectOfType<T>();
+            pGlobalObj.gameObject.name = $"@{typeof(T).Name}";
+
+            ///
+            DontDestroyOnLoad(pGlobalObj);
+        }
+
+        /// 중복 검사
+        T[] go_arr = FindObjectsOfType<T>();
+        Debug.Log($"{typeof(T).Name} 개수 : {go_arr.Length}");
+        foreach (T go in go_arr)
+        {
+            if (go != null && pGlobalObj != go)
+            {
+                Destroy(go.gameObject);
+            }
+        }
+
+        return pGlobalObj;
     }
 }

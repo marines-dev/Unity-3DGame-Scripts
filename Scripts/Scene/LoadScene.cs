@@ -71,7 +71,6 @@ public class LoadScene : BaseScene
         /// UnloadScene
         {
             yield return UnloadSceneAsync(preSceneName);
-
             //GlobalScene.SceneMng.UnloadPreScene();
             yield return null;
 
@@ -87,8 +86,7 @@ public class LoadScene : BaseScene
 
             SetActiveScene(nextSceneName);
             //GlobalScene.SceneMng.GetOrCreateActiveScene();
-
-            GlobalScene.SceneMng.LoadNextScene();
+            //GlobalScene.SceneMng.LoadNextScene();
             yield return null;
 
             string loadSceneName = typeof(LoadScene).Name;
