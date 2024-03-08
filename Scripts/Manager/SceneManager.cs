@@ -43,6 +43,9 @@ public class SceneManager : BaseManager
         }
     }
 
+    Action sceneUnloadEvent = null;
+    Action sceneLoadEvent = null;
+
     protected override void OnAwake() { }
 
     /// <summary>
@@ -53,6 +56,40 @@ public class SceneManager : BaseManager
         PreSceneName = string.Empty;
         NextSceneName = string.Empty;
         IsBaseSceneLoading = false;
+    }
+
+    public void SetSceneManager(Action pSceneUnloadEvent, Action pSceneLoadEvent)
+    {
+        sceneUnloadEvent = pSceneUnloadEvent;
+        sceneLoadEvent = pSceneLoadEvent;
+    }
+
+    public void UnloadPreScene()
+    {
+        //if (! IsBaseSceneLoading)
+        //{
+        //    Debug.LogWarning($"Failed :");
+        //    return;
+        //}
+
+        if( sceneUnloadEvent != null )
+        {
+            sceneUnloadEvent.Invoke();
+        }
+    }
+
+    public void LoadNextScene()
+    {
+        //if (! IsBaseSceneLoading)
+        //{
+        //    Debug.LogWarning($"Failed :");
+        //    return;
+        //}
+
+        if (sceneLoadEvent != null)
+        {
+            sceneLoadEvent.Invoke();
+        }
     }
 
     public void LoadBaseScene<TScene>() where TScene : BaseScene

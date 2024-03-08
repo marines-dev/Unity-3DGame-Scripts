@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public class ManagerLoader : MonoBehaviour
 
     public T CreateManager<T>() where T : BaseManager
     {
-        T manager = GlobalScene.CreateGlobalHandler<T>(transform);
+        T manager = GlobalScene.CreateGlobalObject<T>(transform);
         manager_hashSet.Add(manager);
 
         return manager;
@@ -37,6 +38,9 @@ public class GlobalScene : BaseScene
         }
     }
 
+    /// <summary>
+    /// Manager
+    /// </summary>
     private ManagerLoader mngLoader = null;
     public static ManagerLoader MngLoader
     {
@@ -44,7 +48,7 @@ public class GlobalScene : BaseScene
         {
             if (Instance.mngLoader == null)
             {
-                Instance.mngLoader = CreateGlobalHandler<ManagerLoader>();
+                Instance.mngLoader = CreateGlobalObject<ManagerLoader>();
             }
 
             return Instance.mngLoader;
@@ -239,10 +243,10 @@ public class GlobalScene : BaseScene
 
     public static void CreateGlobalScene()
     {
-        instance = CreateGlobalHandler<GlobalScene>();
+        instance = CreateGlobalObject<GlobalScene>();
     }
 
-    public static T CreateGlobalHandler<T>(Transform pTran = null) where T : Component
+    public static T CreateGlobalObject<T>(Transform pParent = null) where T : Component
     {
         T handler = FindObjectOfType<T>();
         if (handler != null && handler.gameObject != null)
@@ -250,31 +254,12 @@ public class GlobalScene : BaseScene
             Destroy(handler.gameObject);
         }
 
-        string handlerName = $"@{typeof(T).Name}";
-        handler = new GameObject(handlerName).AddComponent<T>();
-        // Global
-        DontDestroyOnLoad(handler);
+        handler = Util.CreateGameObject<T>();
+        GameObject.DontDestroyOnLoad(handler);
 
-        handler.transform.localPosition = Vector3.zero;
-        handler.transform.localRotation = Quaternion.identity;
-        handler.transform.SetParent(pTran);
-
-        handler.gameObject.SetActive(true);
-
+        handler.transform.SetParent(pParent);
         return handler;
     }
-
-    //public static Component CreateHandler(Type pType, Transform pTran = null)
-    //{
-    //    string handlerName = $"@{pType}";
-    //    GameObject go = new GameObject(handlerName);
-    //    go.transform.SetParent(pTran);
-    //    go.transform.localPosition = Vector3.zero;
-    //    go.transform.localRotation = Quaternion.identity;
-    //    go.SetActive(true);
-
-    //    return go.AddComponent(pType);
-    //}
 
     protected override void Awake()
     {
@@ -297,15 +282,17 @@ public class GlobalScene : BaseScene
     protected override void OnAwake()
     {
         // LoadMngRepository
-        mngLoader = CreateGlobalHandler<ManagerLoader>();
+        mngLoader = CreateGlobalObject<ManagerLoader>();
 
         // ResisteredManagers
         sceneMng = mngLoader.CreateManager<SceneManager>();
+        SceneMng.SetSceneManager(UnloadEvent, LoadEvent);
         gameMng = mngLoader.CreateManager<GameManagerEX>();
         cameraMng = mngLoader.CreateManager<CameraManager>();
         resourceMng = mngLoader.CreateManager<ResourceManager>();
         tableMng = mngLoader.CreateManager<TableManager>();
         uiMng = mngLoader.CreateManager<UIManager>();
+        //uiMng.SetUIManager(MainCanvas);
         guiMng = mngLoader.CreateManager<GUIManager>();
         backendMng = mngLoader.CreateManager<BackendManager>();
         gpgsMng = mngLoader.CreateManager<GPGSManager>();
@@ -318,4 +305,23 @@ public class GlobalScene : BaseScene
 
     protected override void OnStart() { }
     protected override void OnDestroy_() { }
+
+    void UnloadEvent()
+    {
+        MngLoader.InitManagers();
+    }
+
+    void LoadEvent()
+    {
+        //Camera[] allCameras = Camera.allCameras;
+        //Debug.Log($"Test1 : 카메라 개수 - {allCameras.Length}");
+        //foreach (Camera camera in allCameras)
+        //{
+        //    Destroy(camera.gameObject);
+        //}
+        //Debug.Log($"Test2 : 카메라 개수 - {allCameras.Length}");
+
+        //GameObject newCameraObject = new GameObject("@Main Camera");
+        //Camera newCamera = newCameraObject.AddComponent<Camera>();
+    }
 }

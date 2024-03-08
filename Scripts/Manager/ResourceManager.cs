@@ -7,7 +7,7 @@ public class ResourceManager : BaseManager
     protected override void OnAwake() { }
     protected override void OnInit() { }
 
-    public T LoadResource<T>(string path) where T : UnityEngine.Object
+    public T Load<T>(string path) where T : UnityEngine.Object
     {
         if (typeof(T) == typeof(GameObject))
         {
@@ -24,9 +24,9 @@ public class ResourceManager : BaseManager
         return Resources.Load<T>(path);
     }
 
-    public GameObject InstantiateResource(string path, Transform parent = null)
+    public GameObject Instantiate(string path, Transform parent = null)
     {
-        GameObject original = LoadResource<GameObject>(path);
+        GameObject original = Load<GameObject>(path);
         if (original == null)
         {
             Debug.LogError($"Failed to load prefab : {path}");

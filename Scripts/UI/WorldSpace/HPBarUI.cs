@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HPBarUI : BaseUI
+public class HPBarUI : BaseUI<HPBarUI.UI>
 {
-    enum Control
+    public enum UI
     {
         /// <sammary>
         /// SampleUI
@@ -27,25 +27,15 @@ public class HPBarUI : BaseUI
     //Transform parent;
     //Stat stat;
 
-    protected override void BindControls()
-    {
-        base.BindControls();
-
-        // Control을 연결합니다.
-        BindControl<Control>();
-    }
-
     // Event를 연결합니다.
     protected override void BindEvents()
     {
-        base.BindEvents();
         //BindEventControl<Button>(Control., OnClick_);
     }
 
     // UIPanel을 생성할 때 초기화하는 함수입니다.
-    protected override void InitUI()
+    protected override void OnAwake()
     {
-        base.InitUI();
 
         //
         //_stat = transform.parent.GetComponent<Stat>();
@@ -82,6 +72,6 @@ public class HPBarUI : BaseUI
 
     void SetHpRatio(float ratio)
     {
-        GetControlComponent<Slider>(Control.HPBarUI_Slider_HPBar).value = ratio;
+        GetUIComponent<Slider>(UI.HPBarUI_Slider_HPBar).value = ratio;
     }
 }

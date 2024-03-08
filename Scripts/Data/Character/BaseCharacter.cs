@@ -565,7 +565,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
         }
 
         string tempPath = $"Prefabs/Weapon/SM_Wep_Watergun_02";
-        GameObject go = GlobalScene.ResourceMng.InstantiateResource(tempPath, weponTrans);
+        GameObject go = GlobalScene.ResourceMng.Instantiate(tempPath, weponTrans);
         if(go == null)
         {
             Debug.LogWarning("Failed : ");
@@ -588,7 +588,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     {
         DestroyHPBarUI();
 
-        hPBarUI = GlobalScene.UIMng.CreateWorldSpaceUI<HPBarUI>(transform);
+        hPBarUI = GlobalScene.UIMng.CreateBaseSpaceUI<HPBarUI>(transform);
         hPBarUI.Open();
     }
 

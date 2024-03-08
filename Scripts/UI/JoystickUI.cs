@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
+class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    enum Control
+    public enum UI
     {
         /// <sammary>
         /// JoystickUI
@@ -37,19 +37,12 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
     RectTransform pointerRectTrans      = null;
     Action<bool> attackButtonAction     = null;
 
-    protected override void BindControls()
-    {
-        base.BindControls();
-
-        BindControl<Control>();
-    }
 
     protected override void BindEvents()
     {
-        base.BindEvents();
         //BindEventControl<Button>(Control.JoystickUI_Button_Attack, OnClick_JoystickUI_Button_Attack);
 
-        EventTrigger eventTrigger = GetControlComponent<Button>(Control.JoystickUI_Button_Attack).gameObject.GetOrAddComponent<EventTrigger>();
+        EventTrigger eventTrigger = GetUIComponent<Button>(UI.JoystickUI_Button_Attack).gameObject.GetOrAddComponent<EventTrigger>();
         var pointerDown = new EventTrigger.Entry();
         pointerDown.eventID = EventTriggerType.PointerDown;
         pointerDown.callback.AddListener((e) => OnPointerDown_JoystickUI_Button_Attack());
@@ -61,21 +54,20 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
         eventTrigger.triggers.Add(pointerUp);
     }
 
-    protected override void InitUI()
+    protected override void OnAwake()
     {
-        base.InitUI();
     }
 
     protected override void OnOpen()
     {
         //
-        RectTransform joystickRectTrans = GetControlComponent<RectTransform>(Control.JoystickUI_Image_JoystickArea);
+        RectTransform joystickRectTrans = GetUIComponent<RectTransform>(UI.JoystickUI_Image_JoystickArea);
         Vector2 sizeDelta           = new Vector2(Screen.height * 0.5f, Screen.height * 0.5f);
         joystickRectTrans.sizeDelta = sizeDelta;
         //transform.gameObject.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 
-        backgroundRectTrans = GetControlComponent<RectTransform>(Control.JoystickUI_Image_Background);
-        pointerRectTrans    = GetControlComponent<RectTransform>(Control.JoystickUI_Image_Pointer);
+        backgroundRectTrans = GetUIComponent<RectTransform>(UI.JoystickUI_Image_Background);
+        pointerRectTrans    = GetUIComponent<RectTransform>(UI.JoystickUI_Image_Pointer);
 
         backgroundRectTrans.sizeDelta   = new Vector2(Screen.height, Screen.height) * 0.25f;
         pointerRectTrans.sizeDelta      = backgroundRectTrans.sizeDelta * 0.45f;
@@ -84,8 +76,8 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
         r           = backgroundRectTrans.sizeDelta.x / 2;
 
         // Attack
-        SetActiveControl(Control.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
-        SetActiveControl(Control.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
+        SetActiveUI(UI.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
+        SetActiveUI(UI.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
     }
 
     // Close할 때 실행할 프로세스입니다.
@@ -183,8 +175,8 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
         }
         
 
-        SetActiveControl(Control.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
-        SetActiveControl(Control.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
+        SetActiveUI(UI.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
+        SetActiveUI(UI.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
     }
 
     public void OnPointerUp_JoystickUI_Button_Attack()
@@ -195,8 +187,8 @@ class JoystickUI : BaseUI, IDragHandler, IBeginDragHandler, IEndDragHandler
             attackButtonAction.Invoke(isAttackButtonPressed);
         }
 
-        SetActiveControl(Control.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
-        SetActiveControl(Control.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
+        SetActiveUI(UI.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
+        SetActiveUI(UI.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
     }
     #endregion JoystickUI
 }

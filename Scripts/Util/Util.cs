@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Util
@@ -56,5 +55,19 @@ public class Util
         }
 
         return null;
+    }
+
+    public static T CreateGameObject<T>(Transform pParent = null) where T : Component
+    {
+        string name = $"@{typeof(T).Name}";
+        GameObject go = new GameObject(name);
+
+        go.transform.SetParent(pParent);
+        go.SetActive(true);
+
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localRotation = Quaternion.identity;
+
+        return go.AddComponent<T>();
     }
 }

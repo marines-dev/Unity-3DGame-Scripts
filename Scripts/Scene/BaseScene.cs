@@ -24,7 +24,7 @@ public abstract class BaseScene : MonoBehaviour
         OnAwake();
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         OnStart();
     }

@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-class TitleUI : BaseUI
+class TitleUI : BaseUI<TitleUI.UI>
 {
-    enum Controls
+    public enum UI
     {
         /// <sammary>
         /// TitleUI
@@ -123,36 +123,26 @@ class TitleUI : BaseUI
     public Action onLogInState { get; private set; } = null;
 
 
-    protected override void BindControls()
-    {
-        base.BindControls();
-
-        BindControl<Controls>();
-    }
-
     protected override void BindEvents()
     {
-        base.BindEvents();
-
-        BindEventControl<Button>(Controls.TitleUI_Button_Guest,             OnClick_TitleUI_Button_Guest);
-        BindEventControl<Button>(Controls.TitleUI_Button_Google,            OnClick_TitleUI_Button_Google);
-        BindEventControl<Button>(Controls.TitleUI_Button_GameStart,         OnClick_TitleUI_Button_GameStart);
-        BindEventControl<Button>(Controls.PatchPopup_Button_Confirm,        OnClick_PatchPopup_Button_Confirm);
-        BindEventControl<Button>(Controls.PatchPopup_Button_Cancel,         OnClick_PatchPopup_Button_Cancel);
-        BindEventControl<Button>(Controls.SignUpPopup_Button_GuestConfirm,  OnClick_SignUpPopup_Button_GuestConfirm);
-        BindEventControl<Button>(Controls.SignUpPopup_Button_GuestCancel,   OnClick_SignUpPopup_Button_GuestCancel);
-        BindEventControl<Button>(Controls.SignUpPopup_Button_GoogleConfirm, OnClick_SignUpPopup_Button_GoogleConfirm);
-        BindEventControl<Button>(Controls.SignUpPopup_Button_GoogleCancel,  OnClick_SignUpPopup_Button_GoogleCancel);
-        BindEventControl<Button>(Controls.NicknamePopup_Button_Confirm,     OnClick_NicknamePopup_Button_Confirm);
-        BindEventControl<Button>(Controls.GuestLogoutPopup_Button_Confirm,  OnClick_GuestLogoutPopup_Button_Confirm);
-        BindEventControl<Button>(Controls.GuestLogoutPopup_Button_Cancel,   OnClick_GuestLogoutPopup_Button_Cancel);
-        BindEventControl<Button>(Controls.DebugTestPopup_Button_Select,     OnClick_DebugTestPopup_Button_Select);
-        BindEventControl<Button>(Controls.DebugTestPopup_Button_TestLogout, OnClick_DebugTestPopup_Button_TestLogout);
+        BindEventUI<Button>(UI.TitleUI_Button_Guest,             OnClick_TitleUI_Button_Guest);
+        BindEventUI<Button>(UI.TitleUI_Button_Google,            OnClick_TitleUI_Button_Google);
+        BindEventUI<Button>(UI.TitleUI_Button_GameStart,         OnClick_TitleUI_Button_GameStart);
+        BindEventUI<Button>(UI.PatchPopup_Button_Confirm,        OnClick_PatchPopup_Button_Confirm);
+        BindEventUI<Button>(UI.PatchPopup_Button_Cancel,         OnClick_PatchPopup_Button_Cancel);
+        BindEventUI<Button>(UI.SignUpPopup_Button_GuestConfirm,  OnClick_SignUpPopup_Button_GuestConfirm);
+        BindEventUI<Button>(UI.SignUpPopup_Button_GuestCancel,   OnClick_SignUpPopup_Button_GuestCancel);
+        BindEventUI<Button>(UI.SignUpPopup_Button_GoogleConfirm, OnClick_SignUpPopup_Button_GoogleConfirm);
+        BindEventUI<Button>(UI.SignUpPopup_Button_GoogleCancel,  OnClick_SignUpPopup_Button_GoogleCancel);
+        BindEventUI<Button>(UI.NicknamePopup_Button_Confirm,     OnClick_NicknamePopup_Button_Confirm);
+        BindEventUI<Button>(UI.GuestLogoutPopup_Button_Confirm,  OnClick_GuestLogoutPopup_Button_Confirm);
+        BindEventUI<Button>(UI.GuestLogoutPopup_Button_Cancel,   OnClick_GuestLogoutPopup_Button_Cancel);
+        BindEventUI<Button>(UI.DebugTestPopup_Button_Select,     OnClick_DebugTestPopup_Button_Select);
+        BindEventUI<Button>(UI.DebugTestPopup_Button_TestLogout, OnClick_DebugTestPopup_Button_TestLogout);
     }
 
-    protected override void InitUI()
+    protected override void OnAwake()
     {
-        base.InitUI();
     }
 
     protected override void OnOpen()
@@ -243,7 +233,7 @@ class TitleUI : BaseUI
     void OnClick_NicknamePopup_Button_Confirm()
     {
         Debug.LogWarning("UI 구조 수정 필요");
-        TMP_InputField inputField = GetControlObject(Controls.NicknamePopup_InputField_Nickname).GetComponent<TMP_InputField>();
+        TMP_InputField inputField = GetUIObject(UI.NicknamePopup_InputField_Nickname).GetComponent<TMP_InputField>();
         if (inputField == null)
             return;
 
@@ -336,14 +326,14 @@ class TitleUI : BaseUI
 
     void UpdateTitleUI(TitleScene.TitleProcessType _titleProcessType)
     {
-        SetActiveControl(Controls.TitleUI_Object_InitDataProcess, _titleProcessType == TitleScene.TitleProcessType.Init);
-        SetActiveControl(Controls.TitleUI_Object_LoginProcess, _titleProcessType == TitleScene.TitleProcessType.LogIn);
-        SetActiveControl(Controls.TitleUI_Object_LoadDataProcess, _titleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
+        SetActiveUI(UI.TitleUI_Object_InitDataProcess, _titleProcessType == TitleScene.TitleProcessType.Init);
+        SetActiveUI(UI.TitleUI_Object_LoginProcess, _titleProcessType == TitleScene.TitleProcessType.LogIn);
+        SetActiveUI(UI.TitleUI_Object_LoadDataProcess, _titleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
 
         if(_titleProcessType == TitleScene.TitleProcessType.LogIn)
         {
-            SetActiveControl(Controls.TitleUI_Object_Login, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.AccountAuth);
-            SetActiveControl(Controls.TitleUI_Object_Logout, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogOut);
+            SetActiveUI(UI.TitleUI_Object_Login, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.AccountAuth);
+            SetActiveUI(UI.TitleUI_Object_Logout, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogOut);
         }
     }
 
@@ -353,7 +343,7 @@ class TitleUI : BaseUI
 
     void OpenTitleUI_Panel_SignUpPopup(LogInManager.AccountType _accountType)
     {
-        SetActiveControl(Controls.TitleUI_Panel_SignUpPopup, true);
+        SetActiveUI(UI.TitleUI_Panel_SignUpPopup, true);
 
         selectAccountType = LogInManager.AccountType.None;
         UpdateTitleUI_Panel_SignUpPopup(_accountType);
@@ -361,13 +351,13 @@ class TitleUI : BaseUI
 
     void CloseTitleUI_Panel_SignUpPopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_SignUpPopup, false);
+        SetActiveUI(UI.TitleUI_Panel_SignUpPopup, false);
     }
 
     void UpdateTitleUI_Panel_SignUpPopup(LogInManager.AccountType _accountType)
     {
-        SetActiveControl(Controls.SignUpPopup_Object_Guest,     _accountType == LogInManager.AccountType.Guest);
-        SetActiveControl(Controls.SignUpPopup_Object_Google,    _accountType == LogInManager.AccountType.Google);
+        SetActiveUI(UI.SignUpPopup_Object_Guest,     _accountType == LogInManager.AccountType.Guest);
+        SetActiveUI(UI.SignUpPopup_Object_Google,    _accountType == LogInManager.AccountType.Google);
     }
 
     #endregion TitleUI_Panel_SignUpPopup
@@ -376,19 +366,19 @@ class TitleUI : BaseUI
 
     void OpenTitleUI_Panel_NicknamePopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_NicknamePopup, true);
+        SetActiveUI(UI.TitleUI_Panel_NicknamePopup, true);
 
         UpdateTitleUI_Panel_NicknamePopup();
     }
 
     void CloseTitleUI_Panel_NicknamePopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_NicknamePopup, false);
+        SetActiveUI(UI.TitleUI_Panel_NicknamePopup, false);
     }
 
     void UpdateTitleUI_Panel_NicknamePopup()
     {
-        TMP_InputField inputField = GetControlComponent<TMP_InputField>(Controls.NicknamePopup_InputField_Nickname);
+        TMP_InputField inputField = GetUIComponent<TMP_InputField>(UI.NicknamePopup_InputField_Nickname);
         if (inputField == null)
             return;
 
@@ -402,14 +392,14 @@ class TitleUI : BaseUI
 
     void OpenTitleUI_Panel_GuestLogoutPopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_GuestLogoutPopup, true);
+        SetActiveUI(UI.TitleUI_Panel_GuestLogoutPopup, true);
 
         UpdateTitleUI_Panel_GuestLogoutPopup();
     }
 
     void CloseTitleUI_Panel_GuestLogoutPopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_GuestLogoutPopup, false);
+        SetActiveUI(UI.TitleUI_Panel_GuestLogoutPopup, false);
     }
 
     void UpdateTitleUI_Panel_GuestLogoutPopup()
@@ -422,7 +412,7 @@ class TitleUI : BaseUI
 
     void OpenTitleUI_Panel_DebugTestPopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_DebugTestPopup, true);
+        SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, true);
 
         debugSelectAble = true;
         UpdateTitleUI_Panel_DebugTestPopup(debugSelectAble);
@@ -430,15 +420,15 @@ class TitleUI : BaseUI
 
     void CloseTitleUI_Panel_DebugTestPopup()
     {
-        SetActiveControl(Controls.TitleUI_Panel_DebugTestPopup, false);
+        SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, false);
     }
 
     void UpdateTitleUI_Panel_DebugTestPopup(bool _debugSelectAble)
     {
         // Select
-        SetActiveControl(Controls.DebugTestPopup_Object_SelectAble,     _debugSelectAble == false);
-        SetActiveControl(Controls.DebugTestPopup_Object_SelectDesable,  _debugSelectAble);
-        SetActiveControl(Controls.DebugTestPopup_Object_DestPopup,      _debugSelectAble);
+        SetActiveUI(UI.DebugTestPopup_Object_SelectAble,     _debugSelectAble == false);
+        SetActiveUI(UI.DebugTestPopup_Object_SelectDesable,  _debugSelectAble);
+        SetActiveUI(UI.DebugTestPopup_Object_DestPopup,      _debugSelectAble);
         SetDebugLog();
     }
 
@@ -448,8 +438,8 @@ class TitleUI : BaseUI
         if (debugSelectAble == false)
             return;
 
-        SetTextControl(Controls.DebugTestPopup_Text_Desc, _logMessage);
-        SetActiveControl(Controls.DebugTestPopup_Object_TestLogout, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
+        SetTextUI(UI.DebugTestPopup_Text_Desc, _logMessage);
+        SetActiveUI(UI.DebugTestPopup_Object_TestLogout, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
 
         string format = string.Format("[DebugLog]\n{0}", _logMessage);
         Debug.Log(format);

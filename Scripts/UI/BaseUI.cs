@@ -1,19 +1,31 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
+using Interface;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 
-public abstract class BaseUI : MonoBehaviour
+public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 {
-    List<Transform> list_uiTrans        = new List<Transform>();
-    Transform[]     array_useUITrans    = null;
+    List<Transform> trans_List = new List<Transform>();
+    Transform[] uiTrans_arr = null;
 
-    GameObject uiObj = null;
-    IEnumerator openUICoroutine = null;
+
+    private void Awake()
+    {
+        BindUI();
+        BindEvents();
+
+        ///
+        OnAwake();
+    }
+
+    protected abstract void BindEvents();
+    protected abstract void OnAwake();
+    protected abstract void OnOpen();
+    protected abstract void OnClose();
 
     public void Open()
     {
@@ -45,27 +57,93 @@ public abstract class BaseUI : MonoBehaviour
         //UIManager_Test.instance.CloseUI<ScreenCoverUI>();
     }
 
-    protected virtual void BindControls() { }
-    protected virtual void BindEvents() { }
-    protected void BindControl<T>() where T : Enum
+    protected Transform GetUITrans(Define _enum)
     {
-        Array    array_control   = System.Enum.GetValues(typeof(T));
-        int      uiCount         = array_control.Length;
-        array_useUITrans         = new Transform[uiCount];
+        int uiIndex = Convert.ToInt32(_enum);
+        Transform trans = uiTrans_arr[uiIndex];
 
-        foreach (int control in array_control)
+        if (trans == null)
         {
-            string      uiName      = System.Enum.GetName(typeof(T), control);
-            Transform   childTrans  = list_uiTrans.Find(x => x.gameObject.name == uiName);
-            int         uiIndex     = (int)control;
-
-            array_useUITrans[uiIndex] = childTrans;
+            Debug.LogWarning($"Failed : {trans}는 null입니다.");
         }
+
+        return trans;
     }
 
-    protected void BindEventControl<T>(Enum _enum, UnityAction _action)
+    protected GameObject GetUIObject(Enum _enum)
     {
-        GameObject obj = GetControlObject(_enum);
+        int uiIndex = Convert.ToInt32(_enum);
+        Transform trans = uiTrans_arr[uiIndex];
+
+        if (trans == null)
+        {
+            Debug.LogWarning($"Failed : {trans}는 null입니다.");
+        }
+
+        return trans.gameObject;
+    }
+
+    protected T GetUIComponent<T>(Enum _enum)
+    {
+        int uiIndex = Convert.ToInt32(_enum);
+        Transform trans = uiTrans_arr[uiIndex];
+
+        if (trans == null)
+        {
+            Debug.LogWarning($"Failed : {trans}는 null입니다.");
+        }
+
+        T component = trans.GetComponent<T>();
+        if(component == null)
+        {
+            Debug.LogWarning($"Failed : {component.ToString()}의 {typeof(T).Name} 컴포넌트는 존재하지 않습니다.");
+        }
+
+        return component;
+    }
+    protected void SetActiveUI(Enum _enum, bool _enable)
+    {
+        GameObject obj = GetUIObject(_enum);
+        obj.SetActive(_enable);
+    }
+
+    protected void SetImageUI(Enum _enum, string _spritePath, int _spriteIndex)
+    {
+        Sprite[] arr_sprite = Resources.LoadAll<Sprite>(_spritePath);
+        if (arr_sprite == null)
+        {
+            Debug.LogWarning($"Failed : {_spritePath} 경로의 리소스를 찾을 수 없습니다.");
+            return;
+        }
+
+        GameObject obj = GetUIObject(_enum);
+        Image image = obj.GetComponent<Image>();
+        if (image == null)
+        {
+            image = obj.AddComponent<Image>();
+        }
+
+        image.sprite = arr_sprite[_spriteIndex];
+        Debug.LogWarning("Failed : IndexTest필요");
+    }
+
+    protected void SetTextUI(Enum _enum, string _text)
+    {
+        GameObject obj = GetUIObject(_enum);
+        TMP_Text text = obj.GetComponent<TMP_Text>();
+        if (text == null)
+        {
+            text = obj.AddComponent<TMP_Text>();
+        }
+
+        text.text = _text;
+    }
+
+    #region Load
+
+    protected void BindEventUI<T>(Enum _enum, UnityAction _action)
+    {
+        GameObject obj = GetUIObject(_enum);
 
         // Button
         if (typeof(T) == typeof(Button))
@@ -81,129 +159,42 @@ public abstract class BaseUI : MonoBehaviour
         }
     }
 
-    protected virtual void InitUI() { }
-    protected abstract void OnOpen();
-    protected abstract void OnClose();
-    protected Transform GetControlTrans(Define _enum)
+    void BindUI()
     {
-        int uiIndex = Convert.ToInt32(_enum);
-        Transform trans = array_useUITrans[uiIndex];
-
-        if (trans == null)
+        /// GetBaseUITransform
         {
-            Debug.LogWarning($"Failed : {trans}는 null입니다.");
+            if (trans_List != null && trans_List.Count != 0)
+            {
+                trans_List.Clear();
+            }
+
+            ReculsiveUI(transform);
         }
 
-        return trans;
+        Array array_control = System.Enum.GetValues(typeof(TUI));
+        int uiCount = array_control.Length;
+        uiTrans_arr = new Transform[uiCount];
+
+        foreach (int control in array_control)
+        {
+            string uiName = System.Enum.GetName(typeof(TUI), control);
+            Transform childTrans = trans_List.Find(x => x.gameObject.name == uiName);
+            int uiIndex = (int)control;
+
+            uiTrans_arr[uiIndex] = childTrans;
+        }
     }
 
-    protected GameObject GetControlObject(Enum _enum)
+    private void ReculsiveUI(Transform _trans)
     {
-        int uiIndex = Convert.ToInt32(_enum);
-        Transform trans = array_useUITrans[uiIndex];
-
-        if (trans == null)
-        {
-            Debug.LogWarning($"Failed : {trans}는 null입니다.");
-        }
-
-        return trans.gameObject;
-    }
-
-    protected T GetControlComponent<T>(Enum _enum)
-    {
-        int uiIndex = Convert.ToInt32(_enum);
-        Transform trans = array_useUITrans[uiIndex];
-
-        if (trans == null)
-        {
-            Debug.LogWarning($"Failed : {trans}는 null입니다.");
-        }
-
-        T component = trans.GetComponent<T>();
-        if(component == null)
-        {
-            Debug.LogWarning($"Failed : {component.ToString()}의 {typeof(T).Name} 컴포넌트는 존재하지 않습니다.");
-        }
-
-        return component;
-    }
-    protected void SetActiveControl(Enum _enum, bool _enable)
-    {
-        GameObject obj = GetControlObject(_enum);
-        obj.SetActive(_enable);
-    }
-
-    protected void SetImageControl(Enum _enum, string _spritePath, int _spriteIndex)
-    {
-        Sprite[] arr_sprite = Resources.LoadAll<Sprite>(_spritePath);
-        if (arr_sprite == null)
-        {
-            Debug.LogWarning($"Failed : {_spritePath} 경로의 리소스를 찾을 수 없습니다.");
-            return;
-        }
-
-        GameObject obj = GetControlObject(_enum);
-        Image image = obj.GetComponent<Image>();
-        if (image == null)
-        {
-            image = obj.AddComponent<Image>();
-        }
-
-        image.sprite = arr_sprite[_spriteIndex];
-        Debug.LogWarning("Failed : IndexTest필요");
-    }
-
-    protected void SetTextControl(Enum _enum, string _text)
-    {
-        GameObject obj = GetControlObject(_enum);
-        TMP_Text text = obj.GetComponent<TMP_Text>();
-        if (text == null)
-        {
-            text = obj.AddComponent<TMP_Text>();
-        }
-
-        text.text = _text;
-    }
-
-    #region Load
-
-    public void Initialized()
-    {
-        uiObj = gameObject;
-
-        if (openUICoroutine != null)
-        {
-            StopCoroutine(openUICoroutine);
-            openUICoroutine = null;
-        }
-
-        InitControlList(uiObj);
-        BindControls();
-        BindEvents();
-        InitUI();
-    }
-
-    private void InitControlList(GameObject _uiPanelObj)
-    {
-        if (list_uiTrans != null && list_uiTrans.Count != 0)
-        {
-            list_uiTrans.Clear();
-        }
-
-        ReculsiveControl(_uiPanelObj.transform);
-    }
-
-    private void ReculsiveControl(Transform _trans)
-    {
-        int findIndex = list_uiTrans.FindIndex(x => x == _trans);
+        int findIndex = trans_List.FindIndex(x => x == _trans);
         if (findIndex == -1)
         {
-            list_uiTrans.Add(_trans);
+            trans_List.Add(_trans);
         }
         else
         {
-            list_uiTrans[findIndex] = _trans;
+            trans_List[findIndex] = _trans;
         }
 
         if (_trans.childCount != 0)
@@ -211,11 +202,20 @@ public abstract class BaseUI : MonoBehaviour
             for (int i = 0; i < _trans.childCount; i++)
             {
                 Transform childTrans = _trans.GetChild(i);
-
-                ReculsiveControl(childTrans);
+                ReculsiveUI(childTrans);
             }
         }
     }
+
+    //private void InitUIList(GameObject pObj)
+    //{
+    //    if (list_uiTrans != null && list_uiTrans.Count != 0)
+    //    {
+    //        list_uiTrans.Clear();
+    //    }
+
+    //    ReculsiveUI(pObj.transform);
+    //}
 
     #endregion Load
 }

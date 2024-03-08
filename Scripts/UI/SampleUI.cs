@@ -1,8 +1,8 @@
 using UnityEngine;
 
-class SampleUI : BaseUI
+class SampleUI : BaseUI<SampleUI.UI>
 {
-    enum Control
+    public enum UI
     {
         /// <sammary>
         /// SampleUI
@@ -21,25 +21,16 @@ class SampleUI : BaseUI
     }
 
 
-    protected override void BindControls()
-    {
-        base.BindControls();
-
-        // Control을 연결합니다.
-        BindControl<Control>();
-    }
 
     // Event를 연결합니다.
     protected override void BindEvents()
     {
-        base.BindEvents();
         //BindEventControl<Button>(Control., OnClick_);
     }
 
     // UIPanel을 생성할 때 초기화하는 함수입니다.
-    protected override void InitUI()
+    protected override void OnAwake()
     {
-        base.InitUI();
     }
 
     // Open할 때 실행할 프로세스입니다.

@@ -11,11 +11,9 @@ public class InitScene : BaseScene
         GlobalScene.CreateGlobalScene();
 
         // ResisteredUI
-        GlobalScene.UIMng.ResisteredBaseUI();
+        //GlobalScene.UIMng.ResisteredBaseUI();
 
         // LoadData
-        GlobalScene.UIMng.LoadUI<LoadingUI>();
-
         IsInitSceneLoaded = true;
     }
 

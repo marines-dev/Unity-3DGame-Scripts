@@ -16,8 +16,7 @@ public class LoadScene : BaseScene
     {
         /// LoadUI
         GlobalScene.UIMng.CloseBaseUIAll();
-        GlobalScene.UIMng.LoadUI<LoadingUI>();
-        loadUI = GlobalScene.UIMng.GetBaseUI<LoadingUI>();
+        loadUI = GlobalScene.UIMng.GetOrCreateBaseUI<LoadingUI>();
     }
 
     protected override void OnStart() 
@@ -32,7 +31,10 @@ public class LoadScene : BaseScene
     {
         ClearLoadingProcess();
 
-        loadUI.Close();
+        if(loadUI != null)
+        {
+            loadUI.Close();
+        }
     }
 
     void LoadingProcess()
@@ -56,30 +58,43 @@ public class LoadScene : BaseScene
     {
         yield return null;
 
-        string loadSceneName = typeof(LoadScene).Name;
-        SetActiveScene(loadSceneName);
+        /// Init
+        {
+            string loadSceneName = typeof(LoadScene).Name;
+            SetActiveScene(loadSceneName);
 
-        preSceneName = GlobalScene.SceneMng.PreSceneName;
-        nextSceneName = GlobalScene.SceneMng.NextSceneName;
-        yield return null;
+            preSceneName = GlobalScene.SceneMng.PreSceneName;
+            nextSceneName = GlobalScene.SceneMng.NextSceneName;
+            yield return null;
+        }
 
-        yield return UnloadSceneAsync(preSceneName);
+        /// UnloadScene
+        {
+            yield return UnloadSceneAsync(preSceneName);
 
-        GlobalScene.MngLoader.InitManagers();
-        yield return null;
+            //GlobalScene.SceneMng.UnloadPreScene();
+            yield return null;
 
-        /// 메모리 정리(임시)
-        Resources.UnloadUnusedAssets();
-        GC.Collect();
-        yield return null;
+            /// 메모리 정리(임시)
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
+            yield return null;
+        }
 
-        yield return LoadSceneAsync(nextSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+        /// LoadScene
+        {
+            yield return LoadSceneAsync(nextSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
 
-        SetActiveScene(nextSceneName);
-        //GlobalScene.SceneMng.GetOrCreateActiveScene();
-        yield return null;
+            SetActiveScene(nextSceneName);
+            //GlobalScene.SceneMng.GetOrCreateActiveScene();
 
-        yield return UnloadSceneAsync(loadSceneName);
+            GlobalScene.SceneMng.LoadNextScene();
+            yield return null;
+
+            string loadSceneName = typeof(LoadScene).Name;
+            yield return UnloadSceneAsync(loadSceneName);
+        }
+
 
         /// Complete
         Debug.Log($"Success : {GlobalScene.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");

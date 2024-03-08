@@ -8,8 +8,7 @@ public class CameraManager : BaseManager
     Define.CameraMode cameraModeType = Define.CameraMode.None;
     Vector3 deltaPos = Vector3.zero;
 
-    //
-    Camera  camera = null;
+    //Camera mainCamera_ref = null;
     IEnumerator lateUpdateQuarterViewCamCoroutine = null;
 
     protected override void OnAwake() { }
@@ -19,7 +18,7 @@ public class CameraManager : BaseManager
 
         cameraModeType = Define.CameraMode.None;
         deltaPos = Vector3.zero;
-        camera = null;
+        //camera = null;
     }
 
     public void SetWorldSceneCamera()
@@ -32,7 +31,7 @@ public class CameraManager : BaseManager
 
         cameraModeType = Define.CameraMode.QuarterView;
         deltaPos = Config.camera_deltaPos;
-        camera = Camera.main;
+        //camera = Camera.main;
         if(camera == null)
         {
             Debug.LogWarning("");
@@ -85,6 +84,6 @@ public class CameraManager : BaseManager
         yield return null;
         deltaPos = Vector3.zero;
         cameraModeType = Define.CameraMode.None;
-        camera = null;
+        //camera = null;
     }
 }

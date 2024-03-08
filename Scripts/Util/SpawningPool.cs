@@ -63,7 +63,7 @@ public class SpawningPool : MonoBehaviour
 
 	GameObject CreatePooledObject()
 	{
-		GameObject pooledObj = GlobalScene.ResourceMng.InstantiateResource(prefabPath);
+		GameObject pooledObj = GlobalScene.ResourceMng.Instantiate(prefabPath);
 		return pooledObj;
 	}
 

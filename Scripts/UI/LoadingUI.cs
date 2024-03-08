@@ -1,8 +1,8 @@
 using UnityEngine;
 
-class LoadingUI : BaseUI
+class LoadingUI : BaseUI<LoadingUI.UI>
 {
-    enum Control
+    public enum UI
     {
         /// <sammary>
         /// LoadingUI
@@ -21,22 +21,13 @@ class LoadingUI : BaseUI
     }
 
 
-    protected override void BindControls()
-    {
-        base.BindControls();
-
-        BindControl<Control>();
-    }
-
     protected override void BindEvents()
     {
-        base.BindEvents();
         //BindEventControl<Button>(Control., OnClick_);
     }
 
-    protected override void InitUI()
+    protected override void OnAwake()
     {
-        base.InitUI();
     }
 
     protected override void OnOpen()

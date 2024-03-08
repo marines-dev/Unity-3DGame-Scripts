@@ -1,25 +1,26 @@
 using System;
 using System.Collections.Generic;
+using Interface;
 using UnityEngine;
 // MainUI /  PopupUI 구분 처리 필요
 // UIID로 변경 필요
 // EventSystem : Canvas 생성 시 자동 생성 확인 필요
 
-[Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
 public class UIManager : BaseManager
 {
-    List<BaseUI> list_BaseUI = new List<BaseUI>();
+    Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
+    //List<BaseUI> LoadedBaseUI_list = new List<BaseUI>();
 
-    Canvas canvas_go_ = null;
-    public Canvas canvas_go
+    Canvas canvas = null;
+    public Canvas Canvas
     {
         get
         {
-            if (canvas_go_ == null)
+            if (canvas == null)
             {
                 LoadCanvas();
             }
-            return canvas_go_;
+            return canvas;
         }
     }
 
@@ -38,7 +39,7 @@ public class UIManager : BaseManager
     }
 
     GameObject uiStorage_go_;
-    GameObject uiIStorage_go
+    GameObject UIStorage
     {
         get
         {
@@ -63,237 +64,116 @@ public class UIManager : BaseManager
 
     #region BaseUI
 
-    // StaticBaseUI
-    public void ResisteredBaseUI()
+    public T GetOrCreateBaseUI<T>() where T : Component, IBaseUI
     {
-        if (uiIStorage_go.transform.childCount != 0)
-        {
-            for (int i = 0; i < uiIStorage_go.transform.childCount; ++i)
-            {
-                Transform childTrans = uiIStorage_go.transform.GetChild(i);
-
-                SetBaseUI(childTrans.gameObject);
-            }
-        }
-    }
-
-    public void LoadUI<TBaseUI>() where TBaseUI : BaseUI
-    {
-        BaseUI baseUI = FindBaseUI<TBaseUI>();
-        string baseUI_name = typeof(TBaseUI).Name;
+        T baseUI = GetBaseUI(typeof(T)) as T;
         if (baseUI != null)
         {
-            Debug.LogWarning($"{baseUI_name} 타입의 BaseUI는 이미 존재합니다.");
-            return;
+            return baseUI;
         }
 
-        string path = $"Prefabs/UI/{baseUI_name}";
-        GameObject resource = GlobalScene.ResourceMng.InstantiateResource(path, uiIStorage_go.transform);
-        SetBaseUI(resource.gameObject);
+        string uiName = typeof(T).Name;
+        string path = $"Prefabs/UI/{uiName}";
+        baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas.transform).GetOrAddComponent<T>();
+        baseUI.Close();
+
+        baseUI_dic.Add(uiName, baseUI);
+        return baseUI;
     }
 
-    public T CreateWorldSpaceUI<T>(Transform parent = null, string name = null) where T : BaseUI
+    public IBaseUI GetOrCreateBaseUI(Type pType)
     {
-        Debug.Log("HPBarUI가 생성되었습니다.");
-        if (string.IsNullOrEmpty(name))
-            name = typeof(T).Name;
+        if (pType == null || pType.BaseType != typeof(IBaseUI))
+        {
+            Debug.LogError("");
+            return null;
+        }
 
-        GameObject go = GlobalScene.ResourceMng.InstantiateResource($"Prefabs/UI/WorldSpace/{name}");
-        if (parent != null)
-            go.transform.SetParent(parent);
+        IBaseUI baseUI = GetBaseUI(pType);
+        if (baseUI != null)
+        {
+            return baseUI;
+        }
+
+        baseUI = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/{pType}", canvas.transform).GetOrAddComponent(pType) as IBaseUI;
+        baseUI.Close();
+
+        string uiName = pType.Name;
+        baseUI_dic.Add(uiName, baseUI);
+        return baseUI;
+    }
+
+    //T GetBaseUI<T>() where T : BaseUI
+    //{
+    //    if (ContainsBaseUI<T>() == false)
+    //    {
+    //        Debug.Log("Failed : ");
+    //        LoadBaseUI<T>();
+    //    }
+
+    //    string typeName = typeof(T).Name;
+    //    T baseUI = baseUI_dic[typeName] as T;
+    //    return baseUI;
+    //}
+
+    IBaseUI GetBaseUI(Type pType)
+    {
+        string name = pType.Name;
+        if (baseUI_dic == null || ! baseUI_dic.ContainsKey(name))
+        {
+            Debug.Log("Failed : ");
+            return null;
+        }
+
+        IBaseUI baseUI = baseUI_dic[pType.Name];
+        return baseUI;
+    }
+
+    [Obsolete("임시")]
+    public T CreateBaseSpaceUI<T>(Transform pParent = null, string pName = null) where T : Component, IBaseUI
+    {
+        GameObject go = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/WorldSpace/{pName}", pParent);
 
         Canvas canvas = go.GetOrAddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.worldCamera = Camera.main;
 
-        BaseUI uiBase = go.GetOrAddComponent<T>();
-
-        uiBase.Initialized();
-        uiBase.Close();
-
-        return Util.GetOrAddComponent<T>(go);
-    }
-
-    public void SetBaseUI<T>(T _ui_obj) where T : BaseUI
-    {
-        if (_ui_obj.transform.parent != uiIStorage_go.transform)
-        {
-            _ui_obj.transform.SetParent(uiIStorage_go.transform);
-        }
-
-        Type type = typeof(T);
-        if (_ui_obj.name != type.Name)
-        {
-            _ui_obj.name = type.Name;
-        }
-
-        T ui = _ui_obj.gameObject.GetComponent<T>();
-        if (ui == null)
-        {
-            ui = _ui_obj.gameObject.AddComponent<T>();
-        }
-
-        BaseUI uiBase = null;
-        int uiBaseIndex = list_BaseUI.FindIndex(x => x.name == ui.name);
-        if (uiBaseIndex == -1)
-        {
-            uiBase = ui;
-            list_BaseUI.Add(uiBase);
-        }
-        else
-        {
-            uiBase = ui;
-            list_BaseUI[uiBaseIndex] = uiBase;
-        }
-
-        uiBase.Initialized();
-
-        CloseBaseUI<T>();
-    }
-
-    public void SetBaseUI(GameObject _ui_obj)
-    {
-        if (_ui_obj.transform.parent != uiIStorage_go.transform)
-        {
-            _ui_obj.transform.SetParent(uiIStorage_go.transform);
-        }
-
-        Type type = Type.GetType(_ui_obj.name);
-        if (type == null)
-        {
-            Debug.LogError($"{_ui_obj.name}는 존재하지 않는 UI 이름입니다.");
-            return;
-        }
-
-        BaseUI uiBase = _ui_obj.GetComponent(type) as BaseUI;
-        if (uiBase == null)
-        {
-            uiBase = _ui_obj.AddComponent(type) as BaseUI;
-        }
-
-        int uiBaseIndex = list_BaseUI.FindIndex(x => x.name == uiBase.name);
-        if (uiBaseIndex == -1)
-        {
-            list_BaseUI.Add(uiBase);
-        }
-        else
-        {
-            list_BaseUI[uiBaseIndex] = uiBase;
-        }
-
-        uiBase.Initialized();
-
-        CloseBaseUI(uiBase.name);
-    }
-
-    public T GetBaseUI<T>() where T : BaseUI
-    {
-        T baseUI = FindBaseUI<T>().GetComponent<T>();
-
-        if (baseUI == null)
-        {
-            Debug.LogWarning($"Failed : {typeof(T).Name}의 BaseUI는 등록되어 있지 않습니다. 먼저 {typeof(T).Name}를 로드해 주세요.");
-            return null;
-        }
+        T baseUI = go.GetOrAddComponent<T>();
+        baseUI.Close();
 
         return baseUI;
-    }
-
-    public BaseUI GetBaseUI(string _uiName)
-    {
-        Type type = Type.GetType(_uiName);
-        BaseUI baseUI = FindBaseUI(_uiName).GetComponent(type) as BaseUI;
-
-        if (baseUI == null)
-        {
-            Debug.LogWarning("Failed : 얻기 실패 : UIPanel을 찾을 수 없습니다.");
-            return null;
-        }
-
-        return baseUI;
-    }
-
-    BaseUI FindBaseUI<T>() where T : BaseUI
-    {
-        Type type = typeof(T);
-        BaseUI uiBase = list_BaseUI.Find(x => x.name == type.Name);
-
-        return uiBase;
-    }
-
-    BaseUI FindBaseUI(string _uiName)
-    {
-        BaseUI uiBase = list_BaseUI.Find(x => x.name == _uiName);
-
-        return uiBase;
-    }
-
-    public void OpenBaseUI<T>() where T : BaseUI
-    {
-        OpenBaseUI(typeof(T).Name);
-    }
-
-    public void OpenBaseUI(string _uiName)
-    {
-        BaseUI uiBase = FindBaseUI(_uiName);
-
-        if (uiBase == null)
-        {
-            Debug.LogWarning("Failed : 열기 위한 {0}의 UI를 찾을 수 없습니다.");
-            return;
-        }
-
-        uiBase.Open();
-    }
-
-    public void CloseBaseUI<T>() where T : BaseUI
-    {
-        CloseBaseUI(typeof(T).Name);
-    }
-
-    public void CloseBaseUI(string _uiName)
-    {
-        BaseUI uiBase = FindBaseUI(_uiName);
-
-        if (uiBase == null)
-        {
-            Debug.Log("닫을 UI를 찾을 수 없습니다.");
-            return;
-        }
-
-        uiBase.Close();
     }
 
     public void OpenBaseUIAll()
     {
-        if (list_BaseUI.Count == 0)
+        if (baseUI_dic.Count == 0)
         {
             Debug.Log("열기 위한 UI가 없습니다.");
             return;
         }
 
-        foreach (var uiBase in list_BaseUI)
+        foreach (IBaseUI baseUI in baseUI_dic.Values)
         {
-            if (uiBase.gameObject != null)
+            if (baseUI != null)
             {
-                uiBase.Open();
+                baseUI.Open();
             }
         }
     }
 
     public void CloseBaseUIAll()
     {
-        if (list_BaseUI.Count == 0)
+        if (baseUI_dic.Count == 0)
         {
             Debug.Log("닫기 위한 UI가 없습니다.");
             return;
         }
 
-        foreach (var uiBase in list_BaseUI)
+        foreach (IBaseUI baseUI in baseUI_dic.Values)
         {
-            if (uiBase != null && uiBase.gameObject != null)
+            if (baseUI != null)
             {
-                uiBase.Close();
+                baseUI.Close();
             }
         }
     }
@@ -304,22 +184,22 @@ public class UIManager : BaseManager
 
     void LoadCanvas()
     {
-        if (canvas_go_ != null)
+        if (canvas != null)
             return;
 
-        canvas_go_ = GameObject.FindObjectOfType<Canvas>();
-        if (canvas_go_ == null)
+        canvas = GameObject.FindObjectOfType<Canvas>();
+        if (canvas == null)
         {
-            canvas_go_ = GlobalScene.ResourceMng.InstantiateResource("Prefabs/UI/Canvas").GetComponent<Canvas>();
+            canvas = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/Canvas").GetComponent<Canvas>();
 
         }
 
         string go_name = $"@{typeof(Canvas).Name}";
-        canvas_go_.gameObject.name = go_name;
-        canvas_go_.gameObject.SetActive(true);
+        canvas.gameObject.name = go_name;
+        canvas.gameObject.SetActive(true);
 
         //
-        DontDestroyOnLoad(canvas_go_);
+        DontDestroyOnLoad(canvas);
     }
 
     [Obsolete("테스트 중")]
@@ -331,7 +211,7 @@ public class UIManager : BaseManager
         eventSystem_go_ = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
         if (eventSystem_go_ == null)
         {
-            eventSystem_go_ = GlobalScene.ResourceMng.InstantiateResource("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystem_go_ = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
         }
 
         string go_name = $"@{typeof(UnityEngine.EventSystems.EventSystem).Name}";
@@ -347,15 +227,43 @@ public class UIManager : BaseManager
         if (uiStorage_go_ != null)
             return;
 
-        uiStorage_go_ = canvas_go.transform.Find(Config.ui_uiStorageName).gameObject;
+        uiStorage_go_ = Canvas.transform.Find(Config.ui_uiStorageName).gameObject;
         if (uiStorage_go_ == null)
         {
-            uiStorage_go_ = GlobalScene.ResourceMng.CreateGameObject(Config.ui_uiStorageName, canvas_go.transform);
+            uiStorage_go_ = GlobalScene.ResourceMng.CreateGameObject(Config.ui_uiStorageName, Canvas.transform);
         }
 
         //
         DontDestroyOnLoad(uiStorage_go_);
     }
+
+    //string FindBaseUIPath(Define.Resource pResourceType, string pResourceName)
+    //{
+    //    switch (pResourceType)
+    //    {
+    //        case Define.Resource.Character:
+    //        case Define.Resource.Item:
+    //            {
+    //                return $"Prefabs/WorldObj/{pResourceType.ToString()}/{pResourceName}";
+    //            }
+    //        case Define.Resource.UI:
+    //            {
+    //                return $"Prefabs/UI/{pResourceName}";
+    //            }
+    //        case Define.Resource.WorldSpace:
+    //            {
+    //                return $"Prefabs/UI/WorldSpace/{pResourceName}";
+    //            }
+    //        case Define.Resource.Table:
+    //            {
+    //                return $"Data/{pResourceType.ToString()}/{pResourceName}";
+    //            }
+
+    //    }
+
+    //    Debug.LogWarning($"Failed : ");
+    //    return string.Empty;
+    //}
 
     #endregion Load
 }

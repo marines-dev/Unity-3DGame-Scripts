@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-class ScreenCoverUI : BaseUI
+class ScreenCoverUI : BaseUI<ScreenCoverUI.UI>
 {
-    enum Control
+    public enum UI
     {
         /// <sammary>
         /// ScreenCoverUI
@@ -29,22 +29,13 @@ class ScreenCoverUI : BaseUI
         LoadingData,
     }
 
-    protected override void BindControls()
-    {
-        base.BindControls();
-
-        BindControl<Control>();
-    }
-
     protected override void BindEvents()
     {
-        base.BindEvents();
         //BindEventControl<Button>(Control., OnClick_);
     }
 
-    protected override void InitUI()
+    protected override void OnAwake()
     {
-        base.InitUI();
     }
 
     protected override void OnOpen()
@@ -84,8 +75,8 @@ class ScreenCoverUI : BaseUI
 
     void UpdateScreenCoverUI(ScreenCoverType _screenCoverType)
     {
-        SetActiveControl(Control.SampleUI_Object_TuchBlocking, _screenCoverType == ScreenCoverType.TuchBlocking);
-        SetActiveControl(Control.SampleUI_Object_LoadingData, _screenCoverType == ScreenCoverType.LoadingData);
+        SetActiveUI(UI.SampleUI_Object_TuchBlocking, _screenCoverType == ScreenCoverType.TuchBlocking);
+        SetActiveUI(UI.SampleUI_Object_LoadingData, _screenCoverType == ScreenCoverType.LoadingData);
     }
 
     #endregion ScreenCoverUI
