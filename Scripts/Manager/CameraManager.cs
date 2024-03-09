@@ -71,15 +71,15 @@ public class CameraManager : BaseManager
             if(GlobalScene.GameMng.IsGamePlay) //�ӽ� : ���� ���� ó�� �� ����
             {
                 RaycastHit hit;
-                if (Physics.Raycast(GlobalScene.GameMng.playerCtrl.transPosition, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
+                if (Physics.Raycast(GlobalScene.GameMng.playerCtrl.Position, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
                 {
-                    float dist = (hit.point - GlobalScene.GameMng.playerCtrl.transPosition).magnitude * 0.8f;
-                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos.normalized * dist;
+                    float dist = (hit.point - GlobalScene.GameMng.playerCtrl.Position).magnitude * 0.8f;
+                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.Position + deltaPos.normalized * dist;
                 }
                 else
                 {
-                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos;
-                    GetComponent<Camera>().transform.LookAt(GlobalScene.GameMng.playerCtrl.transPosition);
+                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.Position + deltaPos;
+                    GetComponent<Camera>().transform.LookAt(GlobalScene.GameMng.playerCtrl.Position);
                 }
             }
 

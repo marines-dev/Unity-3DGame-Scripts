@@ -5,8 +5,8 @@ using UnityEngine;
 
 public interface IControllHandler
 {
-    public Vector3 transPosition { get; set; }
-    public Quaternion transRotation { get; set; }
+    public Vector3 Position { get; }
+    public Vector3 Rotation { get; }
     //public Define.BaseState baseStateType { get; }
 
     public void OnMove(Vector2 pRot);
@@ -17,7 +17,7 @@ public interface IControllHandler
     public void IncreaseExp(int pAddExpValue);
 }
 
-public class GamePlayer : BaseCharacter, IControllHandler
+public class Player : Character, IControllHandler
 {
     int     userLevelValue  = 0;
     int     userExpValue    = 0;
@@ -31,7 +31,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
         if (target != null)
         {
             //
-            Vector3 target_dir = target.transPosition - transPosition;
+            Vector3 target_dir = target.Position - Position;
             if(target_dir.magnitude > scanRange)
             {
                 target.OnDisableTargetOutline();
@@ -54,8 +54,8 @@ public class GamePlayer : BaseCharacter, IControllHandler
                 {
                     if (target != null) //가까운 타겟팅
                     {
-                        float targetDist        = (target.transPosition - transPosition).magnitude;
-                        float tempTargetDist    = (tempTarget.transPosition - transPosition).magnitude;
+                        float targetDist        = (target.Position - Position).magnitude;
+                        float tempTargetDist    = (tempTarget.Position - Position).magnitude;
                         if (targetDist > tempTargetDist) //타겟의 거리가 더 멀면
                         {
                             target.OnDisableTargetOutline();
@@ -74,8 +74,8 @@ public class GamePlayer : BaseCharacter, IControllHandler
 
         if(upperStateType == Define.UpperState.Attack && target != null)
         {
-            Vector3 dir = (target.transPosition - transPosition).normalized;
-            transRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 30 * Time.deltaTime);
+            Vector3 dir = (target.Position - Position).normalized;
+            Rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 30 * Time.deltaTime).eulerAngles;
         }
     }
 
@@ -139,7 +139,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
 
         //
         SetMateriasColorAlpha(1f);
-        DespawnCharacter();
+        Despawn();
         GlobalScene.GameMng.SetPlayerRespawn();
     }
     protected override IEnumerator BaseIdleStateProcecssCoroutine()
@@ -237,7 +237,7 @@ public class GamePlayer : BaseCharacter, IControllHandler
 
         if (target != null)
         {
-            float dist = (target.transPosition - transPosition).magnitude;
+            float dist = (target.Position - Position).magnitude;
             if (dist <= 6f)
             {
                 target.OnDamage(stat.attack);

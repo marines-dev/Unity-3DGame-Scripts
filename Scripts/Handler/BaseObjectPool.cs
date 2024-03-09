@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameObjectPool : MonoBehaviour
+public abstract class BaseObjectPool : MonoBehaviour
 {
     public enum SpawnState
     {
@@ -10,14 +10,13 @@ public class GameObjectPool : MonoBehaviour
         Spawn,
     }
 
-    string prefabPath = string.Empty;
-    string resourceName = string.Empty;
-    bool poolExpand = true;
+    protected string prefabPath = string.Empty;
+    protected bool poolExpand = true;
 
     Dictionary<GameObject, SpawnState> objectPool_dic = new Dictionary<GameObject, SpawnState>();
 
 
-    public void SetGameObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand, Action<GameObject> pInitGameObjectEvent = null)
+    protected virtual void SetObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand)
     {
         prefabPath = pPrefabPath;
         poolExpand = pPoolExpand;
@@ -25,22 +24,19 @@ public class GameObjectPool : MonoBehaviour
         GameObject go = null;
         for (int j = 0; j < pSpawner_poolAmount; j++)
         {
-            go = CreateGameObject();
-            Despawn(go);
-
-            if (pInitGameObjectEvent != null)
-                pInitGameObjectEvent.Invoke(go);
+            go = CreateObject();
+            DespawnObject(go);
         }
     }
 
-    GameObject CreateGameObject()
+    protected virtual GameObject CreateObject()
     {
         GameObject go = GlobalScene.ResourceMng.Instantiate(prefabPath, transform);
-        
-        if(! objectPool_dic.ContainsKey(go)) 
+
+        if (!objectPool_dic.ContainsKey(go))
         {
             objectPool_dic.Add(go, SpawnState.Despawn);
-            
+
         }
         else
         {
@@ -50,7 +46,7 @@ public class GameObjectPool : MonoBehaviour
         return go;
     }
 
-    public GameObject SpawnGameObject()
+    public virtual GameObject SpawnObject()
     {
         GameObject go = null;
         foreach (KeyValuePair<GameObject, SpawnState> pair in objectPool_dic)
@@ -70,7 +66,7 @@ public class GameObjectPool : MonoBehaviour
 
         if (go == null && poolExpand)
         {
-            go = CreateGameObject();
+            go = CreateObject();
             objectPool_dic[go] = SpawnState.Spawn;
             go.gameObject.SetActive(true);
             return go;
@@ -80,25 +76,20 @@ public class GameObjectPool : MonoBehaviour
         return null;
     }
 
-    public void Despawn(GameObject pObj)
+    public virtual void DespawnObject(GameObject pObj)
     {
-        bool despawn = false;
-
         if (pObj == null)
         {
             Debug.LogWarning($"Failed : ");
             return;
         }
 
-        if (! objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == SpawnState.Despawn)
+        if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == SpawnState.Despawn)
         {
             Debug.LogWarning($"Failed : ");
-            return;
         }
 
         objectPool_dic[pObj] = SpawnState.Despawn;
         pObj.gameObject.SetActive(false);
     }
 }
-
-//public class ResourcesPool : MonoBehaviour { }

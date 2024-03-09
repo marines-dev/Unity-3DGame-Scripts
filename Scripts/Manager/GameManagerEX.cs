@@ -43,7 +43,7 @@ public class GameManagerEX : BaseManager
         }
     }
 
-    GamePlayer gamePlayer = null;
+    Player gamePlayer = null;
 
 
     protected override void OnAwake() { }
@@ -54,7 +54,7 @@ public class GameManagerEX : BaseManager
 
     #region Player
 
-    public void SetPalyer(GamePlayer pGamePlayer)
+    public void SetPalyer(Player pGamePlayer)
     {
         gamePlayer = pGamePlayer;
     }
@@ -72,13 +72,13 @@ public class GameManagerEX : BaseManager
 
     public ITargetHandler GetTargetCharacter(GameObject pTarget)
     {
-        if(pTarget == null)
+        if (pTarget == null)
         {
             Debug.LogWarning("Falied : ");
             return null;
         }
 
-        BaseCharacter baseCharacter = pTarget.GetComponent<BaseCharacter>();
+        Character baseCharacter = pTarget.GetComponent<Character>();
         if (baseCharacter == null)
         {
             Debug.LogWarning("Falied : ");

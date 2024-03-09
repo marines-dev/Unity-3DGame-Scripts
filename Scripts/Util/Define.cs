@@ -21,12 +21,27 @@ public class Define
         Weapon,
     }
 
+    public enum WorldObject
+    {
+        None,
+        Character,
+        Item,
+    }
+
+    [Obsolete("임시")]
     public enum Character
     {
         None,
-        GamePlayer,
-        GameMonster,
-        NPC,
+        Human,
+        Monster,
+    }
+
+    public enum Actor
+    {
+        None,
+        Player,
+        Enemy,
+        //NPC,
     }
 
     public enum BaseState

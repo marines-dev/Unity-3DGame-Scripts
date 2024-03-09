@@ -7,8 +7,9 @@ public interface ITargetHandler
 {
     public Define.BaseState baseStateType { get; }
 
-    public Vector3      transPosition { get; set; }
-    public Quaternion   transRotation { get; set; }
+    public Vector3 Position { get; }
+    public Vector3 Rotation { get; }
+    //public Quaternion   transRotation { get; set; }
 
     public void OnEnableTargetOutline();
     public void OnDisableTargetOutline();
@@ -17,30 +18,10 @@ public interface ITargetHandler
 }
 
 // HPBar 기능 이동 필요
-public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
+public class Character : BaseWorldObject, ITargetHandler
 {
-    // Character
-    int characterID_ = 0;
-    protected int characterID
-    {
-        get
-        {
-            if (characterID_ <= 0)
-            {
-                Debug.LogWarning("Failed : ");
-            }
-            return characterID_;
-        }
-        private set
-        {
-            if (value <= 0)
-            {
-                Debug.LogWarning("Failed : ");
-                return;
-            }
-            characterID_ = value;
-        }
-    }
+    Table.CharacterTable.Data characterData = null;
+    //int characterID = 0;
 
     // Stat
     protected struct Stat
@@ -61,38 +42,6 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     protected Define.UpperState upperStateType { get; private set; }    = Define.UpperState.None;
     bool isBaseStateProcess = false;
     bool isUpperStateProcess = false;
-
-    // Transform
-    public Vector3 transPosition
-    {
-        get
-        {
-            Vector3 pos = transform.localPosition;
-            return pos;
-        }
-        set
-        {
-            if (value == null)
-                value = Vector3.zero;
-
-            transform.localPosition = value;
-        }
-    }
-    public Quaternion transRotation
-    {
-        get
-        {
-            Quaternion rot = transform.localRotation;
-            return rot;
-        }
-        set
-        {
-            if (value == null)
-                value = Quaternion.identity;
-
-            transform.localRotation = value;
-        }
-    }
 
     // Test
     protected string baseLayerName      = "Base Layer";
@@ -149,6 +98,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     IEnumerator upperStateProcessCoroutine  = null;
     IEnumerator upperStateProcessRoutine    = null;
 
+
     void Start()
     {
         collider = gameObject.GetComponentInChildren<CapsuleCollider>();
@@ -171,70 +121,67 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     //{
     //}
 
-    protected abstract void InitSpawnCharacter();// 스폰 시 Base.SpawnCharacter() 함수에서 캐릭터를 초기화합니다.
+    protected virtual void InitSpawnCharacter() { }// 스폰 시 Base.SpawnCharacter() 함수에서 캐릭터를 초기화합니다.
     //public abstract void ResetCharacter();
-    protected abstract IEnumerator BaseDieStateProcecssCoroutine();
-    protected abstract IEnumerator BaseIdleStateProcecssCoroutine();
-    protected abstract IEnumerator BaseRunStateProcecssCoroutine();
-    protected abstract IEnumerator UpperReadyStateProcecssCoroutine();
-    protected abstract IEnumerator UpperAttackStateProcecssCoroutine();
-    protected abstract void OnHitEvent();
+    protected virtual IEnumerator BaseDieStateProcecssCoroutine() { yield return null; }
+    protected virtual IEnumerator BaseIdleStateProcecssCoroutine() { yield return null; }
+    protected virtual IEnumerator BaseRunStateProcecssCoroutine() { yield return null; }
+    protected virtual IEnumerator UpperReadyStateProcecssCoroutine() { yield return null; }
+    protected virtual IEnumerator UpperAttackStateProcecssCoroutine() { yield return null; }
+    protected virtual void OnHitEvent() { }
     //protected abstract void SetDead();
     //protected abstract void SetIdle();
     //protected abstract void SetRun();
     //protected abstract void SetSkill();
     //protected abstract void SetRespawn();
 
-    [Obsolete("테스트 중")]
-    public void SpawnCharacter(int pCharacterID)
+    public override  void SetWorldObject(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
     {
-        //
-        characterID = pCharacterID;
+        base.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
 
-        Table.Character.Data characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(characterID);
-        SetStat(characterData.level);
-
-        transPosition = Vector3.zero;
-        transRotation = Quaternion.identity;
-
-        shader.SetMateriasColorAlpha(1f, false);
-        animatorOverride.SetAnimatorController(characterData.animatorController, characterData.animatorAvatar);
-        animatorOverride.SwapAnimationClip(upperReadyAnimationClip1,    upperReadyAnimationClip2);
-        animatorOverride.SwapAnimationClip(upperAttackAnimationClip1,   upperAttackAnimationClip2);
-
-        // Weapon
-        if (characterData.weaponID != 0)
-        {
-            if (weapon == null)
-                CreateWeapon(characterData.weaponID);
-
-            weapon.InitWeapon();
-            SetWeaponPos(Vector3.zero, Quaternion.identity, false);
-        }
-
-        // Stat
-        if (hPBarUI == null)
-            CreateHPBarUI();
-
-        // State
-        baseStateType       = Define.BaseState.None; //초기화
-        upperStateType      = Define.UpperState.None;
-        isBaseStateProcess  = false;
-        isUpperStateProcess = false;
-
-
-        // 자식 클래스에서 초기화할 함수입니다.
-        InitSpawnCharacter(); // 임시(순서)
-
-        //
-        SetBaseStateType(Define.BaseState.Idle);
-        SetUpperStateType(Define.UpperState.Ready);
-        SetHPBarUI();
+        characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(pWorldObjID);
     }
 
-    protected void DespawnCharacter()
+    public override void Spawn(Vector3 pPos, Vector3 pRot)
     {
-        //GlobalScene.SpawnMng.DespawnCharacter(gameObject);
+        base.Spawn(pPos, pRot);
+
+        /////
+        //SetStat(characterData.level);
+
+        //shader.SetMateriasColorAlpha(1f, false);
+        //animatorOverride.SetAnimatorController(characterData.animatorController, characterData.animatorAvatar);
+        //animatorOverride.SwapAnimationClip(upperReadyAnimationClip1, upperReadyAnimationClip2);
+        //animatorOverride.SwapAnimationClip(upperAttackAnimationClip1, upperAttackAnimationClip2);
+
+        //// Weapon
+        //if (characterData.weaponID != 0)
+        //{
+        //    if (weapon == null)
+        //        CreateWeapon(characterData.weaponID);
+
+        //    weapon.InitWeapon();
+        //    SetWeaponPos(Vector3.zero, Quaternion.identity, false);
+        //}
+
+        //// Stat
+        //if (hPBarUI == null)
+        //    CreateHPBarUI();
+
+        //// State
+        //baseStateType = Define.BaseState.None; //초기화
+        //upperStateType = Define.UpperState.None;
+        //isBaseStateProcess = false;
+        //isUpperStateProcess = false;
+
+
+        //// 자식 클래스에서 초기화할 함수입니다.
+        //InitSpawnCharacter(); // 임시(순서)
+
+        ////
+        //SetBaseStateType(Define.BaseState.Idle);
+        //SetUpperStateType(Define.UpperState.Ready);
+        //SetHPBarUI();
     }
 
     void SetWeaponPos(Vector3 pPos, Quaternion pRot, bool pEnable)
@@ -256,15 +203,14 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     [Obsolete("레벨업 스탯 구현 필요")]
     protected void SetStat(int pLevel)
     {
-        Table.Character.Data    characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(characterID);
-        Table.Stat.Data         statData      = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.StatTable.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
 
-        stat_.maxHp     = statData.maxHp;
+        stat_.maxHp = statData.maxHp;
         stat_.currentHp = statData.maxHp;
-        stat_.attack    = statData.attack;
-        stat_.defense   = statData.defense;
+        stat_.attack = statData.attack;
+        stat_.defense = statData.defense;
         stat_.moveSpeed = statData.moveSpeed;
-        stat_.maxExp    = statData.maxExp;
+        stat_.maxExp = statData.maxExp;
     }
 
     protected void SetHP(int pHpValue)
@@ -344,8 +290,8 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
 
     public void OnDamage(int pValue)
     {
-        int damage  = Mathf.Max(0, pValue - stat_.defense);
-        int hp      = stat_.currentHp - pValue;
+        int damage = Mathf.Max(0, pValue - stat_.defense);
+        int hp = stat_.currentHp - pValue;
         SetHP(hp);
 
         //
@@ -566,7 +512,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
 
         string tempPath = $"Prefabs/Weapon/SM_Wep_Watergun_02";
         GameObject go = GlobalScene.ResourceMng.Instantiate(tempPath, weponTrans);
-        if(go == null)
+        if (go == null)
         {
             Debug.LogWarning("Failed : ");
             return;
