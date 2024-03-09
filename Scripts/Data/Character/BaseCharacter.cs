@@ -191,7 +191,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
         //
         characterID = pCharacterID;
 
-        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(characterID);
+        Table.Character.Data characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(characterID);
         SetStat(characterData.level);
 
         transPosition = Vector3.zero;
@@ -256,8 +256,8 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
     [Obsolete("레벨업 스탯 구현 필요")]
     protected void SetStat(int pLevel)
     {
-        Table.Character.Data    characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(characterID);
-        Table.Stat.Data         statData      = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data    characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(characterID);
+        Table.Stat.Data         statData      = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Stat>().GetTableData(characterData.statID);
 
         stat_.maxHp     = statData.maxHp;
         stat_.currentHp = statData.maxHp;

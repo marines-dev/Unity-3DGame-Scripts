@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Interface;
 using UnityEngine;
 
 //public interface ILoader<TKey, TValue>
@@ -9,25 +10,26 @@ using UnityEngine;
 
 namespace Table
 {
-    public abstract class BaseTable
+    public abstract class BaseTable<TData> : MonoBehaviour, IBaseTable where TData : BaseTable<TData>.BaseData
     {
         [Serializable]
         public abstract class BaseData
         {
-            public BaseData Copy()
+            public TData Copy()
             {
-                return (BaseData)this.MemberwiseClone();
+                return this.MemberwiseClone() as TData;
             }
         }
 
         // <id, BaseData>
-        protected Dictionary<int, BaseData> baseData_dic = new Dictionary<int, BaseData>();
+        protected Dictionary<int, TData> baseData_dic = new Dictionary<int, TData>();
 
         public BaseTable()
         {
             Debug.Log($"Success : {this.GetType().Name} 테이블 데이터 로드");
             LoadTableDataDic();
         }
+
         ~BaseTable()
         {
             Debug.Log($"Success : {this.GetType().Name} 테이블 데이터 삭제");
@@ -35,8 +37,7 @@ namespace Table
         }
 
         protected abstract void LoadTableDataDic();
-
-        protected T[] LoadBaseDatas<T>() where T : BaseData
+        protected TData[] LoadBaseDatas()
         {
             ClearBaseDataDic();
 
@@ -49,7 +50,7 @@ namespace Table
                 return null;
             }
 
-            T[] _baseDatas = CSVSerializer.DeserializeData<T>(textAsset.text);
+            TData[] _baseDatas = CSVSerializer.DeserializeData<TData>(textAsset.text);
             if (_baseDatas == null || _baseDatas.Length <= 0)
             {
                 Debug.LogWarning("Failed : ");
@@ -78,40 +79,40 @@ namespace Table
         }
     }
 
-    //public class Sample : BaseTable
-    //{
-    //    [Serializable]
-    //    public class Data : BaseData
-    //    {
-    //        public int id = 0;
-    //        public float key1 = 0f;
-    //        public string key2 = string.Empty;
-    //    }
+    public class Sample : BaseTable<Sample.Data>
+    {
+        [Serializable]
+        public class Data : BaseData
+        {
+            public int id = 0;
+            public float key1 = 0f;
+            public string key2 = string.Empty;
+        }
 
-    //    protected override void LoadTableDataDic()
-    //    {
-    //        Data[] datas = LoadBaseDatas<Data>();
-    //        foreach (Data data in datas)
-    //        {
-    //            baseData_dic.Add(data.id, data);
-    //        }
-    //    }
+        protected override void LoadTableDataDic()
+        {
+            Data[] datas = LoadBaseDatas();
+            foreach (Data data in datas)
+            {
+                baseData_dic.Add(data.id, data);
+            }
+        }
 
-    //    public Data GetTableData(int pID)
-    //    {
-    //        BaseData baseData = GetBaseData(pID);
-    //        if (baseData == null)
-    //        {
-    //            Debug.LogWarning($"Failed : ");
-    //            return null;
-    //        }
+        public Data GetTableData(int pID)
+        {
+            BaseData baseData = GetBaseData(pID);
+            if (baseData == null)
+            {
+                Debug.LogWarning($"Failed : ");
+                return null;
+            }
 
-    //        Data data = baseData.Copy() as Data; //객체 복사
-    //        return data;
-    //    }
-    //}
+            Data data = baseData.Copy() as Data; //객체 복사
+            return data;
+        }
+    }
 
-    public class Spawning : BaseTable
+    public class Spawning : BaseTable<Spawning.Data>
     {
         [Serializable]
         public class Data : BaseData
@@ -124,7 +125,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas<Data>();
+            Data[] datas = LoadBaseDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -150,7 +151,7 @@ namespace Table
             return data;
         }
     }
-    public class Spawner : BaseTable
+    public class Spawner : BaseTable<Spawner.Data>
     {
         [Serializable]
         public class Data : BaseData
@@ -168,7 +169,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas<Data>();
+            Data[] datas = LoadBaseDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -199,7 +200,7 @@ namespace Table
             return data;
         }
     }
-    public class Character : BaseTable
+    public class Character : BaseTable<Character.Data>
     {
         [Serializable]
         public class Data : BaseData
@@ -219,7 +220,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas<Data>();
+            Data[] datas = LoadBaseDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -252,7 +253,7 @@ namespace Table
             return data;
         }
     }
-    public class Stat : BaseTable
+    public class Stat : BaseTable<Stat.Data> 
     {
         [Serializable]
         public class Data : BaseData
@@ -272,7 +273,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas<Data>();
+            Data[] datas = LoadBaseDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -305,7 +306,7 @@ namespace Table
             return data;
         }
     }
-    public class Equipment : BaseTable
+    public class Equipment : BaseTable<Equipment.Data>
     {
         [Serializable]
         public class Data : BaseData
@@ -326,7 +327,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas<Data>();
+            Data[] datas = LoadBaseDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);

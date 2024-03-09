@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     public enum UI
     {

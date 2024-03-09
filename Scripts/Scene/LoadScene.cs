@@ -4,19 +4,31 @@ using UnityEngine;
 
 public class LoadScene : BaseScene
 {
-    LoadingUI loadUI = null;
+    /// <summary>
+    /// Table
+    /// </summary>
+
+    /// <summary>
+    /// MainUI
+    /// </summary>
+    private LoadingUI loadUI = null;
+
+    /// <summary>
+    /// Input
+    /// </summary>
     //public BaseInput BaseInput { get; }
 
     string preSceneName = string.Empty;
     string nextSceneName = string.Empty;
 
-    IEnumerator loadingProcessCoroutine = null;
+    private IEnumerator loadingProcessCoroutine = null;
+
 
     protected override void OnAwake()
     {
         /// LoadUI
         GlobalScene.UIMng.CloseBaseUIAll();
-        loadUI = GlobalScene.UIMng.GetOrCreateBaseUI<LoadingUI>();
+        loadUI = GlobalScene.UIMng.CreateOrGetBaseUI<LoadingUI>();
     }
 
     protected override void OnStart() 

@@ -55,7 +55,7 @@ public class Spawner : MonoBehaviour
             return;
         }
 
-        spawnerData = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
+        spawnerData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawner>().GetTableData(pSpawnerID);
         prefabType = pPrefabType;
         prefabID = pPrefabID;
         if (pSpawnEventAction != null)
@@ -178,7 +178,7 @@ public class SpawnManager : BaseManager
 
     public void SetMonsterSpawner(int pSpawningID)
     {
-        Table.Spawning.Data spawningData = GlobalScene.TableMng.GetTable<Table.Spawning>().GetTableData(pSpawningID);
+        Table.Spawning.Data spawningData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawning>().GetTableData(pSpawningID);
 
         SetCharacterSpawner(spawningData.spawnerID, spawningData.prefabType, spawningData.prefabID, OnSpawnedMonsterAction);
     }
@@ -217,8 +217,8 @@ public class SpawnManager : BaseManager
             return;
         }
 
-        Table.Spawner.Data   spawnerData    = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
-        Table.Character.Data characterData  = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(pPrefabID);
+        Table.Spawner.Data   spawnerData    = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawner>().GetTableData(pSpawnerID);
+        Table.Character.Data characterData  = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(pPrefabID);
 
         Type type = Type.GetType(characterData.characterType.ToString());
         BaseCharacter character = pPooledObj.gameObject.GetComponent(type) as BaseCharacter;
@@ -260,8 +260,8 @@ public class SpawnManager : BaseManager
             return;
         }
 
-        Table.Spawner.Data   spawnerData    = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(pSpawnerID);
-        Table.Character.Data characterData  = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(pPrefabID);
+        Table.Spawner.Data   spawnerData    = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawner>().GetTableData(pSpawnerID);
+        Table.Character.Data characterData  = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(pPrefabID);
 
         Type type = Type.GetType(characterData.characterType.ToString());
         BaseCharacter character = pPooledObj.gameObject.GetComponent(type) as BaseCharacter;

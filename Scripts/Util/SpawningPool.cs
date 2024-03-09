@@ -83,7 +83,7 @@ public class SpawningPool : MonoBehaviour
 		{
 			case Define.Prefabs.Character:
 				{
-					Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(pPrefabID);
+					Table.Character.Data characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(pPrefabID);
 					prefabName = characterData.prefabName;
 				}
 				break;

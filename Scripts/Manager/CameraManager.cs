@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-[Obsolete("Managers Àü¿ë : ÀÏ¹Ý Å¬·¡½º¿¡¼­ »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù. Managers¸¦ ÀÌ¿ëÇØ ÁÖ¼¼¿ä.")]
+
 public class CameraManager : BaseManager
 {
     Define.CameraMode cameraModeType = Define.CameraMode.None;
@@ -37,7 +37,7 @@ public class CameraManager : BaseManager
         cameraModeType = Define.CameraMode.QuarterView;
         deltaPos = Config.camera_deltaPos;
         //camera = Camera.main;
-        if(camera == null)
+        if(GetComponent<Camera>() == null)
         {
             Debug.LogWarning("");
             return;
@@ -63,23 +63,23 @@ public class CameraManager : BaseManager
         }
     }
 
-    [Obsolete("ÀÓ½Ã")]
+    [Obsolete("ï¿½Ó½ï¿½")]
     IEnumerator LateUpdateQuarterViewCamCoroutine()
     {
         while (true)
         {
-            if(GlobalScene.GameMng.IsGamePlay) //ÀÓ½Ã : °ÔÀÓ Á¾·á Ã³¸® ½Ã ¼öÁ¤
+            if(GlobalScene.GameMng.IsGamePlay) //ï¿½Ó½ï¿½ : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             {
                 RaycastHit hit;
                 if (Physics.Raycast(GlobalScene.GameMng.playerCtrl.transPosition, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
                 {
                     float dist = (hit.point - GlobalScene.GameMng.playerCtrl.transPosition).magnitude * 0.8f;
-                    camera.transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos.normalized * dist;
+                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos.normalized * dist;
                 }
                 else
                 {
-                    camera.transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos;
-                    camera.transform.LookAt(GlobalScene.GameMng.playerCtrl.transPosition);
+                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.transPosition + deltaPos;
+                    GetComponent<Camera>().transform.LookAt(GlobalScene.GameMng.playerCtrl.transPosition);
                 }
             }
 

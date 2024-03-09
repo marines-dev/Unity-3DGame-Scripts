@@ -9,9 +9,10 @@ using UnityEngine.UI;
 
 public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 {
+    //public GameObject GameObject { get { return gameObject; } }
     List<Transform> trans_List = new List<Transform>();
     Transform[] uiTrans_arr = null;
-
+    
 
     private void Awake()
     {
@@ -55,6 +56,11 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         OnClose();
 
         //UIManager_Test.instance.CloseUI<ScreenCoverUI>();
+    }
+
+    public void DestroySelf()
+    {
+        GlobalScene.Destroy(gameObject);
     }
 
     protected Transform GetUITrans(Define _enum)

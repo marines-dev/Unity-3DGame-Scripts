@@ -23,11 +23,15 @@ public class TitleScene : BaseScene
 
     protected override void OnAwake()
     {
-        titleUI = GlobalScene.UIMng.GetOrCreateBaseUI<TitleUI>();
+        titleUI = GlobalScene.UIMng.CreateOrGetBaseUI<TitleUI>();
     }
 
     protected override void OnStart()
     {
+        // TitleUI
+        titleUI.Open();
+        titleUI.SetTitleUI(currTitleProcessType);
+
         TitleProcess();
         TestDebugProcess();
     }
@@ -55,13 +59,6 @@ public class TitleScene : BaseScene
 
     void TitleProcess()
     {
-        //SetUI
-        {
-            // TitleUI
-            titleUI.Open();
-            titleUI.SetTitleUI(currTitleProcessType);
-        }
-
         if (titleProcessCoroutine != null)
         {
             StopCoroutine(titleProcessCoroutine);
@@ -80,6 +77,8 @@ public class TitleScene : BaseScene
 
     IEnumerator TitleProcessCoroutine()
     {
+        yield return null;
+
         currTitleProcessType = TitleProcessType.Init;
         titleProcessRoutine = InitDataProcessCoroutine();
         yield return titleProcessRoutine;

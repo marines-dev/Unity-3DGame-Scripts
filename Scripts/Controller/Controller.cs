@@ -29,7 +29,7 @@ public class Controller : MonoBehaviour, IJoystickHandler
         {
             if (joystickUI_ == null)
             {
-                GlobalScene.UIMng.GetOrCreateBaseUI<JoystickUI>();
+                GlobalScene.UIMng.CreateOrGetBaseUI<JoystickUI>();
             }
             return joystickUI_;
         }

@@ -20,7 +20,7 @@ namespace ServerData
     }
 }
 
-[Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
+
 public class UserManager : BaseManager
 {
     // Backend
@@ -107,8 +107,8 @@ public class UserManager : BaseManager
             return userData.hpValue;
         }
 
-        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(userData.characterID);
-        Table.Stat.Data statData = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(userData.characterID);
+        Table.Stat.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Stat>().GetTableData(characterData.statID);
         if (pHpValue > statData.maxHp)
         {
             Debug.Log($"Warning : HP({pHpValue}) 값 초과로 MaxHP({statData.maxHp})으로 저장합니다.");
@@ -143,8 +143,8 @@ public class UserManager : BaseManager
             return userData.expValue;
         }
 
-        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(userData.characterID);
-        Table.Stat.Data statData = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(userData.characterID);
+        Table.Stat.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Stat>().GetTableData(characterData.statID);
         if (pExpValue > statData.maxExp)
         {
             Debug.Log($"Warning : exp({pExpValue}) 값 초과로 MaxExp({statData.maxExp})으로 저장합니다.");
@@ -172,8 +172,8 @@ public class UserManager : BaseManager
     [Obsolete("임시")]
     public int SetUserLevelUp()
     {
-        Table.Character.Data characterData = GlobalScene.TableMng.GetTable<Table.Character>().GetTableData(userData.characterID);
-        Table.Stat.Data statData = GlobalScene.TableMng.GetTable<Table.Stat>().GetTableData(characterData.statID);
+        Table.Character.Data characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Character>().GetTableData(userData.characterID);
+        Table.Stat.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Stat>().GetTableData(characterData.statID);
         if (userData.expValue < statData.maxExp)
         {
             Debug.LogWarning($"Failed : 유저의 Exp({userData.expValue})가 MaxExp({statData.maxExp})보다 작아 LevelUp할 수 없습니다.");

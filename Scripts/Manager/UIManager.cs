@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Interface;
 using UnityEngine;
 // MainUI /  PopupUI 구분 처리 필요
@@ -19,7 +20,19 @@ public class UIManager : BaseManager
     {
     }
 
-    protected override void OnInit() { }
+    protected override void OnInit() 
+    {
+        // DestroyBaseUIAll
+        {
+            IBaseUI[] baseTable_arr = baseUI_dic.Values.ToArray();
+            foreach (IBaseUI baseUI in baseTable_arr)
+            {
+                baseUI.DestroySelf();
+            }
+
+            baseUI_dic.Clear();
+        }
+    }
 
     public void SetUIManager(Canvas pCanvas, UnityEngine.EventSystems.EventSystem pEventSystem)
     {
@@ -29,70 +42,77 @@ public class UIManager : BaseManager
 
     #region BaseUI
 
-    public T GetOrCreateBaseUI<T>() where T : Component, IBaseUI
+    public TBaseUI CreateOrGetBaseUI<TBaseUI>() where TBaseUI : Component, IBaseUI
     {
-        T baseUI = GetBaseUI(typeof(T)) as T;
-        if (baseUI != null)
+        TBaseUI baseUI = null;
+        string name = typeof(TBaseUI).Name;
+        if (baseUI_dic.ContainsKey(name)) /// Get
         {
-            return baseUI;
+            baseUI = baseUI_dic[name] as TBaseUI;
+        }
+        else /// Create
+        {
+            string uiName = typeof(TBaseUI).Name;
+            string path = $"Prefabs/UI/{uiName}";
+            baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas_ref.transform).GetOrAddComponent<TBaseUI>();
         }
 
-        string uiName = typeof(T).Name;
-        string path = $"Prefabs/UI/{uiName}";
-        baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas_ref.transform).GetOrAddComponent<T>();
+        ///
         baseUI.Close();
-
-        baseUI_dic.Add(uiName, baseUI);
         return baseUI;
     }
 
-    public IBaseUI GetOrCreateBaseUI(Type pType)
-    {
-        if (pType == null || pType.BaseType != typeof(IBaseUI))
-        {
-            Debug.LogError("");
-            return null;
-        }
-
-        IBaseUI baseUI = GetBaseUI(pType);
-        if (baseUI != null)
-        {
-            return baseUI;
-        }
-
-        baseUI = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/{pType}", canvas_ref.transform).GetOrAddComponent(pType) as IBaseUI;
-        baseUI.Close();
-
-        string uiName = pType.Name;
-        baseUI_dic.Add(uiName, baseUI);
-        return baseUI;
-    }
-
-    //T GetBaseUI<T>() where T : BaseUI
+    //public TBaseUI CreateOrGetBaseUI<TBaseUI>() where TBaseUI : Component, IBaseUI
     //{
-    //    if (ContainsBaseUI<T>() == false)
+    //    TBaseUI baseUI = GetBaseUI<TBaseUI>();
+    //    if (baseUI != null)
     //    {
-    //        Debug.Log("Failed : ");
-    //        LoadBaseUI<T>();
+    //        return baseUI;
     //    }
 
-    //    string typeName = typeof(T).Name;
-    //    T baseUI = baseUI_dic[typeName] as T;
+    //    string uiName = typeof(TBaseUI).Name;
+    //    string path = $"Prefabs/UI/{uiName}";
+    //    baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas_ref.transform).GetOrAddComponent<TBaseUI>();
+    //    baseUI.Close();
+
+    //    baseUI_dic.Add(uiName, baseUI);
     //    return baseUI;
     //}
 
-    IBaseUI GetBaseUI(Type pType)
-    {
-        string name = pType.Name;
-        if (baseUI_dic == null || ! baseUI_dic.ContainsKey(name))
-        {
-            Debug.Log("Failed : ");
-            return null;
-        }
+    //public IBaseUI CreateOrGetBaseUI(Type pType)
+    //{
+    //    if (pType == null || pType.BaseType != typeof(IBaseUI))
+    //    {
+    //        Debug.LogError("");
+    //        return null;
+    //    }
 
-        IBaseUI baseUI = baseUI_dic[pType.Name];
-        return baseUI;
-    }
+    //    IBaseUI baseUI = GetBaseUI(pType);
+    //    if (baseUI != null)
+    //    {
+    //        return baseUI;
+    //    }
+
+    //    baseUI = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/{pType}", canvas_ref.transform).GetOrAddComponent(pType) as IBaseUI;
+    //    baseUI.Close();
+
+    //    string uiName = pType.Name;
+    //    baseUI_dic.Add(uiName, baseUI);
+    //    return baseUI;
+    //}
+
+    //IBaseUI GetBaseUI(Type pType)
+    //{
+    //    string name = pType.Name;
+    //    if (baseUI_dic == null || !baseUI_dic.ContainsKey(name))
+    //    {
+    //        Debug.Log("Failed : ");
+    //        return null;
+    //    }
+
+    //    IBaseUI baseUI = baseUI_dic[name];
+    //    return baseUI;
+    //}
 
     [Obsolete("임시")]
     public T CreateBaseSpaceUI<T>(Transform pParent = null, string pName = null) where T : Component, IBaseUI

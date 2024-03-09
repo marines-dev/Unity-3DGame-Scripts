@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 
 
-[Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
 public class SceneManager : BaseManager
 {
     public string PreSceneName { get; private set; } = string.Empty;
@@ -49,9 +48,6 @@ public class SceneManager : BaseManager
 
     protected override void OnAwake() { }
 
-    /// <summary>
-    /// 예외 : SceneManager는 씬 로딩 완료 후에 리셋 합니다.
-    /// </summary>
     protected override void OnInit()
     {
         PreSceneName = string.Empty;

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using BackEnd;
 
-[Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
+
 public class BackendManager : BaseManager
 {
     string gameDataRowInDate = string.Empty;

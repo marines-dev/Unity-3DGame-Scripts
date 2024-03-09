@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Interface;
 using UnityEngine;
 
 
-[Obsolete("Managers 전용 : 일반 클래스에서 사용할 수 없습니다. Managers를 이용해 주세요.")]
 public class TableManager : BaseManager
 {
     /// <summary>
     /// Table
     /// </summary>
-    Dictionary<string, Table.BaseTable> table_dic = new Dictionary<string, Table.BaseTable>();
+    private Dictionary<string, IBaseTable> baseTable_dic = new Dictionary<string, IBaseTable>();
 
     /// <summary>
     /// Json
@@ -19,66 +20,85 @@ public class TableManager : BaseManager
 
     protected override void OnAwake()
     {
-        //spawning = new Table.Spawning();
-        //spawner = new Table.Spawner();
-        //character = new Table.Character();
-        //stat = new Table.Stat();
-
         //StatDict = LoadJson<Data.Stat, int, Data.StatData>("StatData_Test").MakeDict();
     }
 
     protected override void OnInit()
     {
-        DeleteTable<Table.Spawning>();
-        DeleteTable<Table.Spawner>();
-        DeleteTable<Table.Character>();
-        DeleteTable<Table.Stat>();
+        // RemoveBaseTableAll
+        {
+            IBaseTable[] baseTable_arr = baseTable_dic.Values.ToArray();
+            for (int i = 0; i < baseTable_arr.Length; ++i)
+            {
+                if (baseTable_arr[i] != null)
+                {
+                    baseTable_arr[i] = null;
+                }
+            }
+            baseTable_dic.Clear();
+        }
     }
 
-    public void LoadTable<T>() where T : Table.BaseTable, new()
+    public TTable CreateOrGetBaseTable<TTable>() where TTable : class, IBaseTable, new()
     {
-        if(ContainsTable<T>())
+        TTable baseTable = null;
+        string name = typeof(TTable).Name;
+        /// Get
         {
-            Debug.LogWarning("Failed : ");
-            return;
+            if (baseTable_dic.ContainsKey(name))
+            {
+                baseTable = baseTable_dic[name] as TTable;
+                return baseTable;
+            }
         }
 
-        // T 테이블 클래스에서 테이블 데이터를 자동 생성 합니다.
-        string tableName = typeof(T).Name;
-        T table = new T();
-
-        table_dic.Add(tableName, table);
-    }
-
-    void DeleteTable<T>() where T : Table.BaseTable, new()
-    {
-        if (ContainsTable<T>() == false)
-            return;
-
-        // 클래스에서 테이블 데이터를 자동 삭제 합니다.
-        string tableName = typeof(T).Name;
-        table_dic.Remove(tableName);
-    }
-
-    bool ContainsTable<T>() where T : Table.BaseTable, new()
-    {
-        string tableName = typeof(T).Name;
-        bool containsKey = table_dic != null && table_dic.ContainsKey(tableName);
-        return containsKey;
-    }
-
-    public T GetTable<T>() where T : Table.BaseTable, new()
-    {
-        if (ContainsTable<T>() == false)
+        /// Create
         {
-            Debug.LogWarning("Failed : ");
-            return default(T);
-        }
+            string tableName = typeof(TTable).Name;
+            baseTable = new TTable();
 
-        string tableName = typeof(T).Name;
-        T talbe = table_dic[tableName] as T;
-        return talbe;
+            baseTable_dic.Add(tableName, baseTable);
+            return baseTable;
+        }
     }
+
+    //public TTable CreateOrGetBaseTable<TTable>() where TTable : class, IBaseTable, new()
+    //{
+    //    TTable baseTable = GetBaseTable(typeof(TTable)) as TTable;
+    //    if (baseTable != null)
+    //    {
+    //        return baseTable;
+    //    }
+
+    //    // T 테이블 클래스에서 테이블 데이터를 자동 생성 합니다.
+    //    string tableName = typeof(TTable).Name;
+    //    TTable table = new TTable();
+
+    //    baseTable_dic.Add(tableName, table);
+    //    return table;
+    //}
+
+    //public Table.BaseTable CreateOrGetBaseTable(Type pType)
+    //{
+    //    if (pType == null || pType.BaseType != typeof(Table.BaseTable))
+    //    {
+    //        Debug.LogError("");
+    //        return null;
+    //    }
+
+    //    Table.BaseTable baseTable = GetBaseTable(pType);
+    //    if (baseTable != null)
+    //    {
+    //        return baseTable;
+    //    }
+
+    //    string tableName = typeof(Table.BaseTable).Name;
+    //    baseTable = new Table.BaseTable(); // ※확인 필요
+
+    //    string uiName = pType.Name;
+    //    baseTable_dic.Add(uiName, baseTable);
+    //    return baseTable;
+    //}
 
     //TILoader LoadJson<TILoader, TKey, TValue>(string path) where TILoader : ILoader<TKey, TValue>
     //{

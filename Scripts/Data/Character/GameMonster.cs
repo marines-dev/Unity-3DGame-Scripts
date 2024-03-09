@@ -331,7 +331,7 @@ public class GameMonster : BaseCharacter
     [Obsolete("Å×½ºÆ®")]
     Vector3 RandomPos()
     {
-        Table.Spawner.Data spawnerData = GlobalScene.TableMng.GetTable<Table.Spawner>().GetTableData(2);
+        Table.Spawner.Data spawnerData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawner>().GetTableData(2);
         Vector3 randDir = UnityEngine.Random.insideUnitSphere * UnityEngine.Random.Range(0, spawnerData.spawnRadius);
         randDir.y       = 0;
         Vector3 randPos = spawnerData.spawnPos + randDir;
