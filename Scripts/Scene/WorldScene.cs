@@ -8,10 +8,10 @@ public class WorldScene : BaseScene
     /// <summary>
     /// Table
     /// </summary>
-    Table.Spawning spawningTable = null;
-    Table.Spawner spawnerTable = null;
-    Table.Character characterTable = null;
-    Table.Stat statTable = null;
+    private Table.Spawning spawningTable = null;
+    private Table.Spawner spawnerTable = null;
+    private Table.Character characterTable = null;
+    private Table.Stat statTable = null;
 
     /// <summary>
     /// MainUI
@@ -26,7 +26,7 @@ public class WorldScene : BaseScene
 
     protected override void OnAwake()
     {
-        // LoadTable
+        /// CreateTable
         {
             spawningTable = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawning>();
             spawnerTable = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Spawner>();
@@ -34,22 +34,26 @@ public class WorldScene : BaseScene
             statTable = GlobalScene.TableMng.CreateOrGetBaseTable<Table.Stat>();
         }
 
-        // SetUI
+        /// SetUI
         {
             // Joystick
             worldUI = GlobalScene.UIMng.CreateOrGetBaseUI<JoystickUI>();
             worldUI.Close();
         }
 
-        //// Player
-        // Player
-        //GlobalScene.UserMng.LoadUserData();
-        //LoadSpawner(spawnerData.id, InitPlayerEvent, SpawnPlayerEvent, DespawnPlayerEvent);
+        // Spawner
+        {
+            /// Player
+            //GlobalScene.UserMng.LoadUserData();
+            //LoadSpawner(spawnerData.id, InitPlayerEvent, SpawnPlayerEvent, DespawnPlayerEvent);
 
-        //GlobalScene.UserMng.LoadUserData();
-        //GlobalScene.SpawnMng.SetPlayerSpawner();
-        //GlobalScene.SpawnMng.SpawnCharacter(GlobalScene.UserMng.SpawnerID);
-        //yield return new WaitUntil(() => GlobalScene.GameMng.IsGamePlay); // 플레이어가 저장되면 다음 구문으로 이동
+            // Enemy
+            Table.Spawner.Data[] spawnerDatas = spawnerTable.GetTableDatasAll();
+            //foreach (Table.Spawner.Data spawnerData in spawnerDatas)
+            //{
+            //    LoadSpawner(spawnerData.id, InitEnemyEvent, SpawnEnemyEvent, DespawnEnemyEvent);
+            //}
+        }
 
         //// Controller
         //GlobalScene.GUIMng.SetWorldSceneController();
@@ -58,10 +62,6 @@ public class WorldScene : BaseScene
         //// Camera
         //GlobalScene.CameraMng.SetWorldSceneCamera();
         //yield return null;
-
-        //// Monster
-        //int tempSpawnerID = 1;
-        //GlobalScene.SpawnMng.SetMonsterSpawner(tempSpawnerID);
     }
 
     protected override void OnStart()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Interface;
 using UnityEngine;
 
@@ -33,13 +34,14 @@ namespace Table
         ~BaseTable()
         {
             Debug.Log($"Success : {this.GetType().Name} Å×ÀÌºí µ¥ÀÌÅÍ »èÁ¦");
-            ClearBaseDataDic();
+            ClearTableDataDic();
         }
 
         protected abstract void LoadTableDataDic();
-        protected TData[] LoadBaseDatas()
+
+        protected TData[] LoadTableDatas()
         {
-            ClearBaseDataDic();
+            ClearTableDataDic();
 
             string tableName    = this.GetType().Name;
             string path         = $"Data/Table/{tableName}";
@@ -59,7 +61,8 @@ namespace Table
 
             return _baseDatas;
         }
-        void ClearBaseDataDic()
+
+        void ClearTableDataDic()
         {
             if (baseData_dic != null && baseData_dic.Count > 0)
             {
@@ -67,16 +70,40 @@ namespace Table
             }
         }
 
-        protected BaseData GetBaseData(int pId)
+
+        public TData GetTableData(int pID)
         {
-            if (baseData_dic == null || baseData_dic.ContainsKey(pId) == false)
+            if (baseData_dic.ContainsKey(pID) == false)
             {
                 Debug.LogWarning("Failed : ");
                 return null;
             }
 
-            return baseData_dic[pId];
+            return baseData_dic[pID].Copy();
         }
+
+        public TData[] GetTableDatasAll()
+        {
+            TData[] tableDatas = baseData_dic.Values.ToArray();
+            TData[] newTableDatas = new TData[tableDatas.Length];
+            for(int i = 0; i < newTableDatas.Length; ++i)
+            {
+                newTableDatas[i] = tableDatas[i].Copy();
+            }
+
+            return newTableDatas;
+        }
+
+        //protected TData LoadBaseData(int pId)
+        //{
+        //    if (baseData_dic.ContainsKey(pId) == false)
+        //    {
+        //        Debug.LogWarning("Failed : ");
+        //        return null;
+        //    }
+
+        //    return baseData_dic[pId].Copy();
+        //}
     }
 
     public class Sample : BaseTable<Sample.Data>
@@ -91,25 +118,25 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas();
+            Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
             }
         }
 
-        public Data GetTableData(int pID)
-        {
-            BaseData baseData = GetBaseData(pID);
-            if (baseData == null)
-            {
-                Debug.LogWarning($"Failed : ");
-                return null;
-            }
+        //public Data GetTableData(int pID)
+        //{
+        //    Data baseData = GetBaseData(pID);
+        //    if (baseData == null)
+        //    {
+        //        Debug.LogWarning($"Failed : ");
+        //        return null;
+        //    }
 
-            Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
-            return data;
-        }
+        //    Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
+        //    return data;
+        //}
     }
 
     public class Spawning : BaseTable<Spawning.Data>
@@ -125,7 +152,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas();
+            Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -136,19 +163,6 @@ namespace Table
                 + $"prefabType : {data.prefabType}\n"
                 + $"prefabID : {data.prefabID}\n");
             }
-        }
-
-        public Data GetTableData(int pID)
-        {
-            BaseData baseData = GetBaseData(pID);
-            if (baseData == null)
-            {
-                Debug.LogWarning($"Failed : ");
-                return null;
-            }
-
-            Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
-            return data;
         }
     }
     public class Spawner : BaseTable<Spawner.Data>
@@ -169,7 +183,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas();
+            Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -185,19 +199,6 @@ namespace Table
                         + $"spawnRot : {data.spawnRot}\n"
                         + $"isPooled : {data.isPooled}\n");
             }
-        }
-
-        public Data GetTableData(int pID)
-        {
-            BaseData baseData = GetBaseData(pID);
-            if (baseData == null)
-            {
-                Debug.LogWarning($"Failed : ");
-                return null;
-            }
-
-            Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
-            return data;
         }
     }
     public class Character : BaseTable<Character.Data>
@@ -220,7 +221,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas();
+            Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -239,20 +240,8 @@ namespace Table
                     + $"weaponID : {data.weaponID}\n");
             }
         }
-
-        public Data GetTableData(int pID)
-        {
-            BaseData baseData = GetBaseData(pID);
-            if (baseData == null)
-            {
-                Debug.LogWarning($"Failed : ");
-                return null;
-            }
-
-            Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
-            return data;
-        }
     }
+
     public class Stat : BaseTable<Stat.Data> 
     {
         [Serializable]
@@ -273,7 +262,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas();
+            Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -291,19 +280,6 @@ namespace Table
                     + $"maxExp : {data.maxExp}\n"
                     + $"maxExp_levelUp_rate : {data.maxExp_levelUp_rate}\n");
             }
-        }
-
-        public Data GetTableData(int pID)
-        {
-            BaseData baseData = GetBaseData(pID);
-            if (baseData == null)
-            {
-                Debug.LogWarning($"Failed : ");
-                return null;
-            }
-
-            Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
-            return data;
         }
     }
     public class Equipment : BaseTable<Equipment.Data>
@@ -327,7 +303,7 @@ namespace Table
 
         protected override void LoadTableDataDic()
         {
-            Data[] datas = LoadBaseDatas();
+            Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
@@ -346,19 +322,6 @@ namespace Table
                     + $"sfxRotation : {data.sfxRotation}\n"
                     + $"attackValue : {data.attackValue}\n");
             }
-        }
-
-        public Data GetTableData(int pID)
-        {
-            BaseData baseData = GetBaseData(pID);
-            if (baseData == null)
-            {
-                Debug.LogWarning($"Failed : ");
-                return null;
-            }
-
-            Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
-            return data;
         }
     }
 }

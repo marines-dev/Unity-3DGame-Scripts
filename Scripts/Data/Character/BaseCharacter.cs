@@ -234,7 +234,7 @@ public abstract class BaseCharacter : MonoBehaviour, ITargetHandler
 
     protected void DespawnCharacter()
     {
-        GlobalScene.SpawnMng.DespawnCharacter(gameObject);
+        //GlobalScene.SpawnMng.DespawnCharacter(gameObject);
     }
 
     void SetWeaponPos(Vector3 pPos, Quaternion pRot, bool pEnable)

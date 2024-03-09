@@ -239,19 +239,19 @@ public class GlobalScene : BaseScene
         }
     }
 
-    private SpawnManager spawnMng = null;
-    public static SpawnManager SpawnMng
-    {
-        get
-        {
-            if (Instance.spawnMng == null)
-            {
-                Instance.spawnMng = Instance.mngLoader.CreateManager<SpawnManager>();
-            }
+    //private SpawnManager_Legacy spawnMng = null;
+    //public static SpawnManager_Legacy SpawnMng
+    //{
+    //    get
+    //    {
+    //        if (Instance.spawnMng == null)
+    //        {
+    //            Instance.spawnMng = Instance.mngLoader.CreateManager<SpawnManager_Legacy>();
+    //        }
 
-            return Instance.spawnMng;
-        }
-    }
+    //        return Instance.spawnMng;
+    //    }
+    //}
 
     private UserManager userMng = null;
     public static UserManager UserMng
@@ -359,7 +359,6 @@ public class GlobalScene : BaseScene
         logInMng = mngLoader.CreateManager<LogInManager>();
         userMng = mngLoader.CreateManager<UserManager>();
         //inputMng = mngLoader.CreateManager<InputManager>();
-        spawnMng = mngLoader.CreateManager<SpawnManager>();
 
         /// SceneMng
         SceneMng.RemoveSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
