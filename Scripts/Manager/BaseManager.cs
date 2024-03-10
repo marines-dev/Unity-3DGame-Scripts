@@ -5,14 +5,18 @@ public abstract class BaseManager : MonoBehaviour
     private void Awake()
     {
         OnAwake();
-        Initialize();
+        OnReset();
+    }
+
+    private void OnDestroy()
+    {
+        OnReset();
     }
 
     protected abstract void OnAwake();
-    protected abstract void OnInit();
 
-    public void Initialize()
-    {
-        OnInit();
-    }
+    /// <summary>
+    /// 활성 씬이 언로드될 때 호출되는 함수 입니다.
+    /// </summary>
+    public abstract void OnReset();
 }

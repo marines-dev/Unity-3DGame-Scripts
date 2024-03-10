@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GUIManager : BaseManager
 {
-    Controller controller_go = null;
+    Controller_Legacy controller_go = null;
     //Controller controller_go
     //{
     //    get
@@ -21,7 +21,7 @@ public class GUIManager : BaseManager
     #region Override
 
     protected override void OnAwake() { }
-    protected override void OnInit()
+    public override void OnReset()
     {
         ExitJoystickController();
         DestroyController();
@@ -54,7 +54,7 @@ public class GUIManager : BaseManager
     {
         if (GlobalScene.GameMng.IsGamePlay == false)
         {
-            Debug.Log($"Failed : {typeof(Controller).Name}를 실행할 수 없습니다.");
+            Debug.Log($"Failed : {typeof(Controller_Legacy).Name}를 실행할 수 없습니다.");
             return;
         }
 
@@ -66,7 +66,7 @@ public class GUIManager : BaseManager
     {
         if(controller_go == null)
         {
-            Debug.Log($"Failed : 종료할 {typeof(Controller).Name}이 없습니다.");
+            Debug.Log($"Failed : 종료할 {typeof(Controller_Legacy).Name}이 없습니다.");
             return;
         }
 
@@ -87,8 +87,8 @@ public class GUIManager : BaseManager
         }
 
         //DestroyController();
-        string name = $"@{typeof(Controller).Name}";
-        controller_go = GlobalScene.ResourceMng.CreateComponentObject<Controller>(name, null);
+        string name = $"@{typeof(Controller_Legacy).Name}";
+        controller_go = GlobalScene.ResourceMng.CreateComponentObject<Controller_Legacy>(name, null);
     }
 
     void DestroyController()

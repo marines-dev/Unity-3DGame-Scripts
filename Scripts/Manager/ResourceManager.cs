@@ -5,7 +5,7 @@ using UnityEngine;
 public class ResourceManager : BaseManager
 {
     protected override void OnAwake() { }
-    protected override void OnInit() { }
+    public override void OnReset() { }
 
     public T Load<T>(string path) where T : UnityEngine.Object
     {

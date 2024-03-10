@@ -1,94 +1,146 @@
 using System;
 using System.Collections;
+using Unity.Android.Types;
 using UnityEngine;
 
 
 public class CameraManager : BaseManager
 {
-    Define.CameraMode cameraModeType = Define.CameraMode.None;
-    Vector3 deltaPos = Vector3.zero;
+    //public enum BGColor
+    //{
+    //    Black,
+    //    Blue,
+    //    White,
+    //}
 
-    Camera mainCamera_ref = null;
-    IEnumerator lateUpdateQuarterViewCamCoroutine = null;
+    public Define.CameraMode CameraModeType { get; private set; } = Define.CameraMode.Defualt;
 
-    protected override void OnAwake() { }
-    protected override void OnInit()
+    static Camera mainCamera_ref = null;
+    private CamController cameraCtrl = null;
+    private CamController CameraCtrl
     {
-        ClearLateUpdateQuarterCameraCoroutine();
+        get
+        {
+            if(cameraCtrl == null)
+            {
+                CameraModeType = Define.CameraMode.None;
+                Debug.LogWarning("");
+                SetDefualtCamMode();
+            }
 
-        cameraModeType = Define.CameraMode.None;
-        deltaPos = Vector3.zero;
-        //camera = null;
+            return cameraCtrl;
+        }
     }
 
-    public void SetCameraManager(Camera pMainCamera)
+    public static void SetCameraManager(Camera pMainCamera)
     {
         mainCamera_ref = pMainCamera;
     }
 
-    public void SetWorldSceneCamera()
+    protected override void OnAwake()
     {
-        if(GlobalScene.SceneMng.IsActiveScene<WorldScene>())
+        ResetCameraMode();
+    }
+
+    public override void OnReset()
+    {
+        ResetCameraMode();
+    }
+
+    public void SetDefualtCamMode()
+    {
+        /// Ä«¸Þ¶ó ÃÊ±âÈ­ È®ÀÎ
+        if (CameraModeType != Define.CameraMode.None)
         {
             Debug.LogWarning("");
             return;
         }
 
-        cameraModeType = Define.CameraMode.QuarterView;
-        deltaPos = Config.camera_deltaPos;
-        //camera = Camera.main;
-        if(GetComponent<Camera>() == null)
+        CameraModeType = Define.CameraMode.Defualt;
+        CamController generalCamCtrl = CamController.CreateCamera();
+
+        cameraCtrl = generalCamCtrl;
+    }
+
+    public void SetQuarterViewCamMode(Transform pTarget)
+    {
+        /// Ä«¸Þ¶ó ÃÊ±âÈ­ È®ÀÎ
+        if (CameraModeType != Define.CameraMode.None)
         {
             Debug.LogWarning("");
             return;
         }
 
-        LateUpdateQuarterViewCam();
+        CameraModeType = Define.CameraMode.QuarterView;
+        QuarterView_CamController quarterViewCamCtrl = QuarterView_CamController.CreateCamera();
+        quarterViewCamCtrl.SetQuarterViewCam(mainCamera_ref, pTarget);
+
+        cameraCtrl = quarterViewCamCtrl;
     }
 
-    void LateUpdateQuarterViewCam()
+    public void SwitchQuarterViewCamPlay(bool pSwitch)
     {
-        //
-        ClearLateUpdateQuarterCameraCoroutine();
-        lateUpdateQuarterViewCamCoroutine = LateUpdateQuarterViewCamCoroutine();
-        StartCoroutine(lateUpdateQuarterViewCamCoroutine);
-    }
-
-    void ClearLateUpdateQuarterCameraCoroutine()
-    {
-        if (lateUpdateQuarterViewCamCoroutine != null)
+        if (CameraModeType != Define.CameraMode.QuarterView)
         {
-            StopCoroutine(lateUpdateQuarterViewCamCoroutine);
-            lateUpdateQuarterViewCamCoroutine = null;
+            Debug.LogWarning("");
+            return;
+        }
+
+        cameraCtrl.SwitchPlay = pSwitch;
+    }
+
+    private void ResetCameraMode()
+    {
+        CameraModeType = Define.CameraMode.None;
+
+        if (cameraCtrl != null)
+        {
+            Destroy(cameraCtrl.gameObject);
+            cameraCtrl = null;
+        }
+
+        if (mainCamera_ref != null)
+        {
+            mainCamera_ref.backgroundColor = Config.cam_backgroundColor;
+
+            mainCamera_ref.transform.localPosition = Config.cam_initPos;
+            mainCamera_ref.transform.localRotation = Quaternion.Euler(Config.cam_initRot);
+            mainCamera_ref.transform.localScale = Config.cam_initScale;
         }
     }
 
-    [Obsolete("ï¿½Ó½ï¿½")]
-    IEnumerator LateUpdateQuarterViewCamCoroutine()
-    {
-        while (true)
-        {
-            if(GlobalScene.GameMng.IsGamePlay) //ï¿½Ó½ï¿½ : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-            {
-                RaycastHit hit;
-                if (Physics.Raycast(GlobalScene.GameMng.playerCtrl.Position, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
-                {
-                    float dist = (hit.point - GlobalScene.GameMng.playerCtrl.Position).magnitude * 0.8f;
-                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.Position + deltaPos.normalized * dist;
-                }
-                else
-                {
-                    GetComponent<Camera>().transform.position = GlobalScene.GameMng.playerCtrl.Position + deltaPos;
-                    GetComponent<Camera>().transform.LookAt(GlobalScene.GameMng.playerCtrl.Position);
-                }
-            }
+    //private void SetPosition(Vector3 pPos)
+    //{
+    //    mainCamera_ref.transform.localPosition = pPos;
+    //}
 
-            yield return null;
-        }
+    //private void SetLookAt(Vector3 targetPos)
+    //{
+    //    mainCamera_ref.transform.LookAt(targetPos);
+    //}
 
-        yield return null;
-        deltaPos = Vector3.zero;
-        cameraModeType = Define.CameraMode.None;
-        //camera = null;
-    }
+    //private void SetBackgroundColor(BGColor pColor = BGColor.Black)
+    //{
+    //    Color color = Color.black;
+    //    switch (pColor)
+    //    {
+    //        case BGColor.Black:
+    //            {
+    //                color = Color.black;
+    //            }
+    //            break;
+    //        case BGColor.Blue:
+    //            {
+    //                color = Color.blue;
+    //            }
+    //            break;
+    //        case BGColor.White:
+    //            {
+    //                color = Color.white;
+    //            }
+    //            break;
+    //    }
+
+    //    mainCamera_ref.backgroundColor = color;
+    //}
 }

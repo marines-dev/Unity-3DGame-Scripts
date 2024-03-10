@@ -70,4 +70,19 @@ public class Util
 
         return go.AddComponent<T>();
     }
+
+    public static T CreateGlobalObject<T>(Transform pParent = null) where T : Component
+    {
+        T handler = GameObject.FindObjectOfType<T>();
+        if (handler != null && handler.gameObject != null)
+        {
+            GameObject.Destroy(handler.gameObject);
+        }
+
+        handler = CreateGameObject<T>();
+        GameObject.DontDestroyOnLoad(handler);
+
+        handler.transform.SetParent(pParent);
+        return handler;
+    }
 }

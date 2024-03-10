@@ -18,6 +18,9 @@ public class WorldScene : BaseScene
     //public BaseInput BaseInput { get; }
 
     #region World
+    
+    Character temp_player = null;
+
     /// <summary>
     /// Spawner
     /// </summary>
@@ -42,15 +45,16 @@ public class WorldScene : BaseScene
 
         // Spawner
         {
-            /// Player
-            //GlobalScene.UserMng.LoadUserData();
-            //LoadSpawner(spawnerData.id, InitPlayerEvent, SpawnPlayerEvent, DespawnPlayerEvent);
+            // Player
+            GlobalScene.UserMng.LoadUserData();
+            temp_player = CharacterSpawner.CreateCharacter(Define.WorldObject.Character, 1, DespawnPlayerEvent); //임시
 
             // Enemy
             Table.SpawnerTable.Data[] spawnerDatas = GlobalScene.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>().GetTableDatasAll();
             foreach (Table.SpawnerTable.Data spawnerData in spawnerDatas)
             {
-                ISpawner worldSpawner = CreateWorldSpawner<CharacterSpawner>(spawnerData.id, SpawnEnemyEvent, DespawnEnemyEvent);
+                ISpawner worldSpawner = CharacterSpawner.CreateSpawner(spawnerData.id, SpawnEnemyEvent, DespawnEnemyEvent);
+                //worldSpawner.SetWorldSpawner(spawnerData.id, SpawnEnemyEvent, DespawnEnemyEvent);
                 
                 ///
                 worldSpawner_hashSet.Add(worldSpawner);
@@ -61,13 +65,26 @@ public class WorldScene : BaseScene
         //GlobalScene.GUIMng.SetWorldSceneController();
         //yield return null;
 
-        //// Camera
-        //GlobalScene.CameraMng.SetWorldSceneCamera();
-        //yield return null;
+        /// Camera
+        GlobalScene.CameraMng.SetQuarterViewCamMode(temp_player.transform);
     }
 
     protected override void OnStart()
     {
+        // Spawn
+        {
+            ///Player
+            Vector3 spawnPos = new Vector3(7.5f, 0f, 1f); //임시
+            Vector3 spawnRot = Quaternion.identity.eulerAngles; //임시
+            temp_player.Spawn(spawnPos, spawnRot);
+
+            /// Enemy
+            SwitchSpawnersPooling(true);
+        }
+
+        /// Camera
+        GlobalScene.CameraMng.SwitchQuarterViewCamPlay(true);
+
         //GlobalScene.GUIMng.StartJoystickController();
     }
 
@@ -75,13 +92,12 @@ public class WorldScene : BaseScene
     {
     }
 
-    public static ISpawner CreateWorldSpawner<TSpawner>(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction) where TSpawner : Component, ISpawner
-    {
-        ISpawner worldSpawner = Util.CreateGameObject<TSpawner>();
-        worldSpawner.SetWorldSpawner(pSpawnerID, pSpawnAction, pDespawnAction);
+    #region Spawner
 
-        return worldSpawner;
-    }
+    //public static ISpawner CreateWorldSpawner<TSpawner>() where TSpawner : Component, ISpawner
+    //{
+    //    return Util.CreateGameObject<TSpawner>();
+    //}
 
     void SpawnEnemyEvent(GameObject pGO, Define.Actor pAactorType, int actorID)
     {
@@ -92,14 +108,6 @@ public class WorldScene : BaseScene
     {
         //SetDespawnWorldObj(pGO);
     }
-
-    //public void LoadSpawner(int pSpawnerID, Action<GameObject> pInitEvent, Action<GameObject, int> pSpawnEvent, Action<GameObject> pDespawnEvent) where T : BaseWorldObj
-    //{
-    //    Spawner worldSpawner = Global.LoadHandler_GameObject<Spawner>(transform);
-    //    worldSpawner.SetSpawner(pSpawnerID, pInitEvent, pSpawnEvent, pDespawnEvent);
-
-    //    spawner_dic.Add(pSpawnerID, worldSpawner);
-    //}
 
     //void InitPlayerEvent(GameObject pGO)
     //{
@@ -134,11 +142,25 @@ public class WorldScene : BaseScene
     //    SetSpawnPlayer();
     //}
 
-    //void DespawnPlayerEvent(GameObject pGO)
-    //{
-    //    SetDespawnWorldObj(pGO);
+    void DespawnPlayerEvent(GameObject pGO)
+    {
+        //SetDespawnWorldObj(pGO);
 
-    //    // Respawn
-    //    RespawnPlayer();
-    //}
+        //// Respawn
+        //RespawnPlayer();
+    }
+
+    public void SwitchSpawnersPooling(bool pSwitch)
+    {
+        foreach(ISpawner spawner in worldSpawner_hashSet)
+        {
+            if(spawner != null)
+            {
+                spawner.SwitchPooling = pSwitch;
+            }
+        }
+    }
+
+    #endregion Spawner
+
 }

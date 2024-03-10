@@ -11,5 +11,5 @@ using UnityEngine;
 public class SampleManager : BaseManager
 {
     protected override void OnAwake() { }
-    protected override void OnInit() { }
+    public override void OnReset() { }
 }

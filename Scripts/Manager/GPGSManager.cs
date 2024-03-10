@@ -7,7 +7,7 @@ using UnityEngine;
 public class GPGSManager : BaseManager
 {
     protected override void OnAwake() { }
-    protected override void OnInit() { }
+    public override void OnReset() { }
 
     public void InitGPGSAuth()
     {

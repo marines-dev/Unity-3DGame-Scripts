@@ -1,17 +1,54 @@
 using System;
-using System.Collections.Generic;
 using Interface;
 using Table;
-using Unity.Android.Types;
 using UnityEngine;
 
-public class CharacterSpawner : WorldSpawner<Character> { }
-
-public class WorldSpawner<TWorldObj> : BaseObjectPool, ISpawner where TWorldObj : BaseWorldObject
+public class CharacterSpawner : BaseSpawner<Character> , ISpawner
 {
+    public static Character CreateCharacter(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
+    {
+        string findPrefabPath = FindPrefabPath(pWorldObjType, pWorldObjID);
+        Character character = GlobalScene.ResourceMng.Instantiate(findPrefabPath).GetOrAddComponent<Character>();
+        character.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
+
+        return character;
+    }
+
+    public static ISpawner CreateSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction)
+    {
+        CharacterSpawner spawner = Util.CreateGameObject<CharacterSpawner>();
+        spawner.SetWorldSpawner(pSpawnerID, pSpawnAction, pDespawnAction);
+        return spawner;
+    }
+}
+
+public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : BaseWorldObject
+{
+    public bool switchPlay = false;
+    public bool SwitchPooling 
+    { 
+        private get { return switchPlay; }
+        set
+        {
+            if(value ==  switchPlay) 
+                return;
+
+            switchPlay = value;
+            if (switchPlay)
+            {
+                //OnPlay();
+            }
+            else
+            {
+                //OnStop();
+            }
+        }
+    }
+
     /// <summary>
     /// TableData
     /// </summary>
+    SpawnerTable.Data spawnerData = null;
     //public int spawnerID;
     //public int poolAmount;
     //public int keepCount;
@@ -21,7 +58,6 @@ public class WorldSpawner<TWorldObj> : BaseObjectPool, ISpawner where TWorldObj 
     //public Vector3 spawnPos;
     //public Quaternion spawnRot;
     //public bool poolExpand;
-    SpawnerTable.Data spawnerData = null;
 
     /// <summary>
     /// StateData
@@ -35,9 +71,11 @@ public class WorldSpawner<TWorldObj> : BaseObjectPool, ISpawner where TWorldObj 
     private Action<GameObject, Define.Actor, int> spawnAction = null; /// <GameObject, actorType, actorID>
     private Action<GameObject> despawnAction = null;
 
-
     private void Update()
     {
+        if (!SwitchPooling)
+            return;
+
         /// UpdatePooling
         if (switchSpawn == false)
         {
@@ -78,6 +116,8 @@ public class WorldSpawner<TWorldObj> : BaseObjectPool, ISpawner where TWorldObj 
         //initAction = pInitAction;
         spawnAction = pSpawnAction;
         despawnAction = pDespawnAction;
+
+        SwitchPooling = false;
     }
 
     protected override void SetObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand)
@@ -133,7 +173,7 @@ public class WorldSpawner<TWorldObj> : BaseObjectPool, ISpawner where TWorldObj 
         }
     }
 
-    private string FindPrefabPath(Define.WorldObject pWorldObjType, int pWorldObjectID)
+    protected static string FindPrefabPath(Define.WorldObject pWorldObjType, int pWorldObjectID)
     {
         switch (pWorldObjType)
         {
@@ -174,5 +214,16 @@ public class WorldSpawner<TWorldObj> : BaseObjectPool, ISpawner where TWorldObj 
 
     //    reserveCount++;
     //    delayTime = UnityEngine.Random.Range(data.minSpawnTime, data.maxSpawnTime);
+    //}
+
+    //[Obsolete("Å×½ºÆ®")]
+    //Vector3 RandomPos()
+    //{
+    //    Table.Spawner.Data spawnerData = Manager.Table.GetTable<Table.Spawner>().GetTableData(2);
+    //    Vector3 randDir = UnityEngine.Random.insideUnitSphere * UnityEngine.Random.Range(0, spawnerData.spawnRadius);
+    //    randDir.y = 0;
+    //    Vector3 randPos = spawnerData.spawnPos + randDir;
+
+    //    return randPos;
     //}
 }

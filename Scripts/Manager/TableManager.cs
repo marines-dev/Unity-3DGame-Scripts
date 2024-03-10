@@ -23,7 +23,7 @@ public class TableManager : BaseManager
         //StatDict = LoadJson<Data.Stat, int, Data.StatData>("StatData_Test").MakeDict();
     }
 
-    protected override void OnInit()
+    public override void OnReset()
     {
         // RemoveBaseTableAll
         {

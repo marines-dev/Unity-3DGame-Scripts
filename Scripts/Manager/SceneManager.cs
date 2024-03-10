@@ -42,52 +42,52 @@ public class SceneManager : BaseManager
         }
     }
 
-    //Action sceneUnloadEvent = null;
-    //Action sceneLoadEvent = null;
+    static Action globalSceneUnloadEvent = null;
+    static Action globalSceneLoadEvent = null;
 
+
+    public static void SetSceneManager(Action pSceneUnloadEvent, Action pSceneLoadEvent)
+    {
+        globalSceneUnloadEvent = pSceneUnloadEvent;
+        globalSceneLoadEvent = pSceneLoadEvent;
+    }
 
     protected override void OnAwake() { }
 
-    protected override void OnInit()
+    public override void OnReset()
     {
         PreSceneName = string.Empty;
         NextSceneName = string.Empty;
         IsBaseSceneLoading = false;
     }
 
-    //public void SetSceneManager(Action pSceneUnloadEvent, Action pSceneLoadEvent)
-    //{
-    //    sceneUnloadEvent = pSceneUnloadEvent;
-    //    sceneLoadEvent = pSceneLoadEvent;
-    //}
+    public void UnloadedScene()
+    {
+        //if (! IsBaseSceneLoading)
+        //{
+        //    Debug.LogWarning($"Failed :");
+        //    return;
+        //}
 
-    //public void UnloadPreScene()
-    //{
-    //    //if (! IsBaseSceneLoading)
-    //    //{
-    //    //    Debug.LogWarning($"Failed :");
-    //    //    return;
-    //    //}
+        if (globalSceneUnloadEvent != null)
+        {
+            globalSceneUnloadEvent.Invoke();
+        }
+    }
 
-    //    if( sceneUnloadEvent != null )
-    //    {
-    //        sceneUnloadEvent.Invoke();
-    //    }
-    //}
+    public void LoadedScene()
+    {
+        //if (! IsBaseSceneLoading)
+        //{
+        //    Debug.LogWarning($"Failed :");
+        //    return;
+        //}
 
-    //public void LoadNextScene()
-    //{
-    //    //if (! IsBaseSceneLoading)
-    //    //{
-    //    //    Debug.LogWarning($"Failed :");
-    //    //    return;
-    //    //}
-
-    //    if (sceneLoadEvent != null)
-    //    {
-    //        sceneLoadEvent.Invoke();
-    //    }
-    //}
+        if (globalSceneLoadEvent != null)
+        {
+            globalSceneLoadEvent.Invoke();
+        }
+    }
 
     public void LoadBaseScene<TScene>() where TScene : BaseScene
     {
@@ -104,29 +104,29 @@ public class SceneManager : BaseManager
         UnityEngine.SceneManagement.SceneManager.LoadScene(loadSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
     }
 
-    public void AddSceneLoaderEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene> pSceneUnloaded, UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
-    {
-        if (pSceneLoadedEvent == null)
-        {
-            Debug.LogWarning("");
-            return;
-        }
+    //public void AddSceneLoaderEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene> pSceneUnloaded, UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
+    //{
+    //    if (pSceneLoadedEvent == null)
+    //    {
+    //        Debug.LogWarning("");
+    //        return;
+    //    }
 
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded += pSceneLoadedEvent;
-        UnityEngine.SceneManagement.SceneManager.sceneUnloaded += pSceneUnloaded;
-    }
+    //    UnityEngine.SceneManagement.SceneManager.sceneLoaded += pSceneLoadedEvent;
+    //    UnityEngine.SceneManagement.SceneManager.sceneUnloaded += pSceneUnloaded;
+    //}
 
-    public void RemoveSceneLoaderEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene> pSceneUnloaded, UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
-    {
-        if (pSceneLoadedEvent == null)
-        {
-            Debug.LogWarning("");
-            return;
-        }
+    //public void RemoveSceneLoaderEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene> pSceneUnloaded, UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
+    //{
+    //    if (pSceneLoadedEvent == null)
+    //    {
+    //        Debug.LogWarning("");
+    //        return;
+    //    }
 
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= pSceneLoadedEvent;
-        UnityEngine.SceneManagement.SceneManager.sceneUnloaded -= pSceneUnloaded;
-    }
+    //    UnityEngine.SceneManagement.SceneManager.sceneLoaded -= pSceneLoadedEvent;
+    //    UnityEngine.SceneManagement.SceneManager.sceneUnloaded -= pSceneUnloaded;
+    //}
 
     public bool IsActiveScene<TScene>() where TScene : BaseScene
     {

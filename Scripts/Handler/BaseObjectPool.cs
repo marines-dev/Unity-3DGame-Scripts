@@ -4,16 +4,10 @@ using UnityEngine;
 
 public abstract class BaseObjectPool : MonoBehaviour
 {
-    public enum SpawnState
-    {
-        Despawn,
-        Spawn,
-    }
-
     protected string prefabPath = string.Empty;
     protected bool poolExpand = true;
 
-    Dictionary<GameObject, SpawnState> objectPool_dic = new Dictionary<GameObject, SpawnState>();
+    Dictionary<GameObject, Define.SpawnState> objectPool_dic = new Dictionary<GameObject, Define.SpawnState>();
 
 
     protected virtual void SetObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand)
@@ -35,12 +29,12 @@ public abstract class BaseObjectPool : MonoBehaviour
 
         if (!objectPool_dic.ContainsKey(go))
         {
-            objectPool_dic.Add(go, SpawnState.Despawn);
+            objectPool_dic.Add(go, Define.SpawnState.Despawn);
 
         }
         else
         {
-            objectPool_dic[go] = SpawnState.Despawn;
+            objectPool_dic[go] = Define.SpawnState.Despawn;
         }
 
         return go;
@@ -49,9 +43,9 @@ public abstract class BaseObjectPool : MonoBehaviour
     public virtual GameObject SpawnObject()
     {
         GameObject go = null;
-        foreach (KeyValuePair<GameObject, SpawnState> pair in objectPool_dic)
+        foreach (KeyValuePair<GameObject, Define.SpawnState> pair in objectPool_dic)
         {
-            if (pair.Value == SpawnState.Despawn)
+            if (pair.Value == Define.SpawnState.Despawn)
             {
                 go = pair.Key;
             }
@@ -59,7 +53,7 @@ public abstract class BaseObjectPool : MonoBehaviour
 
         if (go != null)
         {
-            objectPool_dic[go] = SpawnState.Spawn;
+            objectPool_dic[go] = Define.SpawnState.Spawn;
             go.gameObject.SetActive(true);
             return go;
         }
@@ -67,7 +61,7 @@ public abstract class BaseObjectPool : MonoBehaviour
         if (go == null && poolExpand)
         {
             go = CreateObject();
-            objectPool_dic[go] = SpawnState.Spawn;
+            objectPool_dic[go] = Define.SpawnState.Spawn;
             go.gameObject.SetActive(true);
             return go;
         }
@@ -84,12 +78,12 @@ public abstract class BaseObjectPool : MonoBehaviour
             return;
         }
 
-        if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == SpawnState.Despawn)
+        if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == Define.SpawnState.Despawn)
         {
             Debug.LogWarning($"Failed : ");
         }
 
-        objectPool_dic[pObj] = SpawnState.Despawn;
+        objectPool_dic[pObj] = Define.SpawnState.Despawn;
         pObj.gameObject.SetActive(false);
     }
 }

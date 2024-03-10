@@ -44,16 +44,22 @@ public class Define
         //NPC,
     }
 
-    public enum BaseState
+    public enum SpawnState
     {
-        None,
+        Despawn,
+        Spawn,
+    }
+
+    public enum BaseAnim
+    {
+        //None,
         Die,
         Idle,
         Run,
         //Attack,
     }
 
-    public enum UpperState
+    public enum UpperAnim
     {
         None,
         Ready,
@@ -99,6 +105,7 @@ public class Define
     public enum CameraMode
     {
         None,
+        Defualt,
         QuarterView,
     }
 

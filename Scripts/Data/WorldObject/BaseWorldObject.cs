@@ -7,31 +7,29 @@ public abstract class BaseWorldObject : MonoBehaviour
     Define.WorldObject worldObjType = Define.WorldObject.None;
     int worldObjID = 0;
 
-    //Define.SpawnState spawnState_ = Define.SpawnState.Despawn;
-    //public Define.SpawnState SpawnState
-    //{
-    //    get
-    //    {
-    //        return spawnState_;
-    //    }
-    //    set
-    //    {
-    //        switch (spawnState_)
-    //        {
-    //            case Define.SpawnState.Despawn:
-    //                {
-    //                    gameObject.SetActive(false);
-    //                }
-    //                break;
-    //            case Define.SpawnState.Spawn:
-    //                {
-    //                    gameObject.SetActive(true);
-    //                }
-    //                break;
-    //        }
-    //        spawnState_ = value;
-    //    }
-    //}
+    Define.SpawnState spawnState = Define.SpawnState.Despawn;
+    public Define.SpawnState SpawnState
+    {
+        get { return spawnState; }
+        set
+        {
+            spawnState = value;
+
+            switch (spawnState)
+            {
+                case Define.SpawnState.Despawn:
+                    {
+                        gameObject.SetActive(false);
+                    }
+                    break;
+                case Define.SpawnState.Spawn:
+                    {
+                        gameObject.SetActive(true);
+                    }
+                    break;
+            }
+        }
+    }
     //public bool IsActive { get { return gameObject.activeInHierarchy; } }
 
     public Vector3 LocalPosition 
@@ -74,7 +72,7 @@ public abstract class BaseWorldObject : MonoBehaviour
         worldObjID = pWorldObjID;
         despawnAction = pDespawnAction;
 
-        //spawnState_ = Define.SpawnState.Despawn;
+        SpawnState = Define.SpawnState.Despawn;
     }
 
     public virtual void Spawn(Vector3 pPos, Vector3 pRot)
@@ -83,7 +81,7 @@ public abstract class BaseWorldObject : MonoBehaviour
         Position = pPos;
         Rotation = pRot;
 
-        //spawnState_ = Define.SpawnState.Despawn;
+        SpawnState = Define.SpawnState.Spawn;
     }
 
     protected virtual void Despawn()
@@ -91,6 +89,6 @@ public abstract class BaseWorldObject : MonoBehaviour
         if (despawnAction != null)
             despawnAction.Invoke(gameObject);
 
-        //spawnState_ = Define.SpawnState.Despawn;
+        SpawnState = Define.SpawnState.Despawn;
     }
 }

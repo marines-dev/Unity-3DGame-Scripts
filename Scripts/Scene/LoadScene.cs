@@ -82,8 +82,8 @@ public class LoadScene : BaseScene
 
         /// UnloadScene
         {
+            GlobalScene.SceneMng.UnloadedScene();
             yield return UnloadSceneAsync(preSceneName);
-            //GlobalScene.SceneMng.UnloadPreScene();
             yield return null;
 
             /// 메모리 정리(임시)
@@ -95,10 +95,11 @@ public class LoadScene : BaseScene
         /// LoadScene
         {
             yield return LoadSceneAsync(nextSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
-
             SetActiveScene(nextSceneName);
             //GlobalScene.SceneMng.GetOrCreateActiveScene();
-            //GlobalScene.SceneMng.LoadNextScene();
+            yield return null;
+
+            GlobalScene.SceneMng.LoadedScene();
             yield return null;
 
             string loadSceneName = typeof(LoadScene).Name;

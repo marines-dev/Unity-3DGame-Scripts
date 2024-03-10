@@ -27,7 +27,7 @@ public class LogInManager : BaseManager
     public bool isDone { get; private set; } = false;
 
     protected override void OnAwake() { }
-    protected override void OnInit() { }
+    public override void OnReset() { }
 
 
     public void InitLogInState()

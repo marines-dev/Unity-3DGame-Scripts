@@ -5,7 +5,7 @@ using UnityEngine;
 
 public interface ITargetHandler
 {
-    public Define.BaseState baseStateType { get; }
+    public Define.BaseAnim BaseAnimType { get; set; }
 
     public Vector3 Position { get; }
     public Vector3 Rotation { get; }
@@ -20,86 +20,133 @@ public interface ITargetHandler
 // HPBar 기능 이동 필요
 public class Character : BaseWorldObject, ITargetHandler
 {
-    Table.CharacterTable.Data characterData = null;
+    private Table.CharacterTable.Data characterData = null;
     //int characterID = 0;
 
-    // Stat
-    protected struct Stat
+    #region Actor
+
+    //테이블(enum)
+    //액터 종류(임시) : (Player),  Enemy, Boss, NPC
+    string animatorControllerType = string.Empty;
+    protected struct Stat //액터마다 Stat구성 다름
     {
         public int maxHp;
         public int currentHp;
         public int attack;
         public int defense;
-        public float moveSpeed;
-        public int maxExp;
-        //public int exp = 0;
     }
-    protected Stat stat_;
-    protected Stat stat { get { return stat_; } }
+    private Stat statData;
+    protected Stat StatData { get { return statData; } }
+    
+    int weaponID = 0;
 
-    // State
-    public Define.BaseState     baseStateType { get; private set; }     = Define.BaseState.None;
-    protected Define.UpperState upperStateType { get; private set; }    = Define.UpperState.None;
-    bool isBaseStateProcess = false;
-    bool isUpperStateProcess = false;
-
-    // Test
-    protected string baseLayerName      = "Base Layer";
-    protected string upperLayerName     = "Upper Layer";
-    string upperReadyAnimationClip1     = "Humanoid_Ready_Hand";
-    string upperReadyAnimationClip2     = "Humanoid_Ready_Gun";
-    string upperAttackAnimationClip1    = "Humanoid_Attack_Hand";
-    string upperAttackAnimationClip2    = "Humanoid_Attack_Gun";
-    protected float hitTime = 0.5f;
-
-    NavMeshAgent        navMeshAgent_ = null;
-    public NavMeshAgent navMeshAgent
+    ////스크립트(animatorControllerType에 따라 결정) //스크립트오브젝터블고려
+    protected string baseLayerName = "Base Layer"; 
+    protected string upperLayerName = "Upper Layer";
+    private Define.BaseAnim baseAnimType = Define.BaseAnim.Idle;
+    public Define.BaseAnim BaseAnimType
     {
-        get
+        get { return baseAnimType; }
+        set
         {
-            if (navMeshAgent_ == null)
+            if (value == baseAnimType)
             {
-                navMeshAgent_ = transform.gameObject.GetOrAddComponent<NavMeshAgent>();
+                Debug.Log("Failed : ");
+                return;
             }
-            return navMeshAgent_;
+
+            baseAnimType = value;
+
+            switch (baseAnimType)
+            {
+                case Define.BaseAnim.Die:
+                    {
+                        if (isDying == false)
+                            SetDie();
+                    }
+                    break;
+                case Define.BaseAnim.Idle:
+                    {
+                        SetIdle();
+                    }
+                    break;
+                case Define.BaseAnim.Run:
+                    {
+                        SetRun();
+                    }
+                    break;
+            }
         }
     }
-    Animator_Util           animatorOverride_ = null;
-    protected Animator_Util animatorOverride
+
+    private Define.UpperAnim upperAnimType = Define.UpperAnim.None;
+    public Define.UpperAnim UpperAnimType
     {
-        get
+        get { return upperAnimType; }
+        set
         {
-            if (animatorOverride_ == null)
+            if (value == upperAnimType || value == Define.UpperAnim.None)
             {
-                animatorOverride_ = gameObject.GetOrAddComponent<Animator_Util>();
+                Debug.Log($"Failed : ");
+                return;
             }
-            return animatorOverride_;
+
+            upperAnimType = value;
+
+            // Upper
+            switch (upperAnimType)
+            {
+                case Define.UpperAnim.Ready:
+                    {
+                        SetReady();
+                    }
+                    break;
+                case Define.UpperAnim.Attack:
+                    {
+                        if (isAttacking == false)
+                        {
+                            SetAttack();
+                        }
+                    }
+                    break;
+            }
         }
     }
-    Shader_Util             shader_ = null;
-    protected Shader_Util   shader
-    {
-        get
-        {
-            if (shader_ == null)
-            {
-                shader_ = gameObject.GetOrAddComponent<Shader_Util>();
-            }
-            return shader_;
-        }
-    }
-    protected Weapon weapon { get; private set; } = null;
-    HPBarUI     hPBarUI     = null;
-    Collider    collider    = null;
 
-    [Obsolete("임시")]IEnumerator fixedUpdateHPBarCoroutine = null;
-    IEnumerator baseStateProcessCoroutine   = null;
-    IEnumerator baseStateProcessRoutine     = null;
-    IEnumerator upperStateProcessCoroutine  = null;
-    IEnumerator upperStateProcessRoutine    = null;
+    string baseIdleAnimationClip = "";
+    string baseRunAnimationClip = "";
+    string upperReadyAnimationClip = "Humanoid_Ready_Gun";
+    string upperAttackAnimationClip = "Humanoid_Attack_Gun";
+    
+    public int attackSpeed; 
+    public float runSpeed;
+    protected float hitTime = 0.4f; //플레이어
+    //배틀액터 //Enemy - hitTime = 0.55f; 
+    ////플레이어엑터만 무기에 따라 바뀜
+    //string upperReadyAnimationClip1 = "Humanoid_Ready_Hand";
+    //string upperAttackAnimationClip1 = "Humanoid_Attack_Hand";
 
 
-    void Start()
+    // 상태값(Test)
+    float startTime = 1f;
+    float andTime = 0f;
+    float fadeOutTime = 0f;
+    bool isAttacking = false;
+    bool isHit = false;
+    bool isDying = false;
+
+    Collider collider = null;
+    protected NavMeshAgent navMeshAgent { get; private set; } = null;
+    //protected Animator_Util animator { get; private set; } = null;
+    protected Shader_Util shader { get; private set; } = null;
+
+    //protected Weapon weapon { get; private set; } = null;
+    //HPBarUI hpBarUI = null;
+
+    #endregion Actor
+
+
+    void Awake()
     {
         collider = gameObject.GetComponentInChildren<CapsuleCollider>();
         if (collider == null)
@@ -111,31 +158,30 @@ public class Character : BaseWorldObject, ITargetHandler
             }
         }
 
-        navMeshAgent_ = gameObject.GetOrAddComponent<NavMeshAgent>();
-        navMeshAgent_.radius = 0.3f;
-        animatorOverride_ = gameObject.GetOrAddComponent<Animator_Util>();
-        shader_ = gameObject.GetOrAddComponent<Shader_Util>();
+        navMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
+        navMeshAgent.radius = 0.3f;
+        //animator = gameObject.GetOrAddComponent<Animator_Util>();
+        shader = gameObject.GetOrAddComponent<Shader_Util>();
     }
 
-    //void OnDestroy()
-    //{
-    //}
+    protected virtual void Update()
+    {
+        if (BaseAnimType == Define.BaseAnim.Die)
+        {
+            UpdateDying();
+        }
+        else if (UpperAnimType == Define.UpperAnim.Attack)
+        {
+            UpdateAttacking();
+        }
+    }
 
-    protected virtual void InitSpawnCharacter() { }// 스폰 시 Base.SpawnCharacter() 함수에서 캐릭터를 초기화합니다.
-    //public abstract void ResetCharacter();
-    protected virtual IEnumerator BaseDieStateProcecssCoroutine() { yield return null; }
-    protected virtual IEnumerator BaseIdleStateProcecssCoroutine() { yield return null; }
-    protected virtual IEnumerator BaseRunStateProcecssCoroutine() { yield return null; }
-    protected virtual IEnumerator UpperReadyStateProcecssCoroutine() { yield return null; }
-    protected virtual IEnumerator UpperAttackStateProcecssCoroutine() { yield return null; }
-    protected virtual void OnHitEvent() { }
-    //protected abstract void SetDead();
-    //protected abstract void SetIdle();
-    //protected abstract void SetRun();
-    //protected abstract void SetSkill();
-    //protected abstract void SetRespawn();
+    void FixedUpdate()
+    {
+        //hpBarUI.SetUpdateHPBar(transform, stat_.currentHp, stat_.maxHp);
+    }
 
-    public override  void SetWorldObject(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
+    public override void SetWorldObject(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
     {
         base.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
 
@@ -146,13 +192,35 @@ public class Character : BaseWorldObject, ITargetHandler
     {
         base.Spawn(pPos, pRot);
 
-        /////
-        //SetStat(characterData.level);
+        //
+        shader.SetMateriasColorAlpha(1f, false);
 
-        //shader.SetMateriasColorAlpha(1f, false);
-        //animatorOverride.SetAnimatorController(characterData.animatorController, characterData.animatorAvatar);
-        //animatorOverride.SwapAnimationClip(upperReadyAnimationClip1, upperReadyAnimationClip2);
-        //animatorOverride.SwapAnimationClip(upperAttackAnimationClip1, upperAttackAnimationClip2);
+        
+        //animator.SetAnimatorController(characterData.animatorController, characterData.animatorAvatar);
+        //animator.SwapAnimationClip(upperReadyAnimationClip1, upperReadyAnimationClip2);
+        //animator.SwapAnimationClip(upperAttackAnimationClip1, upperAttackAnimationClip2);
+
+        // Stat
+        {
+            Table.StatTable.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+
+            this.statData.maxHp = statData.maxHp;
+            this.statData.currentHp = statData.maxHp;
+            this.statData.attack = statData.attack;
+            this.statData.defense = statData.defense;
+            
+            //this.runSpeed = statData.moveSpeed;
+            //this.statData.maxExp = statData.maxExp;
+        }
+
+        //if (hpBarUI == null)
+        //    CreateHPBarUI();
+
+        //hpBarUI.Open();
+
+        // State
+        baseAnimType = Define.BaseAnim.Idle;
+        upperAnimType = Define.UpperAnim.Ready;
 
         //// Weapon
         //if (characterData.weaponID != 0)
@@ -164,63 +232,176 @@ public class Character : BaseWorldObject, ITargetHandler
         //    SetWeaponPos(Vector3.zero, Quaternion.identity, false);
         //}
 
-        //// Stat
-        //if (hPBarUI == null)
-        //    CreateHPBarUI();
-
-        //// State
-        //baseStateType = Define.BaseState.None; //초기화
-        //upperStateType = Define.UpperState.None;
-        //isBaseStateProcess = false;
-        //isUpperStateProcess = false;
-
-
-        //// 자식 클래스에서 초기화할 함수입니다.
-        //InitSpawnCharacter(); // 임시(순서)
-
-        ////
-        //SetBaseStateType(Define.BaseState.Idle);
-        //SetUpperStateType(Define.UpperState.Ready);
-        //SetHPBarUI();
+        isAttacking = false;
+        isHit = false;
+        isDying = false;
     }
 
-    void SetWeaponPos(Vector3 pPos, Quaternion pRot, bool pEnable)
+    protected override void Despawn()
     {
-        if (weapon == null)
+        base.Despawn();
+
+        SetMateriasColorAlpha(1f);
+
+        baseAnimType = Define.BaseAnim.Die;
+        upperAnimType = Define.UpperAnim.None;
+    }
+
+    protected virtual void SetDie()
+    {
+        //hpBarUI.Close(); //임시
+
+        navMeshAgent.isStopped = true;
+        navMeshAgent.velocity = Vector3.zero;
+        //animator.SetRebind();
+
+        //
+        string animName = BaseAnimType.ToString();
+        //animator.SetCrossFade(baseLayerName, animName, 0.03f, 1f);
+
+        startTime = 1f;
+        andTime = 0f;
+        fadeOutTime = 0f;
+        isDying = true;
+    }
+
+    protected virtual void SetIdle()
+    {
+        navMeshAgent.isStopped = true;
+        navMeshAgent.velocity = Vector3.zero;
+
+        string animName = BaseAnimType.ToString();
+        //animator.SetCrossFade(baseLayerName, animName, 0.03f, 1f);
+    }
+
+    protected virtual void SetRun()
+    {
+        navMeshAgent.isStopped = false;
+        //navMeshAgent.speed = stat_.moveSpeed;
+
+        string animName = BaseAnimType.ToString();
+        //animator.SetCrossFade(baseLayerName, animName, 0.03f, 1f);
+    }
+
+    protected virtual void SetReady()
+    {
+        isAttacking = false;
+        //// Weapon
+        //Vector3 pos = new Vector3(-0f, 0f, -0.3f);
+        //Quaternion rot = Quaternion.Euler(0f, 0f, 180f);
+        //SetWeaponPos(pos, rot, true);
+
+        string animName = UpperAnimType.ToString();
+        //animator.SetCrossFade(upperLayerName, animName, 0.1f, 1f);
+    }
+
+    protected virtual void SetAttack()
+    {
+        isAttacking = true;
+        isHit = false;
+
+        //// Weapon
+        //Vector3 pos = new Vector3(0.14f, 0.14f, -0.35f);
+        //Quaternion rot = Quaternion.Euler(19f, -37f, 166f);
+        //SetWeaponPos(pos, rot, true);
+
+        string animName = UpperAnimType.ToString();
+        //animator.SetCrossFade(upperLayerName, animName, 0f, 1f);
+    }
+
+    //protected abstract void OnHitEvent();
+
+    void UpdateAttacking()
+    {
+        if (isAttacking == false)
             return;
 
-        weapon.SetPosition(pPos);
-        weapon.SetRotation(pRot);
-        weapon.SetEnable(pEnable);
+        //int truncValue = (int)animator.GetAnimatorStateNormalizedTime(upperLayerName);
+        //float animTime = animator.GetAnimatorStateNormalizedTime(upperLayerName) - truncValue;
+
+        //if (isHit && animTime < hitTime)
+        //{
+        //    isHit = false; // Reset
+        //}
+        //else if (isHit == false && animTime >= hitTime)
+        //{
+        //    isHit = true;
+        //    OnHitEvent();
+        //}
+
+        //if (animTime >= 1.0f)
+        //{
+        //    isAttacking = false;
+        //    isHit = false;
+        //}
     }
 
-    void SetHPBarUI()
+    void UpdateDying()
     {
-        hPBarUI.Open();
-        FixedUpdateHPBarProcess();
+        //if (isDying == false)
+        //    return;
+
+        //fadeOutTime = Mathf.Lerp(startTime, andTime, animator.GetAnimatorStateNormalizedTime(baseLayerName));
+        //SetMateriasColorAlpha(fadeOutTime);
+
+        //if (animator.GetAnimatorStateNormalizedTime(baseLayerName) >= 1.0f)
+        //{
+        //    SetMateriasColorAlpha(0f);
+        //    animator.SetRebind();
+
+        //    SetDespawn();
+
+        //    startTime = 1f;
+        //    andTime = 0f;
+        //    fadeOutTime = 0f;
+        //    isDying = false;
+        //}
     }
 
-    [Obsolete("레벨업 스탯 구현 필요")]
-    protected void SetStat(int pLevel)
+    public void OnDamage(int pValue)
     {
-        Table.StatTable.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+        //int damage = Mathf.Max(0, pValue - stat_.defense);
+        //int hp = stat_.currentHp - pValue;
+        //SetHP(hp);
 
-        stat_.maxHp = statData.maxHp;
-        stat_.currentHp = statData.maxHp;
-        stat_.attack = statData.attack;
-        stat_.defense = statData.defense;
-        stat_.moveSpeed = statData.moveSpeed;
-        stat_.maxExp = statData.maxExp;
+        ////
+        //if (stat_.currentHp <= 0)
+        //{
+        //    BaseStateType = Define.BaseState.Die;
+        //}
     }
+
+    public void OnEnableTargetOutline()
+    {
+        shader.OnEnableOutline();
+    }
+
+    public void OnDisableTargetOutline()
+    {
+        shader.OnDisableOutline();
+    }
+
+    //[Obsolete("레벨업 스탯 구현 필요")]
+    //protected void SetStat()
+    //{
+    //    Table.StatTable.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+
+    //    stat_.maxHp = statData.maxHp;
+    //    stat_.currentHp = statData.maxHp;
+    //    stat_.attack = statData.attack;
+    //    stat_.defense = statData.defense;
+    //    stat_.moveSpeed = statData.moveSpeed;
+    //    stat_.maxExp = statData.maxExp;
+    //}
 
     protected void SetHP(int pHpValue)
     {
         if (pHpValue < 0)
-            stat_.currentHp = 0;
-        else if (pHpValue > stat_.maxHp)
-            stat_.currentHp = stat_.maxHp;
+            statData.currentHp = 0;
+        else if (pHpValue > statData.maxHp)
+            statData.currentHp = statData.maxHp;
         else
-            stat_.currentHp = pHpValue;
+            statData.currentHp = pHpValue;
     }
 
     protected void SetMateriasColorAlpha(float pAlpha)
@@ -234,317 +415,67 @@ public class Character : BaseWorldObject, ITargetHandler
         return navMeshAgent.CalculatePath(_randPos, path);
     }
 
-    protected void SetBaseStateType(Define.BaseState pBaseStateType)
+    void SetWeaponPos(Vector3 pPos, Quaternion pRot, bool pEnable)
     {
-        if (baseStateType == Define.BaseState.Die)
-        {
-            Debug.Log("");
-            return;
-        }
+        //if (weapon == null)
+        //    return;
 
-        if (pBaseStateType == Define.BaseState.None)
-        {
-            Debug.Log("");
-            return;
-        }
-
-        if (pBaseStateType == baseStateType)
-        {
-            Debug.Log("");
-            return;
-        }
-
-        //
-        baseStateType = pBaseStateType;
-        //animatorOverride.speed = 1; //임시
-
-        SetBaseStateProcess();
-    }
-
-    protected void SetUpperStateType(Define.UpperState pUpperStateType)
-    {
-        if (baseStateType == Define.BaseState.Die)
-        {
-            Debug.Log("");
-            return;
-        }
-
-        if (pUpperStateType == Define.UpperState.None)
-        {
-            Debug.Log("");
-            return;
-        }
-
-        if (pUpperStateType == upperStateType)
-        {
-            Debug.Log("");
-            return;
-        }
-
-        //
-        upperStateType = pUpperStateType;
-        //animatorOverride.speed = 1; //임시
-
-        SetUpperStateProcess();
-    }
-
-    public void OnDamage(int pValue)
-    {
-        int damage = Mathf.Max(0, pValue - stat_.defense);
-        int hp = stat_.currentHp - pValue;
-        SetHP(hp);
-
-        //
-        if (stat_.currentHp <= 0)
-        {
-            Debug.Log($"{gameObject.name} : Dead");
-            ClearFixedUpdateHPBar();
-
-            //
-            SetUpperStateType(Define.UpperState.Ready);
-            SetBaseStateType(Define.BaseState.Die);
-        }
-    }
-
-    public void OnEnableTargetOutline()
-    {
-        shader.OnEnableOutline();
-    }
-
-    public void OnDisableTargetOutline()
-    {
-        shader.OnDisableOutline();
-    }
-
-    void FixedUpdateHPBarProcess()
-    {
-        ClearFixedUpdateHPBarPorcess();
-
-        fixedUpdateHPBarCoroutine = FixedUpdateHPBarCoroutine();
-        StartCoroutine(fixedUpdateHPBarCoroutine);
-    }
-
-    void ClearFixedUpdateHPBar()
-    {
-        //
-        ClearFixedUpdateHPBarPorcess();
-        if (hPBarUI != null)
-            hPBarUI.Close();
-    }
-
-    void ClearFixedUpdateHPBarPorcess()
-    {
-        if (fixedUpdateHPBarCoroutine != null)
-        {
-            StopCoroutine(fixedUpdateHPBarCoroutine);
-            fixedUpdateHPBarCoroutine = null;
-        }
-    }
-
-    IEnumerator FixedUpdateHPBarCoroutine()
-    {
-        if (hPBarUI == null)
-        {
-            Debug.LogWarning("Failed : ");
-            yield break;
-        }
-        yield return null;
-
-        hPBarUI.SetHPBar(transform, stat_.currentHp, stat_.maxHp);
-
-        while (baseStateType != Define.BaseState.Die)
-        {
-            hPBarUI.SetHPBar(transform, stat_.currentHp, stat_.maxHp);
-
-            yield return new WaitForFixedUpdate();
-        }
-
-        hPBarUI.SetHPBar(transform, 0, stat_.maxHp);
-    }
-
-    void SetBaseStateProcess()
-    {
-        ClearBaseStateProcess();
-
-        switch (baseStateType)
-        {
-            case Define.BaseState.Die:
-                {
-                    baseStateProcessRoutine = BaseDieStateProcecssCoroutine();
-                }
-                break;
-            case Define.BaseState.Idle:
-                {
-                    //// WeaponPos
-                    //Vector3 pos = new Vector3(-0.0319f, 0.0585f, 0.1015f);
-                    //Quaternion rot = Quaternion.Euler(0f, 0f, 0f);
-                    //SetWeaponPos(pos, rot, true);
-
-                    baseStateProcessRoutine = BaseIdleStateProcecssCoroutine();
-                }
-                break;
-            case Define.BaseState.Run:
-                {
-                    //// WeaponPos
-                    //Vector3 pos = new Vector3(-0.139f, 0.025f, 0.043f);
-                    //Quaternion rot = Quaternion.Euler(17.513f, -57.14f, -4.325f);
-                    //SetWeaponPos(pos, rot, true);
-
-                    baseStateProcessRoutine = BaseRunStateProcecssCoroutine();
-                }
-                break;
-        }
-
-        baseStateProcessCoroutine = BaseStateProcessCoroutine();
-        StartCoroutine(baseStateProcessCoroutine);
-    }
-
-    void ClearBaseStateProcess()
-    {
-        // Coroutine
-        if (baseStateProcessCoroutine != null)
-        {
-            StopCoroutine(baseStateProcessCoroutine);
-            baseStateProcessCoroutine = null;
-        }
-
-        // Routine
-        if (baseStateProcessRoutine != null)
-        {
-            StopCoroutine(baseStateProcessRoutine);
-            baseStateProcessRoutine = null;
-        }
-
-        isBaseStateProcess = false;
-    }
-
-    IEnumerator BaseStateProcessCoroutine()
-    {
-        //
-        isBaseStateProcess = true;
-        yield return null;
-
-        if (baseStateProcessRoutine != null)
-            yield return baseStateProcessRoutine;
-
-        isBaseStateProcess = false;
-    }
-
-    void SetUpperStateProcess()
-    {
-        ClearUpperStateProcess();
-
-        switch (upperStateType)
-        {
-            case Define.UpperState.Ready:
-                {
-                    // WeaponPos
-                    Vector3 pos = new Vector3(-0f, 0f, -0.3f);
-                    Quaternion rot = Quaternion.Euler(0f, 0f, 180f);
-                    SetWeaponPos(pos, rot, true);
-
-                    upperStateProcessRoutine = UpperReadyStateProcecssCoroutine();
-                }
-                break;
-            case Define.UpperState.Attack:
-                {
-                    // WeaponPos
-                    Vector3 pos = new Vector3(0.14f, 0.14f, -0.35f);
-                    Quaternion rot = Quaternion.Euler(19f, -37f, 166f);
-                    SetWeaponPos(pos, rot, true);
-
-                    upperStateProcessRoutine = UpperAttackStateProcecssCoroutine();
-                }
-                break;
-        }
-
-        upperStateProcessCoroutine = UpperStateProcessCoroutine();
-        StartCoroutine(upperStateProcessCoroutine);
-    }
-
-    void ClearUpperStateProcess()
-    {
-        // Coroutine
-        if (upperStateProcessCoroutine != null)
-        {
-            StopCoroutine(upperStateProcessCoroutine);
-            upperStateProcessCoroutine = null;
-        }
-
-        // Routine
-        if (upperStateProcessRoutine != null)
-        {
-            StopCoroutine(upperStateProcessRoutine);
-            upperStateProcessRoutine = null;
-        }
-
-        isUpperStateProcess = false;
-    }
-
-    IEnumerator UpperStateProcessCoroutine()
-    {
-        //
-        isUpperStateProcess = true;
-        yield return null;
-
-        if (upperStateProcessRoutine != null)
-            yield return upperStateProcessRoutine;
-
-        isUpperStateProcess = false;
+        //weapon.SetPosition(pPos);
+        //weapon.SetRotation(pRot);
+        //weapon.SetEnable(pEnable);
     }
 
     #region Load
 
     void CreateWeapon(int pWeaponID)
     {
-        if (pWeaponID == 0)
-            return;
+        //if (pWeaponID == 0)
+        //    return;
 
-        DestroyWeapon();
+        //DestroyWeapon();
 
-        Transform[] children = GetComponentsInChildren<Transform>();
-        Transform weponTrans = Array.Find(children, x => x.name == "Hand_L");
-        if (weponTrans == null)
-        {
-            Debug.LogWarning("Failed : ");
-            return;
-        }
+        //Transform[] children = GetComponentsInChildren<Transform>();
+        //Transform weponTrans = Array.Find(children, x => x.name == "Hand_L");
+        //if (weponTrans == null)
+        //{
+        //    Debug.LogWarning("Failed : ");
+        //    return;
+        //}
 
-        string tempPath = $"Prefabs/Weapon/SM_Wep_Watergun_02";
-        GameObject go = GlobalScene.ResourceMng.Instantiate(tempPath, weponTrans);
-        if (go == null)
-        {
-            Debug.LogWarning("Failed : ");
-            return;
-        }
+        //string tempPath = $"Prefabs/Weapon/SM_Wep_Watergun_02";
+        //UnityEngine.GameObject go = GlobalScene.ResourceMng.Instantiate(tempPath, weponTrans);
+        //if (go == null)
+        //{
+        //    Debug.LogWarning("Failed : ");
+        //    return;
+        //}
 
-        weapon = go.GetOrAddComponent<Weapon>();
+        //weapon = go.GetOrAddComponent<Weapon>();
     }
 
     void DestroyWeapon()
     {
-        if (weapon != null)
-        {
-            GlobalScene.ResourceMng.DestroyGameObject(weapon.gameObject);
-            weapon = null;
-        }
+        //if (weapon != null)
+        //{
+        //    GlobalScene.ResourceMng.DestroyGameObject(weapon.gameObject);
+        //    weapon = null;
+        //}
     }
 
     void CreateHPBarUI()
     {
-        DestroyHPBarUI();
-
-        hPBarUI = GlobalScene.UIMng.CreateBaseSpaceUI<HPBarUI>(transform);
-        hPBarUI.Open();
+        //DestroyHPBarUI();
+        //hpBarUI = GlobalScene.UIMng.CreateWorldSpaceUI<HPBarUI>(transform);
+        //hpBarUI.Load();
     }
 
     void DestroyHPBarUI()
     {
-        if (hPBarUI != null)
-        {
-            GlobalScene.ResourceMng.DestroyGameObject(hPBarUI.gameObject);
-            hPBarUI = null;
-        }
+        //if (hpBarUI != null)
+        //{
+        //    GlobalScene.ResourceMng.DestroyGameObject(hpBarUI.gameObject);
+        //    hpBarUI = null;
+        //}
     }
 
     #endregion Load

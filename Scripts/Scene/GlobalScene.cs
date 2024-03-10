@@ -8,19 +8,19 @@ public class ManagerLoader : MonoBehaviour
 
     public T CreateManager<T>() where T : BaseManager
     {
-        T manager = GlobalScene.CreateGlobalObject<T>(transform);
+        T manager = Util.CreateGlobalObject<T>(transform);
         manager_hashSet.Add(manager);
 
         return manager;
     }
 
-    public void InitManagers()
+    public void ResetManagers()
     {
         foreach (BaseManager manager in manager_hashSet)
         {
             if (manager != null)
             {
-                manager.Initialize();
+                manager.OnReset();
             }
         }
     }
@@ -104,7 +104,7 @@ public class GlobalScene : BaseScene
         {
             if (mngLoader == null)
             {
-                mngLoader = CreateGlobalObject<ManagerLoader>();
+                mngLoader = Util.CreateGlobalObject<ManagerLoader>();
             }
 
             return mngLoader;
@@ -299,22 +299,7 @@ public class GlobalScene : BaseScene
 
     public static void CreateGlobalScene()
     {
-        instance = CreateGlobalObject<GlobalScene>();
-    }
-
-    public static T CreateGlobalObject<T>(Transform pParent = null) where T : Component
-    {
-        T handler = FindObjectOfType<T>();
-        if (handler != null && handler.gameObject != null)
-        {
-            Destroy(handler.gameObject);
-        }
-
-        handler = Util.CreateGameObject<T>();
-        GameObject.DontDestroyOnLoad(handler);
-
-        handler.transform.SetParent(pParent);
-        return handler;
+        instance = Util.CreateGlobalObject<GlobalScene>();
     }
 
     protected override void Awake()
@@ -340,19 +325,22 @@ public class GlobalScene : BaseScene
         ///
         ResisteredGlobalObjs();
 
+        /// Registered as a Manager.
+        CameraManager.SetCameraManager(MainCamera);
+        UIManager.SetUIManager(MainCanvas, MainEventSystem);
+        SceneManager.SetSceneManager(UnloadedGlobalSceneEvent, LoadedGlobalSceneEvent);
+
         /// LoadMngRepository
-        mngLoader = CreateGlobalObject<ManagerLoader>();
+        mngLoader = Util.CreateGlobalObject<ManagerLoader>();
 
         /// ResisteredManagers
         sceneMng = mngLoader.CreateManager<SceneManager>();
-        //SceneMng.SetSceneManager(UnloadEvent, LoadEvent);
         gameMng = mngLoader.CreateManager<GameManagerEX>();
         cameraMng = mngLoader.CreateManager<CameraManager>();
-        CameraMng.SetCameraManager(MainCamera);
+        
         resourceMng = mngLoader.CreateManager<ResourceManager>();
         tableMng = mngLoader.CreateManager<TableManager>();
         uiMng = mngLoader.CreateManager<UIManager>();
-        uiMng.SetUIManager(MainCanvas, MainEventSystem);
         guiMng = mngLoader.CreateManager<GUIManager>();
         backendMng = mngLoader.CreateManager<BackendManager>();
         gpgsMng = mngLoader.CreateManager<GPGSManager>();
@@ -361,34 +349,34 @@ public class GlobalScene : BaseScene
         //inputMng = mngLoader.CreateManager<InputManager>();
 
         /// SceneMng
-        SceneMng.RemoveSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
-        SceneMng.AddSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
+        //SceneMng.RemoveSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
+        //SceneMng.AddSceneLoaderEvent(OnSceneUnloaded, OnSceneLoaded);
     }
 
     protected override void OnStart() { }
     protected override void OnDestroy_() { }
 
-    void OnSceneUnloaded(UnityEngine.SceneManagement.Scene pScene)
-    {
-        MngLoader.InitManagers();
-        Debug.Log("Success : OnSceneUnloaded");
-    }
-
-    void OnSceneLoaded(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
-    {
-        ResisteredGlobalObjs();
-        Debug.Log("Success : OnSceneLoaded");
-    }
-
-    //void UnloadEvent()
+    //void OnSceneUnloaded(UnityEngine.SceneManagement.Scene pScene)
     //{
-    //    MngLoader.InitManagers();
+    //    MngLoader.ResetManagers();
+    //    Debug.Log("Success : OnSceneUnloaded");
     //}
 
-    //void LoadEvent()
+    //void OnSceneLoaded(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
     //{
     //    ResisteredGlobalObjs();
+    //    Debug.Log("Success : OnSceneLoaded");
     //}
+
+    void UnloadedGlobalSceneEvent()
+    {
+        MngLoader.ResetManagers();
+    }
+
+    void LoadedGlobalSceneEvent()
+    {
+        ResisteredGlobalObjs();
+    }
 
     void ResisteredGlobalObjs()
     {

@@ -25,8 +25,11 @@ public static class Config
 
     #region Camera
 
-    //public static readonly Vector3 camera_deltaPos = new Vector3(0.0f, 6.0f, -5.0f);
-    public static readonly Vector3 camera_deltaPos = new Vector3(0.0f, 8.0f, -5.0f);
+    public static readonly Vector3 cam_initPos = new Vector3(0f, 1f, -10f);
+    public static readonly Vector3 cam_initRot = new Vector3(0f, 0f, 0f);
+    public static readonly Vector3 cam_initScale = new Vector3(1f, 1f, 1f);
+    public static readonly Color cam_backgroundColor = Color.black;
+    public static readonly Vector3 followCam_deltaPos = new Vector3(0.0f, 8.0f, -5.0f);
 
     #endregion Camera
 

@@ -17,7 +17,7 @@ public interface IJoystickHandler : IHandler
 //{
 //}
 
-public class Controller : MonoBehaviour, IJoystickHandler
+public class Controller_Legacy : MonoBehaviour, IJoystickHandler
 {
     //public float moveSpeed = 4f;
     public bool IsAttackButtonPressed { get; private set; } = false;

@@ -12,15 +12,15 @@ public class UIManager : BaseManager
     Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
     //List<BaseUI> LoadedBaseUI_list = new List<BaseUI>();
 
-    Canvas canvas_ref = null;
-    UnityEngine.EventSystems.EventSystem eventSystem_ref = null;
+    private static Canvas canvas_ref = null;
+    private static UnityEngine.EventSystems.EventSystem eventSystem_ref = null;
 
 
     protected override void OnAwake()
     {
     }
 
-    protected override void OnInit() 
+    public override void OnReset() 
     {
         // DestroyBaseUIAll
         {
@@ -34,7 +34,7 @@ public class UIManager : BaseManager
         }
     }
 
-    public void SetUIManager(Canvas pCanvas, UnityEngine.EventSystems.EventSystem pEventSystem)
+    public static void SetUIManager(Canvas pCanvas, UnityEngine.EventSystems.EventSystem pEventSystem)
     {
         canvas_ref = pCanvas;
         eventSystem_ref = pEventSystem;

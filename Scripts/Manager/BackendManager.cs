@@ -11,7 +11,7 @@ public class BackendManager : BaseManager
     BackendReturnObject bro = null;
 
     protected override void OnAwake() { }
-    protected override void OnInit()
+    public override void OnReset()
     {
         gameDataRowInDate = string.Empty;
     }

@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Table
 {
-    public abstract class BaseTable<TData> : MonoBehaviour, IBaseTable where TData : BaseTable<TData>.BaseData
+    public abstract class BaseTable<TData> : IBaseTable where TData : BaseTable<TData>.BaseData
     {
         [Serializable]
         public abstract class BaseData
@@ -178,38 +178,38 @@ namespace Table
         }
     }
 
-    //public class ActorTable : BaseTable<ActorTable.Data>
-    //{
-    //    [Serializable]
-    //    public class Data : BaseData
-    //    {
-    //        public int id = 0;
-    //        public Define.Actor actorType = Define.Actor.None;
-    //        public string animatorController = string.Empty;
-    //        public string animatorAvatar = string.Empty;
-    //        public Define.BaseState initStateType = Define.BaseState.None;
-    //        //public int level = 0;
-    //        //public int coin = 0;
-    //        //public int statID = 0;
-    //        public int weaponID = 0;
-    //    }
+    public class ActorTable : BaseTable<ActorTable.Data>
+    {
+        [Serializable]
+        public class Data : BaseData
+        {
+            public int id = 0;
+            public Define.Actor actorType = Define.Actor.None;
+            public string animatorController = string.Empty;
+            public string animatorAvatar = string.Empty;
+            public Define.BaseAnim initStateType = Define.BaseAnim.Idle;
+            //public int level = 0;
+            //public int coin = 0;
+            //public int statID = 0;
+            public int weaponID = 0;
+        }
 
-    //    protected override void LoadTableDataDic()
-    //    {
-    //        Data[] datas = LoadTableDatas();
-    //        foreach (Data data in datas)
-    //        {
-    //            baseData_dic.Add(data.id, data);
+        protected override void LoadTableDataDic()
+        {
+            Data[] datas = LoadTableDatas();
+            foreach (Data data in datas)
+            {
+                baseData_dic.Add(data.id, data);
 
-    //            Debug.Log($"Success({this.GetType()})\n"
-    //                + $"id : {data.id}\n"
-    //                + $"animatorController : {data.animatorController}\n"
-    //                + $"animatorAvatar : {data.animatorAvatar}\n"
-    //                + $"initStateType : {data.initStateType}\n"
-    //                + $"weaponID : {data.weaponID}\n");
-    //        }
-    //    }
-    //}
+                Debug.Log($"Success({this.GetType()})\n"
+                    + $"id : {data.id}\n"
+                    + $"animatorController : {data.animatorController}\n"
+                    + $"animatorAvatar : {data.animatorAvatar}\n"
+                    + $"initStateType : {data.initStateType}\n"
+                    + $"weaponID : {data.weaponID}\n");
+            }
+        }
+    }
 
     public class StatTable : BaseTable<StatTable.Data>
     {

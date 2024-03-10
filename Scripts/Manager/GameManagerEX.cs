@@ -13,8 +13,8 @@ public class GameManagerEX : BaseManager
         get
         {
             bool isWorldScene = GlobalScene.SceneMng.IsActiveScene<WorldScene>();
-            bool isSpawnPlayer = gamePlayer != null;
-            bool isLivePlayer = gamePlayer != null && gamePlayer.baseStateType != Define.BaseState.Die;
+            bool isSpawnPlayer = player != null;
+            bool isLivePlayer = player != null && player.BaseAnimType != Define.BaseAnim.Die;
 
             //
             bool isGamePlay = isWorldScene && isSpawnPlayer && isLivePlayer;
@@ -30,7 +30,7 @@ public class GameManagerEX : BaseManager
 
         }
     }
-    public IControllHandler playerCtrl
+    public IControllHndl_Legacy playerCtrl
     {
         get
         {
@@ -39,28 +39,28 @@ public class GameManagerEX : BaseManager
                 Debug.LogWarning("Failed : ");
                 return null;
             }
-            return gamePlayer;
+            return player;
         }
     }
 
-    Player gamePlayer = null;
+    Player player = null;
 
 
     protected override void OnAwake() { }
-    protected override void OnInit()
+    public override void OnReset()
     {
-        gamePlayer = null;
+        player = null;
     }
 
     #region Player
 
     public void SetPalyer(Player pGamePlayer)
     {
-        gamePlayer = pGamePlayer;
+        player = pGamePlayer;
     }
     public void SetPlayerRespawn()
     {
-        gamePlayer = null;
+        player = null;
 
         // Respawn
         //Managers.Spawn.SpawnCharacter(Managers.User.SpawnerID);
