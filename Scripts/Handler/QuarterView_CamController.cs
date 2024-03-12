@@ -9,7 +9,7 @@ public class CamController : BaseController
 {
     public static CamController CreateCamera()
     {
-        if (GlobalScene.CameraMng.CameraModeType != Define.CameraMode.Defualt)
+        if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
         {
             Debug.LogWarning("");
             return null;
@@ -23,7 +23,7 @@ public class CamController : BaseController
 
     protected virtual void Awake()
     {
-        if (GlobalScene.CameraMng.CameraModeType != Define.CameraMode.Defualt)
+        if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
         {
             Debug.LogWarning("");
             Destroy(gameObject);
@@ -42,7 +42,7 @@ public class QuarterView_CamController : CamController
 
     public new static QuarterView_CamController CreateCamera()
     {
-        if (GlobalScene.CameraMng.CameraModeType != Define.CameraMode.QuarterView)
+        if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
             Debug.LogWarning("");
             return null;
@@ -53,7 +53,7 @@ public class QuarterView_CamController : CamController
 
     protected override void Awake()
     {
-        if (GlobalScene.CameraMng.CameraModeType != Define.CameraMode.QuarterView)
+        if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
             Debug.LogWarning("");
             Destroy(gameObject);

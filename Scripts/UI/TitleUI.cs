@@ -266,7 +266,7 @@ class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_DebugTestPopup_Button_TestLogout()
     {
-        switch (GlobalScene.LogInMng.currAccountType)
+        switch (LogInManager.Instance.currAccountType)
         {
             case LogInManager.AccountType.Guest:
                 {
@@ -297,7 +297,7 @@ class TitleUI : BaseUI<TitleUI.UI>
 
         if (_titleProcessType == TitleScene.TitleProcessType.LogIn)
         {
-            switch (GlobalScene.LogInMng.currLogInProcessType)
+            switch (LogInManager.Instance.currLogInProcessType)
             {
                 //case LoginManager.LoginProcessType.UserLogOut:
                 //    {
@@ -332,8 +332,8 @@ class TitleUI : BaseUI<TitleUI.UI>
 
         if(_titleProcessType == TitleScene.TitleProcessType.LogIn)
         {
-            SetActiveUI(UI.TitleUI_Object_Login, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.AccountAuth);
-            SetActiveUI(UI.TitleUI_Object_Logout, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogOut);
+            SetActiveUI(UI.TitleUI_Object_Login, LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.AccountAuth);
+            SetActiveUI(UI.TitleUI_Object_Logout, LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.UserLogOut);
         }
     }
 
@@ -439,7 +439,7 @@ class TitleUI : BaseUI<TitleUI.UI>
             return;
 
         SetTextUI(UI.DebugTestPopup_Text_Desc, _logMessage);
-        SetActiveUI(UI.DebugTestPopup_Object_TestLogout, GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
+        SetActiveUI(UI.DebugTestPopup_Object_TestLogout, LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
 
         string format = string.Format("[DebugLog]\n{0}", _logMessage);
         Debug.Log(format);

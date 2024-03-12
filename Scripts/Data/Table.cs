@@ -45,7 +45,7 @@ namespace Table
 
             string tableName    = this.GetType().Name;
             string path         = $"Data/Table/{tableName}";
-            TextAsset textAsset = GlobalScene.ResourceMng.Load<TextAsset>(path);
+            TextAsset textAsset = ResourceManager.Instance.Load<TextAsset>(path);
             if (textAsset == null)
             {
                 Debug.LogWarning("Failed : ");

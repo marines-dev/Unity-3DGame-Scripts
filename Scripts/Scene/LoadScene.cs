@@ -27,8 +27,8 @@ public class LoadScene : BaseScene
     protected override void OnAwake()
     {
         /// LoadUI
-        GlobalScene.UIMng.CloseBaseUIAll();
-        loadUI = GlobalScene.UIMng.CreateOrGetBaseUI<LoadingUI>();
+        UIManager.Instance.CloseBaseUIAll();
+        loadUI = UIManager.Instance.CreateOrGetBaseUI<LoadingUI>();
     }
 
     protected override void OnStart() 
@@ -75,15 +75,15 @@ public class LoadScene : BaseScene
             string loadSceneName = typeof(LoadScene).Name;
             SetActiveScene(loadSceneName);
 
-            preSceneName = GlobalScene.SceneMng.PreSceneName;
-            nextSceneName = GlobalScene.SceneMng.NextSceneName;
+            preSceneName = SceneManager.Instance.PreSceneName;
+            nextSceneName = SceneManager.Instance.NextSceneName;
             yield return null;
         }
 
         /// UnloadScene
         {
-            GlobalScene.SceneMng.UnloadedScene();
             yield return UnloadSceneAsync(preSceneName);
+            ManagerLoader.ResetManagers();
             yield return null;
 
             /// 메모리 정리(임시)
@@ -99,7 +99,7 @@ public class LoadScene : BaseScene
             //GlobalScene.SceneMng.GetOrCreateActiveScene();
             yield return null;
 
-            GlobalScene.SceneMng.LoadedScene();
+            Global.RegisteredGlobalObjects();
             yield return null;
 
             string loadSceneName = typeof(LoadScene).Name;
@@ -108,7 +108,7 @@ public class LoadScene : BaseScene
 
 
         /// Complete
-        Debug.Log($"Success : {GlobalScene.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
+        Debug.Log($"Success : {SceneManager.Instance.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
 
     void SetActiveScene(string pSceneName)

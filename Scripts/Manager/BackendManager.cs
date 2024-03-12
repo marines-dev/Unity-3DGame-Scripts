@@ -3,14 +3,14 @@ using UnityEngine;
 using BackEnd;
 
 
-public class BackendManager : BaseManager
+public class BackendManager : BaseManager<BackendManager>
 {
     string gameDataRowInDate = string.Empty;
 
     //
     BackendReturnObject bro = null;
 
-    protected override void OnAwake() { }
+    protected override void OnInitialized() { }
     public override void OnReset()
     {
         gameDataRowInDate = string.Empty;
@@ -69,7 +69,7 @@ public class BackendManager : BaseManager
         }
         else
         {
-            GlobalScene.BackendMng.DeleteGuestInfo();
+            DeleteGuestInfo();
 
             Debug.LogError($"Failed : GuestLogIn - {bro}");
             return false;

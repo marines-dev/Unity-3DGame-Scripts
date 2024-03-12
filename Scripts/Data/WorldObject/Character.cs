@@ -185,7 +185,7 @@ public class Character : BaseWorldObject, ITargetHandler
     {
         base.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
 
-        characterData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(pWorldObjID);
+        characterData = TableManager.Instance.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(pWorldObjID);
     }
 
     public override void Spawn(Vector3 pPos, Vector3 pRot)
@@ -202,7 +202,7 @@ public class Character : BaseWorldObject, ITargetHandler
 
         // Stat
         {
-            Table.StatTable.Data statData = GlobalScene.TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+            Table.StatTable.Data statData = TableManager.Instance.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
 
             this.statData.maxHp = statData.maxHp;
             this.statData.currentHp = statData.maxHp;

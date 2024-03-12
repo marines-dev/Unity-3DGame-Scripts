@@ -23,7 +23,7 @@ public class TitleScene : BaseScene
 
     protected override void OnAwake()
     {
-        titleUI = GlobalScene.UIMng.CreateOrGetBaseUI<TitleUI>();
+        titleUI = UIManager.Instance.CreateOrGetBaseUI<TitleUI>();
     }
 
     protected override void OnStart()
@@ -101,9 +101,9 @@ public class TitleScene : BaseScene
     IEnumerator InitDataProcessCoroutine()
     {
         // Server
-        GlobalScene.BackendMng.InitBackendSDK();
-        GlobalScene.GPGSMng.InitGPGSAuth();
-        GlobalScene.LogInMng.InitLogInState();
+        BackendManager.Instance.InitBackendSDK();
+        GPGSManager.Instance.InitGPGSAuth();
+        LogInManager.Instance.InitLogInState();
         yield return null;
     }
 
@@ -111,7 +111,7 @@ public class TitleScene : BaseScene
     {
         titleUI.SetTitleUI(currTitleProcessType);
         titleUI.Set_OnLogInState(OnLogInState);
-        yield return new WaitUntil(() => GlobalScene.LogInMng.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
+        yield return new WaitUntil(() => LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
     }
 
     void OnLogInState()
@@ -120,14 +120,14 @@ public class TitleScene : BaseScene
         {
             case TitleProcessType.LogIn:
                 {
-                    switch (GlobalScene.LogInMng.currLogInProcessType)
+                    switch (LogInManager.Instance.currLogInProcessType)
                     {
                         case LogInManager.LogInProcessType.UserLogOut:
                             {
                                 if (titleUI.selectAccountType == LogInManager.AccountType.None)
                                     return;
 
-                                bool isSignUp = GlobalScene.LogInMng.SetSignUp(titleUI.selectAccountType);
+                                bool isSignUp = LogInManager.Instance.SetSignUp(titleUI.selectAccountType);
                                 if(isSignUp)
                                 {
                                     TitleProcess();
@@ -143,7 +143,7 @@ public class TitleScene : BaseScene
 
                         case LogInManager.LogInProcessType.AccountAuth:
                             {
-                                GlobalScene.LogInMng.SetUserLogIn();
+                                LogInManager.Instance.SetUserLogIn();
                             }
                             break;
 
@@ -151,7 +151,7 @@ public class TitleScene : BaseScene
                             {
                                 if (string.IsNullOrEmpty(titleUI.inputNickname) == false)
                                 {
-                                    GlobalScene.LogInMng.SetUpdateNickname(titleUI.inputNickname);
+                                    LogInManager.Instance.SetUpdateNickname(titleUI.inputNickname);
                                 }
 
                                 TitleProcess();
@@ -164,7 +164,7 @@ public class TitleScene : BaseScene
             case TitleProcessType.LoadUserData:
                 {
                     Debug.LogWarning("Debug 테스트용");
-                    GlobalScene.LogInMng.SetUserLogOut();
+                    LogInManager.Instance.SetUserLogOut();
 
                     TitleProcess();
                 }
@@ -178,16 +178,16 @@ public class TitleScene : BaseScene
         titleUI.SetTitleUI(currTitleProcessType);
         yield return new WaitForSeconds(2f); // 테스트 코드
 
-        if (GlobalScene.UserMng.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
+        if (UserManager.Instance.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
         {
             // 유저 데이터 생성 및 저장
-            GlobalScene.UserMng.CreateUserData();
+            UserManager.Instance.CreateUserData();
         }
     }
 
     IEnumerator LoadGameSceneProcessCoroutine()
     {
-        GlobalScene.SceneMng.LoadBaseScene<WorldScene>();
+        SceneManager.Instance.LoadBaseScene<WorldScene>();
         yield return null;
 
         titleUI.Close();
@@ -218,12 +218,12 @@ public class TitleScene : BaseScene
     {
         try
         {
-            string inData = GlobalScene.BackendMng.GetInData();
-            string nickname = GlobalScene.BackendMng.GetNickname();
+            string inData = BackendManager.Instance.GetInData();
+            string nickname = BackendManager.Instance.GetNickname();
             string format = string.Format(
                 "[TitleProcess] " + currTitleProcessType.ToString() + '\n' +
-                "[LoginProcess] " + GlobalScene.LogInMng.currLogInProcessType.ToString() + '\n' +
-                "[AccountType] " + GlobalScene.LogInMng.currAccountType.ToString() + '\n' +
+                "[LoginProcess] " + LogInManager.Instance.currLogInProcessType.ToString() + '\n' +
+                "[AccountType] " + LogInManager.Instance.currAccountType.ToString() + '\n' +
                 "[InData] " + inData + '\n' +
                 "[nickname] " + nickname + '\n');
 

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 
-public class LogInManager : BaseManager
+public class LogInManager : BaseManager<LogInManager>
 {
     public enum LogInProcessType
     {
@@ -26,7 +26,7 @@ public class LogInManager : BaseManager
     public AccountType      currAccountType { get; private set; }       = AccountType.None;
     public bool isDone { get; private set; } = false;
 
-    protected override void OnAwake() { }
+    protected override void OnInitialized() { }
     public override void OnReset() { }
 
 
@@ -35,10 +35,10 @@ public class LogInManager : BaseManager
         currLogInProcessType = LogInProcessType.InitLogIn;
         currAccountType = AccountType.None;
 
-        isDone = GlobalScene.BackendMng.TokenLogin();
+        isDone = BackendManager.Instance.TokenLogin();
         if (isDone)
         {
-            string nickname = GlobalScene.BackendMng.GetNickname();
+            string nickname = BackendManager.Instance.GetNickname();
             isDone = CheckNickname(nickname);
             if (isDone)
             {
@@ -73,7 +73,7 @@ public class LogInManager : BaseManager
         {
             case AccountType.Guest:
                 {
-                    isDone = GlobalScene.BackendMng.GuestLogIn();
+                    isDone = BackendManager.Instance.GuestLogIn();
                     currAccountType = GetAccountType();
                 }
                 break;
@@ -86,11 +86,11 @@ public class LogInManager : BaseManager
                         return isDone;
                     }
 
-                    isDone = GlobalScene.BackendMng.CheckFederationAccount();
+                    isDone = BackendManager.Instance.CheckFederationAccount();
 
                     if (isDone)
                     {
-                        isDone = GlobalScene.BackendMng.AuthorizeFederation();
+                        isDone = BackendManager.Instance.AuthorizeFederation();
                     }
                 }
                 break;
@@ -105,7 +105,7 @@ public class LogInManager : BaseManager
 
     public bool SetUpdateNickname(string _updateNickname)
     {
-        isDone = GlobalScene.BackendMng.CreateNickname(_updateNickname);
+        isDone = BackendManager.Instance.CreateNickname(_updateNickname);
 
         return isDone;
     }
@@ -124,18 +124,18 @@ public class LogInManager : BaseManager
         {
             case AccountType.Guest:
                 {
-                    isDone = GlobalScene.BackendMng.SignOut();
+                    isDone = BackendManager.Instance.SignOut();
 
                     if(isDone)
                     {
-                        GlobalScene.BackendMng.DeleteGuestInfo();
+                        BackendManager.Instance.DeleteGuestInfo();
                     }
                 }
                 break;
 
             case AccountType.Google:
                 {
-                    isDone = GlobalScene.BackendMng.LogOut();
+                    isDone = BackendManager.Instance.LogOut();
                 }
                 break;
 
@@ -147,7 +147,7 @@ public class LogInManager : BaseManager
 
     private AccountType GetAccountType()
     {
-        string subscriptionType = GlobalScene.BackendMng.GetSubscriptionType();
+        string subscriptionType = BackendManager.Instance.GetSubscriptionType();
         switch (subscriptionType)
         {
             case "customSignUp":

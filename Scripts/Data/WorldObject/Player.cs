@@ -93,7 +93,7 @@ public class Player : Character, IControllHndl_Legacy
         {
             if (hitCollider.tag == "Monster")
             {
-                ITargetHandler tempTarget = GlobalScene.GameMng.GetTargetCharacter(hitCollider.gameObject);
+                ITargetHandler tempTarget = GameManagerEX.Instance.GetTargetCharacter(hitCollider.gameObject);
                 if (tempTarget != null && tempTarget.BaseAnimType != Define.BaseAnim.Die)
                 {
                     if (target != null) //가까운 타겟팅

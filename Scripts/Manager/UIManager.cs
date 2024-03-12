@@ -7,7 +7,7 @@ using UnityEngine;
 // UIID로 변경 필요
 // EventSystem : Canvas 생성 시 자동 생성 확인 필요
 
-public class UIManager : BaseManager
+public class UIManager : BaseManager<UIManager>
 {
     Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
     //List<BaseUI> LoadedBaseUI_list = new List<BaseUI>();
@@ -16,7 +16,7 @@ public class UIManager : BaseManager
     private static UnityEngine.EventSystems.EventSystem eventSystem_ref = null;
 
 
-    protected override void OnAwake()
+    protected override void OnInitialized()
     {
     }
 
@@ -54,7 +54,7 @@ public class UIManager : BaseManager
         {
             string uiName = typeof(TBaseUI).Name;
             string path = $"Prefabs/UI/{uiName}";
-            baseUI = GlobalScene.ResourceMng.Instantiate(path, canvas_ref.transform).GetOrAddComponent<TBaseUI>();
+            baseUI = ResourceManager.Instance.Instantiate(path, canvas_ref.transform).GetOrAddComponent<TBaseUI>();
         }
 
         ///
@@ -117,7 +117,7 @@ public class UIManager : BaseManager
     [Obsolete("임시")]
     public T CreateBaseSpaceUI<T>(Transform pParent = null, string pName = null) where T : Component, IBaseUI
     {
-        GameObject go = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/WorldSpace/{pName}", pParent);
+        GameObject go = ResourceManager.Instance.Instantiate($"Prefabs/UI/WorldSpace/{pName}", pParent);
 
         Canvas canvas = go.GetOrAddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;

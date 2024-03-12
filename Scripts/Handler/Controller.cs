@@ -29,7 +29,7 @@ public class Controller_Legacy : MonoBehaviour, IJoystickHandler
         {
             if (joystickUI_ == null)
             {
-                GlobalScene.UIMng.CreateOrGetBaseUI<JoystickUI>();
+                UIManager.Instance.CreateOrGetBaseUI<JoystickUI>();
             }
             return joystickUI_;
         }
@@ -63,11 +63,11 @@ public class Controller_Legacy : MonoBehaviour, IJoystickHandler
     {
         if (pIsDown)
         {
-            GlobalScene.GameMng.playerCtrl.OnAttack();
+            GameManagerEX.Instance.playerCtrl.OnAttack();
         }
         else
         {
-            GlobalScene.GameMng.playerCtrl.OnReady();
+            GameManagerEX.Instance.playerCtrl.OnReady();
         }
     }
 
@@ -105,7 +105,7 @@ public class Controller_Legacy : MonoBehaviour, IJoystickHandler
     {
         while (true)
         {
-            if (GlobalScene.GameMng.IsGamePlay)
+            if (GameManagerEX.Instance.IsGamePlay)
             {
                 if (Vector2.Distance(joystickUI.dragPos, joystickUI.beginPos) > 10) // Move
                 {
@@ -115,11 +115,11 @@ public class Controller_Legacy : MonoBehaviour, IJoystickHandler
                     //angle = angle < 0 ? 360 + angle : angle;
                     //Vector3 eulerAngles = new Vector3(0, Camera.main.transform.eulerAngles.y + angle, 0);
                     //Managers.Game.playerCtrl.OnMove(eulerAngles);
-                    GlobalScene.GameMng.playerCtrl.OnMove(dir);
+                    GameManagerEX.Instance.playerCtrl.OnMove(dir);
                 }
                 else // Stop
                 {
-                    GlobalScene.GameMng.playerCtrl.OnStop();
+                    GameManagerEX.Instance.playerCtrl.OnStop();
                 }
             }
 

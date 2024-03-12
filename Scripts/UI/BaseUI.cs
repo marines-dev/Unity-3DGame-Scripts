@@ -60,7 +60,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
     public void DestroySelf()
     {
-        GlobalScene.Destroy(gameObject);
+        ResourceManager.Instance.DestroyGameObject(gameObject);
     }
 
     protected Transform GetUITrans(Define _enum)

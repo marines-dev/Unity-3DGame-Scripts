@@ -4,9 +4,9 @@ using UnityEngine;
 //using GooglePlayGames.BasicApi;
 
 
-public class GPGSManager : BaseManager
+public class GPGSManager : BaseManager<GPGSManager>
 {
-    protected override void OnAwake() { }
+    protected override void OnInitialized() { }
     public override void OnReset() { }
 
     public void InitGPGSAuth()

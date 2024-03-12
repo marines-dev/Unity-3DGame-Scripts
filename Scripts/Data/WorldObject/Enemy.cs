@@ -111,14 +111,14 @@ public class Enemy : Character
     {
         float distance = 0f;
 
-        if (GlobalScene.GameMng.IsGamePlay)
+        if (GameManagerEX.Instance.IsGamePlay)
         {
             if (UpperAnimType == Define.UpperAnim.Attack)
             {
                 return;
             }
 
-            destPos = GlobalScene.GameMng.playerCtrl.Position;
+            destPos = GameManagerEX.Instance.playerCtrl.Position;
             distance = (destPos - Position).magnitude;
             if (distance <= scanRange && CalculateNavMeshPath(destPos))
             {
@@ -143,9 +143,9 @@ public class Enemy : Character
     {
         float distance = 0f;
         //행동 변경 검사 : 공격 범위 이내이면 -> Attack
-        if (GlobalScene.GameMng.IsGamePlay /*&& target != null*/)
+        if (GameManagerEX.Instance.IsGamePlay /*&& target != null*/)
         {
-            distance = (GlobalScene.GameMng.playerCtrl.Position - Position).magnitude;
+            distance = (GameManagerEX.Instance.playerCtrl.Position - Position).magnitude;
             if (distance <= attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
             {
                 navMeshAgent.SetDestination(transform.position);
@@ -169,9 +169,9 @@ public class Enemy : Character
 
     void UpdateUpperReady()
     {
-        if (GlobalScene.GameMng.IsGamePlay)
+        if (GameManagerEX.Instance.IsGamePlay)
         {
-            float distance = (GlobalScene.GameMng.playerCtrl.Position - Position).magnitude;
+            float distance = (GameManagerEX.Instance.playerCtrl.Position - Position).magnitude;
             if (distance <= attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
             {
                 UpperAnimType = Define.UpperAnim.Attack;
@@ -182,16 +182,16 @@ public class Enemy : Character
 
     void UpdateUpperAttack()
     {
-        if (GlobalScene.GameMng.IsGamePlay)
+        if (GameManagerEX.Instance.IsGamePlay)
         {
-            float distance = (GlobalScene.GameMng.playerCtrl.Position - Position).magnitude;
+            float distance = (GameManagerEX.Instance.playerCtrl.Position - Position).magnitude;
             if (distance > attackRange)
             {
                 UpperAnimType = Define.UpperAnim.Ready;
                 return;
             }
 
-            Vector3 dir = GlobalScene.GameMng.playerCtrl.Position - Position;
+            Vector3 dir = GameManagerEX.Instance.playerCtrl.Position - Position;
             Quaternion quat = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
         }

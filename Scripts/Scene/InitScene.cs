@@ -7,11 +7,11 @@ public class InitScene : BaseScene
 
     protected override void OnAwake()
     {
-        /// CreateGlobalScene
-        GlobalScene.CreateGlobalScene();
+        /// LoadManager
+        ManagerLoader.CreateManagers();
 
-        // ResisteredUI
-        //GlobalScene.UIMng.ResisteredBaseUI();
+        /// CreateGlobalScene
+        Global.RegisteredGlobalObjects();
 
         // LoadData
         IsInitSceneLoaded = true;
@@ -19,7 +19,7 @@ public class InitScene : BaseScene
 
     protected override void OnStart()
     {
-        GlobalScene.SceneMng.LoadBaseScene<TitleScene>();
+        SceneManager.Instance.LoadBaseScene<TitleScene>();
     }
 
     protected override void OnDestroy_()

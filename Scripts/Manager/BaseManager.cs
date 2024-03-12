@@ -1,22 +1,38 @@
+using System;
 using UnityEngine;
 
-public abstract class BaseManager : MonoBehaviour
+public interface IBaseManager
 {
-    private void Awake()
+    public void OnReset();
+}
+
+public abstract class BaseManager<TMng> : IBaseManager where TMng : class, IBaseManager, new()
+{
+    private static TMng instance = null;
+    public static TMng Instance
     {
-        OnAwake();
-        OnReset();
+        get
+        {
+            if (instance == null)
+            {
+                instance = ManagerLoader.CreateManager<TMng>();
+            }
+            return instance;
+        }
     }
 
-    private void OnDestroy()
+    public BaseManager()
     {
-        OnReset();
+        Debug.Log($"Success : <{typeof(TMng).ToString()}> Manager가 생성되었습니다.");
+
+        OnInitialized();
     }
 
-    protected abstract void OnAwake();
+    ~BaseManager()
+    {
+        Debug.Log($"Success : <{typeof(TMng).ToString()}> Manager가 삭제되었습니다.");
+    }
 
-    /// <summary>
-    /// 활성 씬이 언로드될 때 호출되는 함수 입니다.
-    /// </summary>
+    protected abstract void OnInitialized();
     public abstract void OnReset();
 }

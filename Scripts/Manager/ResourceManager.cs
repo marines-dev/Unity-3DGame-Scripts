@@ -2,9 +2,9 @@
 using UnityEngine;
 
 
-public class ResourceManager : BaseManager
+public class ResourceManager : BaseManager<ResourceManager>
 {
-    protected override void OnAwake() { }
+    protected override void OnInitialized() { }
     public override void OnReset() { }
 
     public T Load<T>(string path) where T : UnityEngine.Object

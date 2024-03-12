@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class GameManagerEX : BaseManager
+public class GameManagerEX : BaseManager<GameManagerEX>
 {
     bool isPaused = false; //앱의 활성화 상태 저장 유무
 
@@ -12,7 +12,7 @@ public class GameManagerEX : BaseManager
     {
         get
         {
-            bool isWorldScene = GlobalScene.SceneMng.IsActiveScene<WorldScene>();
+            bool isWorldScene = SceneManager.Instance.IsActiveScene<WorldScene>();
             bool isSpawnPlayer = player != null;
             bool isLivePlayer = player != null && player.BaseAnimType != Define.BaseAnim.Die;
 
@@ -34,7 +34,7 @@ public class GameManagerEX : BaseManager
     {
         get
         {
-            if (!GlobalScene.GameMng.IsGamePlay)
+            if (!GameManagerEX.Instance.IsGamePlay)
             {
                 Debug.LogWarning("Failed : ");
                 return null;
@@ -46,7 +46,7 @@ public class GameManagerEX : BaseManager
     Player player = null;
 
 
-    protected override void OnAwake() { }
+    protected override void OnInitialized() { }
     public override void OnReset()
     {
         player = null;
@@ -64,8 +64,8 @@ public class GameManagerEX : BaseManager
 
         // Respawn
         //Managers.Spawn.SpawnCharacter(Managers.User.SpawnerID);
-        GlobalScene.UserMng.UpdateUserData();
-        GlobalScene.SceneMng.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
+        UserManager.Instance.UpdateUserData();
+        SceneManager.Instance.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
     }
 
     #endregion Player
@@ -93,8 +93,8 @@ public class GameManagerEX : BaseManager
         if (pause) // 앱이 비활성화 되었을 때 처리
         {
             isPaused = true;
-            if (GlobalScene.SceneMng.IsActiveScene<WorldScene>())
-                GlobalScene.UserMng.UpdateUserData();
+            if (SceneManager.Instance.IsActiveScene<WorldScene>())
+                UserManager.Instance.UpdateUserData();
         }
         else // 앱이 활성화 되었을 때 처리
         {
@@ -108,7 +108,7 @@ public class GameManagerEX : BaseManager
     [Obsolete("테스트 중")]
     void OnApplicationQuit() // 앱이 종료 될 때 처리
     {
-        if (GlobalScene.SceneMng.IsActiveScene<WorldScene>())
-            GlobalScene.UserMng.UpdateUserData(); //Managers.User.SaveUserData();
+        if (SceneManager.Instance.IsActiveScene<WorldScene>())
+            UserManager.Instance.UpdateUserData(); //Managers.User.SaveUserData();
     }
 }

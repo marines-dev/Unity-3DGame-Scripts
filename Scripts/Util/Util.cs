@@ -57,6 +57,24 @@ public class Util
         return null;
     }
 
+    #region Temp
+
+#if UNITY_EDITOR
+
+    [Obsolete("임시")]
+    public static void LogWarning(string pMsg = "")
+    {
+        Debug.LogWarning($"Failed : {pMsg}");
+    }
+
+    [Obsolete("임시")]
+    public static void LogError(string pMsg = "")
+    {
+        Debug.LogError($"Failed : {pMsg}");
+    }
+
+#endif
+
     public static T CreateGameObject<T>(Transform pParent = null) where T : Component
     {
         string name = $"@{typeof(T).Name}";
@@ -85,4 +103,6 @@ public class Util
         handler.transform.SetParent(pParent);
         return handler;
     }
+
+    #endregion Temp
 }

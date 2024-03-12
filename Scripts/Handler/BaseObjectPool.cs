@@ -25,7 +25,7 @@ public abstract class BaseObjectPool : MonoBehaviour
 
     protected virtual GameObject CreateObject()
     {
-        GameObject go = GlobalScene.ResourceMng.Instantiate(prefabPath, transform);
+        GameObject go = ResourceManager.Instance.Instantiate(prefabPath, transform);
 
         if (!objectPool_dic.ContainsKey(go))
         {

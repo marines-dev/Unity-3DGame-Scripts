@@ -4,7 +4,7 @@ using Unity.Android.Types;
 using UnityEngine;
 
 
-public class CameraManager : BaseManager
+public class CameraManager : BaseManager<CameraManager>
 {
     //public enum BGColor
     //{
@@ -37,7 +37,7 @@ public class CameraManager : BaseManager
         mainCamera_ref = pMainCamera;
     }
 
-    protected override void OnAwake()
+    protected override void OnInitialized()
     {
         ResetCameraMode();
     }
@@ -95,7 +95,7 @@ public class CameraManager : BaseManager
 
         if (cameraCtrl != null)
         {
-            Destroy(cameraCtrl.gameObject);
+            ResourceManager.Instance.DestroyGameObject(cameraCtrl.gameObject);
             cameraCtrl = null;
         }
 

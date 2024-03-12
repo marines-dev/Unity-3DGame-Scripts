@@ -272,7 +272,7 @@ public class Weapon : MonoBehaviour
         DestroyShotSFX();
 
         string path = $"Prefabs/SFX/Shot"; //юс╫ц
-        shotSFX     = GlobalScene.ResourceMng.Instantiate(path, transform).GetOrAddComponent<ParticleSystem>();
+        shotSFX     = ResourceManager.Instance.Instantiate(path, transform).GetOrAddComponent<ParticleSystem>();
 
         shotSFX.transform.parent        = transform;
         shotSFX.transform.localPosition = new Vector3(0.0007f, 0.0491f, 0.5542f);
@@ -284,7 +284,7 @@ public class Weapon : MonoBehaviour
     {
         if (shotSFX != null && shotSFX.gameObject != null)
         {
-            GlobalScene.ResourceMng.DestroyGameObject(shotSFX.gameObject);
+            ResourceManager.Instance.DestroyGameObject(shotSFX.gameObject);
         }
         shotSFX = null;
     }

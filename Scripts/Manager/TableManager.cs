@@ -5,7 +5,7 @@ using Interface;
 using UnityEngine;
 
 
-public class TableManager : BaseManager
+public class TableManager : BaseManager<TableManager>
 {
     /// <summary>
     /// Table
@@ -18,7 +18,7 @@ public class TableManager : BaseManager
     // public Dictionary<int, Data.StatData> StatDict { get; private set; } = new Dictionary<int, Data.StatData>();
 
 
-    protected override void OnAwake()
+    protected override void OnInitialized()
     {
         //StatDict = LoadJson<Data.Stat, int, Data.StatData>("StatData_Test").MakeDict();
     }

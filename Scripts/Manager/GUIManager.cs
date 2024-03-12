@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 
-public class GUIManager : BaseManager
+public class GUIManager : BaseManager<GUIManager>
 {
     Controller_Legacy controller_go = null;
     //Controller controller_go
@@ -20,7 +20,7 @@ public class GUIManager : BaseManager
 
     #region Override
 
-    protected override void OnAwake() { }
+    protected override void OnInitialized() { }
     public override void OnReset()
     {
         ExitJoystickController();
@@ -33,7 +33,7 @@ public class GUIManager : BaseManager
 
     public void SetWorldSceneController()
     {
-        if(GlobalScene.GameMng.playerCtrl == null)
+        if(GameManagerEX.Instance.playerCtrl == null)
         {
             Debug.LogWarning("Failed : ");
             return;
@@ -52,7 +52,7 @@ public class GUIManager : BaseManager
 
     public void StartJoystickController()
     {
-        if (GlobalScene.GameMng.IsGamePlay == false)
+        if (GameManagerEX.Instance.IsGamePlay == false)
         {
             Debug.Log($"Failed : {typeof(Controller_Legacy).Name}를 실행할 수 없습니다.");
             return;
@@ -88,7 +88,7 @@ public class GUIManager : BaseManager
 
         //DestroyController();
         string name = $"@{typeof(Controller_Legacy).Name}";
-        controller_go = GlobalScene.ResourceMng.CreateComponentObject<Controller_Legacy>(name, null);
+        controller_go = ResourceManager.Instance.CreateComponentObject<Controller_Legacy>(name, null);
     }
 
     void DestroyController()
@@ -99,7 +99,7 @@ public class GUIManager : BaseManager
             return;
         }
 
-        GlobalScene.ResourceMng.DestroyGameObject(controller_go.gameObject);
+        ResourceManager.Instance.DestroyGameObject(controller_go.gameObject);
         controller_go = null;
     }
 
