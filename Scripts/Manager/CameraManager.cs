@@ -72,13 +72,13 @@ public class CameraManager : BaseManager<CameraManager>
         }
 
         CameraModeType = Define.CameraMode.QuarterView;
-        QuarterView_CamController quarterViewCamCtrl = QuarterView_CamController.CreateCamera();
+        QuarterViewCamController quarterViewCamCtrl = QuarterViewCamController.CreateCamera();
         quarterViewCamCtrl.SetQuarterViewCam(mainCamera_ref, pTarget);
 
         cameraCtrl = quarterViewCamCtrl;
     }
 
-    public void SwitchQuarterViewCamPlay(bool pSwitch)
+    public void PlayQuarterViewCam(bool pSwitch)
     {
         if (CameraModeType != Define.CameraMode.QuarterView)
         {
@@ -86,7 +86,14 @@ public class CameraManager : BaseManager<CameraManager>
             return;
         }
 
-        cameraCtrl.SwitchPlay = pSwitch;
+        if(pSwitch)
+        {
+            cameraCtrl.Play();
+        }
+        else
+        {
+            cameraCtrl.Stop();
+        }
     }
 
     private void ResetCameraMode()

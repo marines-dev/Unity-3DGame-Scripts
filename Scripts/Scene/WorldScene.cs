@@ -83,7 +83,7 @@ public class WorldScene : BaseScene
         }
 
         /// Camera
-        CameraManager.Instance.SwitchQuarterViewCamPlay(true);
+        CameraManager.Instance.PlayQuarterViewCam(true);
 
         //GlobalScene.GUIMng.StartJoystickController();
     }
@@ -156,7 +156,7 @@ public class WorldScene : BaseScene
         {
             if(spawner != null)
             {
-                spawner.SwitchPooling = pSwitch;
+                spawner.Play();
             }
         }
     }

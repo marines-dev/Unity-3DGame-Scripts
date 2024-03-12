@@ -24,40 +24,31 @@ public class CharacterSpawner : BaseSpawner<Character> , ISpawner
 
 public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : BaseWorldObject
 {
-    public bool switchPlay = false;
-    public bool SwitchPooling 
-    { 
-        private get { return switchPlay; }
-        set
-        {
-            if(value ==  switchPlay) 
-                return;
+    //public bool switchPlay = false;
+    //public bool SwitchPooling 
+    //{ 
+    //    private get { return switchPlay; }
+    //    set
+    //    {
+    //        if(value ==  switchPlay) 
+    //            return;
 
-            switchPlay = value;
-            if (switchPlay)
-            {
-                //OnPlay();
-            }
-            else
-            {
-                //OnStop();
-            }
-        }
-    }
+    //        switchPlay = value;
+    //        if (switchPlay)
+    //        {
+    //            //OnPlay();
+    //        }
+    //        else
+    //        {
+    //            //OnStop();
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// TableData
     /// </summary>
     SpawnerTable.Data spawnerData = null;
-    //public int spawnerID;
-    //public int poolAmount;
-    //public int keepCount;
-    //public float minSpawnTime;
-    //public float maxSpawnTime;
-    //public float spawnRadius;
-    //public Vector3 spawnPos;
-    //public Quaternion spawnRot;
-    //public bool poolExpand;
 
     /// <summary>
     /// StateData
@@ -65,24 +56,25 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
     int spawnCount = 0;
     int reserveCount = 0;
     float delayTime = 0f; // юс╫ц
-    bool switchSpawn = false;
+    bool isSpawn = false;
 
     //private Action<GameObject> initAction = null;
     private Action<GameObject, Define.Actor, int> spawnAction = null; /// <GameObject, actorType, actorID>
     private Action<GameObject> despawnAction = null;
 
+
     private void Update()
     {
-        if (!SwitchPooling)
+        if (!IsPlaying)
             return;
 
         /// UpdatePooling
-        if (switchSpawn == false)
+        if (isSpawn == false)
         {
             bool isSpawn = reserveCount + spawnCount < spawnerData.keepCount;
             if (isSpawn)
             {
-                switchSpawn = true;
+                this.isSpawn = true;
                 reserveCount++;
                 delayTime = UnityEngine.Random.Range(spawnerData.minSpawnTime, spawnerData.maxSpawnTime);
             }
@@ -90,9 +82,12 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
         else
         {
             Invoke("Spawn", delayTime);
-            switchSpawn = false;
+            isSpawn = false;
         }
     }
+
+    //protected override void OnPlay() { }
+    //protected override void OnStop() { }
 
     public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction)
     {
@@ -110,14 +105,14 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
         spawnCount = 0;
         reserveCount = 0;
         delayTime = 0f;
-        switchSpawn = false;
+        isSpawn = false;
 
         ///
         //initAction = pInitAction;
         spawnAction = pSpawnAction;
         despawnAction = pDespawnAction;
 
-        SwitchPooling = false;
+        Stop();
     }
 
     protected override void SetObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand)
@@ -192,17 +187,6 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
         Debug.LogWarning($"Failed : ");
         return string.Empty;
     }
-
-    //public void StartPooling()
-    //{
-    //    if (pooled == false)
-    //    {
-    //        Debug.LogWarning($"Failed : ");
-    //        return;
-    //    }
-
-    //    isPooling = data.pooled;
-    //}
 
     //public void ReadySpawn()
     //{

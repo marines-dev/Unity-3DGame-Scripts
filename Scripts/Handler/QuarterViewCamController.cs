@@ -1,38 +1,8 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Default
-/// </summary>
-public class CamController : BaseController
-{
-    public static CamController CreateCamera()
-    {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
-        {
-            Debug.LogWarning("");
-            return null;
-        }
 
-        return Util.CreateGlobalObject<QuarterView_CamController>();
-    }
-
-    //protected override void OnPlay() { }
-    //protected override void OnStop() { }
-
-    protected virtual void Awake()
-    {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
-        {
-            Debug.LogWarning("");
-            Destroy(gameObject);
-            return;
-        }
-    }
-}
-
-public class QuarterView_CamController : CamController
+public class QuarterViewCamController : CamController
 {
     private readonly Vector3 deltaPos = Config.followCam_deltaPos;
 
@@ -40,7 +10,7 @@ public class QuarterView_CamController : CamController
     private Transform temp_target = null;
 
 
-    public new static QuarterView_CamController CreateCamera()
+    public new static QuarterViewCamController CreateCamera()
     {
         if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
@@ -48,7 +18,7 @@ public class QuarterView_CamController : CamController
             return null;
         }
 
-        return Util.CreateGlobalObject<QuarterView_CamController>();
+        return Util.CreateGlobalObject<QuarterViewCamController>();
     }
 
     protected override void Awake()
@@ -63,10 +33,10 @@ public class QuarterView_CamController : CamController
 
     private void LateUpdate()
     {
-        if (! SwitchPlay)
-             return;
+        if (!IsPlaying)
+            return;
 
-        if(temp_target != null)
+        if (temp_target != null)
         {
             RaycastHit hit;
             if (Physics.Raycast(temp_target.position, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
@@ -96,6 +66,6 @@ public class QuarterView_CamController : CamController
 
         followCam_ref = pFollowCam;
         temp_target = pTarget;
-        SwitchPlay = false;
+        Stop();
     }
 }
