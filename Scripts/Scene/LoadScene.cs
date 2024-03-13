@@ -44,11 +44,15 @@ public class LoadScene : BaseScene
 
     protected override void OnDestroy_() 
     {
-        loadUI?.Close();
+        if(loadUI != null)
+        {
+            loadUI.Close();
+        }
+
         ClearLoadingProcess();
 
         /// Complete
-        Debug.Log($"Test : {SceneManager.Instance.ActiveSceneName} 씬 로드를 완료했습니다.");
+        Debug.Log($"Success : {SceneManager.Instance.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
 
     void LoadingProcess()
@@ -87,9 +91,6 @@ public class LoadScene : BaseScene
 
         yield return LoadSceneAsync(nextSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
         SetActiveScene(nextSceneName);
-        yield return null;
-
-        Global.RegisteredGlobalObjects();
         yield return null;
 
         string loadSceneName = typeof(LoadScene).Name;

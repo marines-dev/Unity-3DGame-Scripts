@@ -5,19 +5,16 @@ using UnityEngine;
 /// </summary>
 public class CamController : BaseHandler
 {
-    public static CamController CreateCamera()
+    public static CamController CreateCameraController()
     {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
+        if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
             Debug.LogWarning("");
             return null;
         }
 
-        return Util.CreateGlobalObject<QuarterViewCamController>();
+        return Util.CreateGlobalObject<CamController>();
     }
-
-    //protected override void OnPlay() { }
-    //protected override void OnStop() { }
 
     protected virtual void Awake()
     {
@@ -28,5 +25,8 @@ public class CamController : BaseHandler
             return;
         }
     }
+
+    //protected override void OnPlay() { }
+    //protected override void OnStop() { }
 }
 

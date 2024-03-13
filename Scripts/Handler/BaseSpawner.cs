@@ -3,12 +3,12 @@ using Interface;
 using Table;
 using UnityEngine;
 
-public class CharacterSpawner : BaseSpawner<Character> , ISpawner
+public class CharacterSpawner : BaseSpawner<Enemy> , ISpawner
 {
-    public static Character CreateCharacter(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
+    public static Player CreateCharacter(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
     {
         string findPrefabPath = FindPrefabPath(pWorldObjType, pWorldObjID);
-        Character character = ResourceManager.Instance.Instantiate(findPrefabPath).GetOrAddComponent<Character>();
+        Player character = ResourceManager.Instance.Instantiate(findPrefabPath).GetOrAddComponent<Player>();
         character.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
 
         return character;

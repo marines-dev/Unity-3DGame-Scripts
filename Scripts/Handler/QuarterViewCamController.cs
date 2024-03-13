@@ -9,8 +9,7 @@ public class QuarterViewCamController : CamController
     protected Camera followCam_ref = null;
     private Transform temp_target = null;
 
-
-    public new static QuarterViewCamController CreateCamera()
+    public new static QuarterViewCamController CreateCameraController()
     {
         if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {

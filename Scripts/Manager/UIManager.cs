@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Interface;
 using UnityEngine;
+using UnityEngine.EventSystems;
 // MainUI /  PopupUI 구분 처리 필요
 // UIID로 변경 필요
 // EventSystem : Canvas 생성 시 자동 생성 확인 필요
@@ -12,12 +13,39 @@ public class UIManager : BaseManager<UIManager>
     Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
     //List<BaseUI> LoadedBaseUI_list = new List<BaseUI>();
 
-    private static Canvas canvas_ref = null;
-    private static UnityEngine.EventSystems.EventSystem eventSystem_ref = null;
+    Canvas mainCanvas = null;
+    public Canvas MainCanvas
+    {
+        get
+        {
+            if (mainCanvas == null)
+            {
+                mainCanvas = FindOrCreateMainCanvas();
+            }
+            return mainCanvas;
+        }
+    }
+
+    EventSystem mainEventSystem = null;
+    public EventSystem MainEventSystem
+    {
+        get
+        {
+            if (mainEventSystem == null)
+            {
+                mainEventSystem = FindOrCreateMainEventSystem();
+            }
+            return mainEventSystem;
+        }
+    }
 
 
     protected override void OnInitialized()
     {
+        mainCanvas = FindOrCreateMainCanvas();
+        mainEventSystem = FindOrCreateMainEventSystem();
+
+        SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_UIManager);
     }
 
     public override void OnReset() 
@@ -34,12 +62,6 @@ public class UIManager : BaseManager<UIManager>
         }
     }
 
-    public static void SetUIManager(Canvas pCanvas, UnityEngine.EventSystems.EventSystem pEventSystem)
-    {
-        canvas_ref = pCanvas;
-        eventSystem_ref = pEventSystem;
-    }
-
     #region BaseUI
 
     public TBaseUI CreateOrGetBaseUI<TBaseUI>() where TBaseUI : Component, IBaseUI
@@ -54,7 +76,7 @@ public class UIManager : BaseManager<UIManager>
         {
             string uiName = typeof(TBaseUI).Name;
             string path = $"Prefabs/UI/{uiName}";
-            baseUI = ResourceManager.Instance.Instantiate(path, canvas_ref.transform).GetOrAddComponent<TBaseUI>();
+            baseUI = ResourceManager.Instance.Instantiate(path, MainCanvas.transform).GetOrAddComponent<TBaseUI>();
         }
 
         ///
@@ -115,9 +137,10 @@ public class UIManager : BaseManager<UIManager>
     //}
 
     [Obsolete("임시")]
-    public T CreateBaseSpaceUI<T>(Transform pParent = null, string pName = null) where T : Component, IBaseUI
+    public T CreateBaseSpaceUI<T>(Transform pParent = null) where T : Component, IBaseUI
     {
-        GameObject go = ResourceManager.Instance.Instantiate($"Prefabs/UI/WorldSpace/{pName}", pParent);
+        string name = typeof(T).Name;
+        GameObject go = ResourceManager.Instance.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
 
         Canvas canvas = go.GetOrAddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
@@ -195,44 +218,83 @@ public class UIManager : BaseManager<UIManager>
     //    return string.Empty;
     //}
 
-    //void LoadCanvas()
+    private Canvas FindOrCreateMainCanvas()
+    {
+        Canvas[] canvas_arr = null;
+        if (mainCanvas == null)
+        {
+            canvas_arr = GameObject.FindObjectsOfType<Canvas>();
+            Debug.Log($"{typeof(Canvas).Name} 개수 : {canvas_arr.Length}");
+            foreach (Canvas canvas in canvas_arr)
+            {
+                if (canvas != null && canvas.renderMode != RenderMode.WorldSpace)
+                {
+                    mainCanvas = canvas;
+                    break;
+                }
+            }
+
+            if(mainCanvas == null)
+            {
+                mainCanvas = Util.CreateGameObject<Canvas>();
+            }
+
+            mainCanvas.gameObject.name = $"@{typeof(Canvas).Name}";
+        }
+
+        /// 중복 검사
+        canvas_arr = GameObject.FindObjectsOfType<Canvas>();
+        foreach (Canvas canvas in canvas_arr)
+        {
+            if (canvas != null && canvas.renderMode != RenderMode.WorldSpace && canvas != mainCanvas)
+            {
+                ResourceManager.Instance.DestroyGameObject(canvas.gameObject);
+            }
+        }
+
+        ///
+        GameObject.DontDestroyOnLoad(mainCanvas);
+        return mainCanvas;
+    }
+
+    private EventSystem FindOrCreateMainEventSystem()
+    {
+        if (mainEventSystem == null)
+        {
+            mainEventSystem = GameObject.FindObjectOfType<EventSystem>();
+            if (mainEventSystem == null)
+            {
+                mainEventSystem = Util.CreateGameObject<EventSystem>();
+            }
+
+            mainEventSystem.gameObject.name = $"@{typeof(EventSystem).Name}";
+        }
+
+        /// 중복 검사
+        EventSystem[] eventSystem_arr = GameObject.FindObjectsOfType<EventSystem>();
+        foreach (EventSystem eventSystem in eventSystem_arr)
+        {
+            if (eventSystem != null && eventSystem != mainEventSystem)
+            {
+                ResourceManager.Instance.DestroyGameObject(eventSystem.gameObject);
+            }
+        }
+
+        ///
+        GameObject.DontDestroyOnLoad(mainEventSystem);
+        return mainEventSystem;
+    }
+
+    private void AddSceneLoadedEvent_UIManager(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
+    {
+        mainCanvas = FindOrCreateMainCanvas();
+        mainEventSystem = FindOrCreateMainEventSystem();
+    }
+
+    //public static void SetUIManager(Canvas pCanvas, EventSystem pEventSystem)
     //{
-    //    if (canvas != null)
-    //        return;
-
-    //    canvas = GameObject.FindObjectOfType<Canvas>();
-    //    if (canvas == null)
-    //    {
-    //        canvas = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/Canvas").GetComponent<Canvas>();
-
-    //    }
-
-    //    string go_name = $"@{typeof(Canvas).Name}";
-    //    canvas.gameObject.name = go_name;
-    //    canvas.gameObject.SetActive(true);
-
-    //    //
-    //    DontDestroyOnLoad(canvas);
-    //}
-
-    //[Obsolete("테스트 중")]
-    //void LoadEventSystem()
-    //{
-    //    if (eventSystem_go_ != null)
-    //        return;
-
-    //    eventSystem_go_ = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
-    //    if (eventSystem_go_ == null)
-    //    {
-    //        eventSystem_go_ = GlobalScene.ResourceMng.Instantiate("Prefabs/UI/EventSystem").GetComponent<UnityEngine.EventSystems.EventSystem>();
-    //    }
-
-    //    string go_name = $"@{typeof(UnityEngine.EventSystems.EventSystem).Name}";
-    //    eventSystem_go_.gameObject.name = go_name;
-    //    eventSystem_go_.gameObject.SetActive(true);
-
-    //    //
-    //    DontDestroyOnLoad(eventSystem_go_);
+    //    canvas_ref = pCanvas;
+    //    eventSystem_ref = pEventSystem;
     //}
 
     #endregion Load

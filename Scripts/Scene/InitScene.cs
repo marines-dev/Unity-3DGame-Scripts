@@ -10,10 +10,6 @@ public class InitScene : BaseScene
         /// LoadManager
         ManagerLoader.CreateManagers();
 
-        /// CreateGlobalScene
-        Global.RegisteredGlobalObjects();
-
-        // LoadData
         IsInitSceneLoaded = true;
     }
 

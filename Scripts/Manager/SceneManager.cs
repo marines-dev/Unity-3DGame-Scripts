@@ -79,6 +79,18 @@ public class SceneManager : BaseManager<SceneManager>
         return typeof(TScene).Name;
     }
 
+    public void AddSceneLoadedEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
+    {
+        if (pSceneLoadedEvent == null)
+        {
+            Debug.LogWarning("");
+            return;
+        }
+
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= pSceneLoadedEvent;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += pSceneLoadedEvent;
+    }
+
     //BaseScene GetCurrentBaseScene()
     //{
     //    Type type = Type.GetType(GetActiveSceneName());

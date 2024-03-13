@@ -11,17 +11,17 @@ public static class ManagerLoader
     public static void CreateManagers()
     {
         CreateManager<SceneManager>();
-        CreateManager<GameManagerEX>();
-        CreateManager<CameraManager>();
         CreateManager<ResourceManager>();
+        CreateManager<SystemManager>();
+        CreateManager<CameraManager>();
         CreateManager<TableManager>();
         CreateManager<UIManager>();
-        CreateManager<GUIManager>();
         CreateManager<BackendManager>();
         CreateManager<GPGSManager>();
         CreateManager<LogInManager>();
         CreateManager<UserManager>();
         //CreateManager<InputManager>();
+        //CreateManager<GUIManager>();
     }
 
     public static TMng CreateManager<TMng>() where TMng : class, IBaseManager, new()

@@ -52,7 +52,7 @@ public class Define
 
     public enum BaseAnim
     {
-        //None,
+        None,
         Die,
         Idle,
         Run,

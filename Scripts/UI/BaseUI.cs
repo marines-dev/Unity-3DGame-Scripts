@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 {
     //public GameObject GameObject { get { return gameObject; } }
+    public bool IsOpen { get { return gameObject.activeSelf; } }
+
     List<Transform> trans_List = new List<Transform>();
     Transform[] uiTrans_arr = null;
     
@@ -45,7 +47,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
     public void Close()
     {
-        if (gameObject.activeSelf == true)
+        if (gameObject.activeSelf)
         {
             gameObject.SetActive(false);
         }

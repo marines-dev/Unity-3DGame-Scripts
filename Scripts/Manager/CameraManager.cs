@@ -15,7 +15,19 @@ public class CameraManager : BaseManager<CameraManager>
 
     public Define.CameraMode CameraModeType { get; private set; } = Define.CameraMode.Defualt;
 
-    static Camera mainCamera_ref = null;
+    Camera mainCamera = null;
+    Camera MainCamera
+    {
+        get
+        {
+            if (mainCamera == null)
+            {
+                mainCamera = FindOrCreateMainCamera();
+            }
+            return mainCamera;
+        }
+    }
+
     private CamController cameraCtrl = null;
     private CamController CameraCtrl
     {
@@ -32,14 +44,17 @@ public class CameraManager : BaseManager<CameraManager>
         }
     }
 
-    public static void SetCameraManager(Camera pMainCamera)
-    {
-        mainCamera_ref = pMainCamera;
-    }
+    //public static void SetCameraManager(Camera pMainCamera)
+    //{
+    //    mainCamera_ref = pMainCamera;
+    //}
 
     protected override void OnInitialized()
     {
+        mainCamera = FindOrCreateMainCamera();
         ResetCameraMode();
+
+        SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_CameraManager);
     }
 
     public override void OnReset()
@@ -57,8 +72,7 @@ public class CameraManager : BaseManager<CameraManager>
         }
 
         CameraModeType = Define.CameraMode.Defualt;
-        CamController generalCamCtrl = CamController.CreateCamera();
-
+        CamController generalCamCtrl = CamController.CreateCameraController();
         cameraCtrl = generalCamCtrl;
     }
 
@@ -72,8 +86,8 @@ public class CameraManager : BaseManager<CameraManager>
         }
 
         CameraModeType = Define.CameraMode.QuarterView;
-        QuarterViewCamController quarterViewCamCtrl = QuarterViewCamController.CreateCamera();
-        quarterViewCamCtrl.SetQuarterViewCam(mainCamera_ref, pTarget);
+        QuarterViewCamController quarterViewCamCtrl = QuarterViewCamController.CreateCameraController();
+        quarterViewCamCtrl.SetQuarterViewCam(MainCamera, pTarget);
 
         cameraCtrl = quarterViewCamCtrl;
     }
@@ -88,11 +102,11 @@ public class CameraManager : BaseManager<CameraManager>
 
         if(pSwitch)
         {
-            cameraCtrl.Play();
+            CameraCtrl.Play();
         }
         else
         {
-            cameraCtrl.Stop();
+            CameraCtrl.Stop();
         }
     }
 
@@ -106,14 +120,48 @@ public class CameraManager : BaseManager<CameraManager>
             cameraCtrl = null;
         }
 
-        if (mainCamera_ref != null)
+        if (MainCamera != null)
         {
-            mainCamera_ref.backgroundColor = Config.cam_backgroundColor;
+            MainCamera.backgroundColor = Config.cam_backgroundColor;
 
-            mainCamera_ref.transform.localPosition = Config.cam_initPos;
-            mainCamera_ref.transform.localRotation = Quaternion.Euler(Config.cam_initRot);
-            mainCamera_ref.transform.localScale = Config.cam_initScale;
+            MainCamera.transform.localPosition = Config.cam_initPos;
+            MainCamera.transform.localRotation = Quaternion.Euler(Config.cam_initRot);
+            MainCamera.transform.localScale = Config.cam_initScale;
         }
+    }
+
+    private Camera FindOrCreateMainCamera()
+    {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                mainCamera = Util.CreateGameObject<Camera>();
+            }
+
+            mainCamera.gameObject.name = $"@{typeof(Camera).Name}";
+        }
+
+        /// 중복 검사
+        Camera[] camera_arr = Camera.allCameras;
+        Debug.Log($"{typeof(Camera).Name} 개수 : {camera_arr.Length}");
+        foreach (Camera camera in camera_arr)
+        {
+            if (camera != null && mainCamera != camera)
+            {
+                ResourceManager.Instance.DestroyGameObject(camera.gameObject);
+            }
+        }
+
+        ///
+        GameObject.DontDestroyOnLoad(mainCamera);
+        return mainCamera;
+    }
+
+    private void AddSceneLoadedEvent_CameraManager(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
+    {
+        mainCamera = FindOrCreateMainCamera();
     }
 
     //private void SetPosition(Vector3 pPos)

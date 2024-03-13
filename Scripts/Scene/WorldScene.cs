@@ -6,6 +6,15 @@ using UnityEngine;
 
 public class WorldScene : BaseScene
 {
+    static WorldScene instance;
+    public static WorldScene Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
     /// <summary>
     /// MainUI
     /// </summary>
@@ -18,8 +27,44 @@ public class WorldScene : BaseScene
     //public BaseInput BaseInput { get; }
 
     #region World
-    
-    Character temp_player = null;
+
+    public bool IsGamePlay
+    {
+        get
+        {
+            bool isWorldScene = SceneManager.Instance.IsActiveScene<WorldScene>();
+            bool isSpawnPlayer = temp_player != null;
+            bool isLivePlayer = temp_player != null && temp_player.BaseAnimType != Define.BaseAnim.Die;
+
+            //
+            bool isGamePlay = isWorldScene && isSpawnPlayer && isLivePlayer;
+            if (isGamePlay)
+            {
+                return true;
+            }
+            else
+            {
+                Debug.Log("Failed : 게임을 플레이할 수 없습니다.");
+                return false;
+            }
+
+        }
+    }
+
+
+    Player temp_player = null;
+    public IControllHndl_Temp PlayerCtrl
+    {
+        get
+        {
+            if (! IsGamePlay)
+            {
+                Debug.LogWarning("Failed : ");
+                return null;
+            }
+            return temp_player;
+        }
+    }
 
     /// <summary>
     /// Spawner
@@ -28,8 +73,18 @@ public class WorldScene : BaseScene
 
 
     #endregion World
+
     protected override void OnAwake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         /// CreateTable
         {
             TableManager.Instance.CreateOrGetBaseTable<Table.SpawnerTable>();
@@ -61,9 +116,8 @@ public class WorldScene : BaseScene
             }
         }
 
-        //// Controller
+        // Controller
         //GlobalScene.GUIMng.SetWorldSceneController();
-        //yield return null;
 
         /// Camera
         CameraManager.Instance.SetQuarterViewCamMode(temp_player.transform);
@@ -79,8 +133,10 @@ public class WorldScene : BaseScene
             temp_player.Spawn(spawnPos, spawnRot);
 
             /// Enemy
-            SwitchSpawnersPooling(true);
+            PlaySpawnersPooling(true);
         }
+
+        worldUI.Open();
 
         /// Camera
         CameraManager.Instance.PlayQuarterViewCam(true);
@@ -90,6 +146,12 @@ public class WorldScene : BaseScene
 
     protected override void OnDestroy_()
     {
+        if(instance != null && instance.gameObject != null)
+        {
+            ResourceManager.Instance.DestroyGameObject(instance.gameObject);
+        }
+
+        instance = null;
     }
 
     #region Spawner
@@ -144,23 +206,49 @@ public class WorldScene : BaseScene
 
     void DespawnPlayerEvent(GameObject pGO)
     {
-        //SetDespawnWorldObj(pGO);
-
-        //// Respawn
-        //RespawnPlayer();
+        /// Respawn
+        UserManager.Instance.UpdateUserData();
+        SceneManager.Instance.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
     }
 
-    public void SwitchSpawnersPooling(bool pSwitch)
+    public void PlaySpawnersPooling(bool pSwitch)
     {
         foreach(ISpawner spawner in worldSpawner_hashSet)
         {
             if(spawner != null)
             {
-                spawner.Play();
+                if(pSwitch)
+                    spawner.Play();
+                else
+                    spawner.Stop();
             }
         }
     }
 
     #endregion Spawner
 
+    public void SetPlayerDead()
+    {
+        worldUI.Close();
+        CameraManager.Instance.PlayQuarterViewCam(false);
+        PlaySpawnersPooling(false);
+    }
+
+    public ITargetHandler_Temp GetTargetCharacter(GameObject pTarget)
+    {
+        if (pTarget == null)
+        {
+            Debug.LogWarning("Falied : ");
+            return null;
+        }
+
+        Character baseCharacter = pTarget.GetComponent<Character>();
+        if (baseCharacter == null)
+        {
+            Debug.LogWarning("Falied : ");
+            return null;
+        }
+
+        return baseCharacter;
+    }
 }

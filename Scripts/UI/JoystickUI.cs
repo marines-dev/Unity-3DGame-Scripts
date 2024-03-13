@@ -26,17 +26,71 @@ public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler
         // Text
     }
 
-    float   r;
-    float   moveSpeed               = 4f;
-    bool    isAttackButtonPressed   = false;
-    public Vector2  beginPos { get; private set; }   = Vector3.zero;
-    public Vector2  dragPos { get; private set; }    = Vector3.zero;
-    Vector2         centerPos                        = Vector3.zero;
+    private float r;
+    private float moveSpeed               = 4f;
+    private bool isAttackButtonPressed   = false;
+    private Vector2 beginPos = Vector3.zero;
+    private Vector2 dragPos = Vector3.zero;
+    private Vector2 centerPos  = Vector3.zero;
 
-    RectTransform backgroundRectTrans   = null;
-    RectTransform pointerRectTrans      = null;
-    Action<bool> attackButtonAction     = null;
+    private RectTransform backgroundRectTrans   = null;
+    private RectTransform pointerRectTrans      = null;
+    //private Action<bool> attackButtonAction     = null;
 
+    private void FixedUpdate()
+    {
+        if (IsOpen && WorldScene.Instance.IsGamePlay)
+        {
+            if (Vector2.Distance(dragPos, beginPos) > 10) // Move
+            {
+                //
+                Vector2 dir = (dragPos - beginPos).normalized;
+                float angle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
+                angle = angle < 0 ? 360 + angle : angle;
+                Vector3 eulerAngles = new Vector3(0, Camera.main.transform.eulerAngles.y + angle, 0);
+
+                ///
+                WorldScene.Instance.PlayerCtrl.OnMove(eulerAngles);
+            }
+            else // Stop
+            {
+                ///
+                WorldScene.Instance.PlayerCtrl.OnStop();
+            }
+        }
+    }
+
+    //void FixedUpdate()
+    //{
+    //    if (Vector2.Distance(dragPos, beginPos) > 10) // joystick move
+    //    {
+    //        Vector2 v2 = (dragPos - beginPos).normalized;
+    //        float angle = Mathf.Atan2(v2.x, v2.y) * Mathf.Rad2Deg;
+    //        angle = angle < 0 ? 360 + angle : angle;
+    //        //Vector3 eulerAngles = new Vector3(0, cameraTransform.eulerAngles.y + angle, 0);
+    //        //playerCC.transform.eulerAngles = eulerAngles;
+    //        //playerCC.Move(player.forward * Time.deltaTime * moveSpeed);
+
+    //        //if (anim)//your ainmation set
+    //        //{
+    //        //    anim.CrossFade("forward");
+    //        //}
+    //    }
+    //    else // joystick stop
+    //    {
+    //        //if (anim)//your ainmation set
+    //        //{
+    //        //    anim.CrossFade("standing");
+    //        //}
+    //    }
+    //    ////Simulated drop
+    //    //if (!playerCC.isGrounded)
+    //    //{
+    //    //    playerCC.Move(new Vector3(0, -10f * Time.deltaTime, 0));
+    //    //}
+
+    //    //cameraController.CameraSet();
+    //}
 
     protected override void BindEvents()
     {
@@ -80,7 +134,6 @@ public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler
         SetActiveUI(UI.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
     }
 
-    // Close할 때 실행할 프로세스입니다.
     protected override void OnClose()
     {
         isAttackButtonPressed   = false;
@@ -90,40 +143,8 @@ public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler
 
         backgroundRectTrans = null;
         pointerRectTrans    = null;
-        attackButtonAction  = null;
+        //attackButtonAction  = null;
     }
-
-    //void FixedUpdate()
-    //{
-    //    if (Vector2.Distance(dragPos, beginPos) > 10) // joystick move
-    //    {
-    //        Vector2 v2 = (dragPos - beginPos).normalized;
-    //        float angle = Mathf.Atan2(v2.x, v2.y) * Mathf.Rad2Deg;
-    //        angle = angle < 0 ? 360 + angle : angle;
-    //        //Vector3 eulerAngles = new Vector3(0, cameraTransform.eulerAngles.y + angle, 0);
-    //        //playerCC.transform.eulerAngles = eulerAngles;
-    //        //playerCC.Move(player.forward * Time.deltaTime * moveSpeed);
-
-    //        //if (anim)//your ainmation set
-    //        //{
-    //        //    anim.CrossFade("forward");
-    //        //}
-    //    }
-    //    else // joystick stop
-    //    {
-    //        //if (anim)//your ainmation set
-    //        //{
-    //        //    anim.CrossFade("standing");
-    //        //}
-    //    }
-    //    ////Simulated drop
-    //    //if (!playerCC.isGrounded)
-    //    //{
-    //    //    playerCC.Move(new Vector3(0, -10f * Time.deltaTime, 0));
-    //    //}
-
-    //    //cameraController.CameraSet();
-    //}
 
     #region Button
 
@@ -135,17 +156,6 @@ public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler
     #endregion Button
 
     #region JoystickUI
-
-    public void SetJoystickController(Action<bool> pAttackBtnAction)
-    {
-        if(pAttackBtnAction == null)
-        {
-            Debug.LogWarning("");
-            return;
-        }
-
-        attackButtonAction = pAttackBtnAction;
-    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -169,11 +179,8 @@ public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler
     public void OnPointerDown_JoystickUI_Button_Attack()
     {
         isAttackButtonPressed = true;
-        if(attackButtonAction != null)
-        {
-            attackButtonAction.Invoke(isAttackButtonPressed);
-        }
-        
+        WorldScene.Instance.PlayerCtrl.OnAttack();
+
 
         SetActiveUI(UI.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
         SetActiveUI(UI.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
@@ -182,13 +189,22 @@ public class JoystickUI : BaseUI<JoystickUI.UI>, IDragHandler, IBeginDragHandler
     public void OnPointerUp_JoystickUI_Button_Attack()
     {
         isAttackButtonPressed = false;
-        if (attackButtonAction != null)
-        {
-            attackButtonAction.Invoke(isAttackButtonPressed);
-        }
+        WorldScene.Instance.PlayerCtrl.OnReady();
 
         SetActiveUI(UI.JoystickUI_Object_GunAttackDeselect,   isAttackButtonPressed == false);
         SetActiveUI(UI.JoystickUI_Object_GunAttackSelect,     isAttackButtonPressed);
     }
+
+    //public void SetJoystickController(Action<bool> pAttackBtnAction)
+    //{
+    //    if(pAttackBtnAction == null)
+    //    {
+    //        Debug.LogWarning("");
+    //        return;
+    //    }
+
+    //    attackButtonAction = pAttackBtnAction;
+    //}
+
     #endregion JoystickUI
 }
