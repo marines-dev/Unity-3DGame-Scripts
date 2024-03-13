@@ -164,7 +164,7 @@ public class Enemy : Character
             return;
         }
 
-        //navMeshAgent.speed = StatData.moveSpeed;
+        navMeshAgent.speed = Stat.runSpeed;
         navMeshAgent.SetDestination(temp_destPos);
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
     }

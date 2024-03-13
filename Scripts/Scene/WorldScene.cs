@@ -18,7 +18,7 @@ public class WorldScene : BaseScene
     /// <summary>
     /// MainUI
     /// </summary>
-    private JoystickUI worldUI = null;
+    private WorldUI worldUI = null;
     //public BaseInput BaseInput { get; }
 
     /// <summary>
@@ -44,13 +44,12 @@ public class WorldScene : BaseScene
             }
             else
             {
-                Debug.Log("Failed : 게임을 플레이할 수 없습니다.");
+                Util.LogWarning("Failed : 게임을 플레이할 수 없습니다.");
                 return false;
             }
 
         }
     }
-
 
     Player temp_player = null;
     public IControllHndl_Temp PlayerCtrl
@@ -59,7 +58,7 @@ public class WorldScene : BaseScene
         {
             if (! IsGamePlay)
             {
-                Debug.LogWarning("Failed : ");
+                Util.LogWarning();
                 return null;
             }
             return temp_player;
@@ -94,7 +93,7 @@ public class WorldScene : BaseScene
         /// CreateUI
         {
             // Joystick
-            worldUI = UIManager.Instance.CreateOrGetBaseUI<JoystickUI>();
+            worldUI = UIManager.Instance.CreateOrGetBaseUI<WorldUI>();
             worldUI.Close();
         }
 

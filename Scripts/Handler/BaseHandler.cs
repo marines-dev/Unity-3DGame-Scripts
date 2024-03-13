@@ -9,7 +9,8 @@ public abstract class BaseHandler : MonoBehaviour
         IsPlaying = true;
         gameObject.SetActive(true);
         OnPlay();
-        Debug.Log($"Play : {this.name}을 시작합니다.");
+
+        Util.LogSuccess($"{this.name}을 시작합니다.");
     }
 
     public void Stop()
@@ -18,7 +19,7 @@ public abstract class BaseHandler : MonoBehaviour
         gameObject.SetActive(false);
         OnStop();
 
-        Debug.Log($"Stop : {this.name}을 종료합니다.");
+        Util.LogSuccess($"{this.name}을 종료합니다.");
     }
 
     protected virtual void OnPlay() { }

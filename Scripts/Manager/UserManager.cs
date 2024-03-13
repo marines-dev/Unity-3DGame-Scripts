@@ -45,7 +45,7 @@ public class UserManager : BaseManager<UserManager>
             userData = new ServerData.UserData();
     }
 
-    public override void OnReset() { }
+    public override void OnRelease() { }
 
     // Debug.Log(ToString())
     [Obsolete("테스트 : 데이터 디버깅")]

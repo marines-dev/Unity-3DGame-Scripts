@@ -15,7 +15,7 @@ public abstract class BaseScene : MonoBehaviour
             string initSceneName = typeof(InitScene).Name;
             if(activeSceneName != initSceneName)
             {
-                Debug.LogWarning($"Failed : 게임 초기화를 위해 {typeof(InitScene).Name} 씬으로 이동합니다.");
+                Util.LogWarning($"게임 초기화를 위해 {typeof(InitScene).Name} 씬으로 이동합니다.");
                 UnityEngine.SceneManagement.SceneManager.LoadScene(initSceneName);
                 return;
             }

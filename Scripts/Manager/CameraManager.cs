@@ -1,33 +1,12 @@
-using System;
-using System.Collections;
-using Unity.Android.Types;
 using UnityEngine;
 
 
 public class CameraManager : BaseManager<CameraManager>
 {
-    //public enum BGColor
-    //{
-    //    Black,
-    //    Blue,
-    //    White,
-    //}
-
     public Define.CameraMode CameraModeType { get; private set; } = Define.CameraMode.Defualt;
 
-    Camera mainCamera = null;
-    Camera MainCamera
-    {
-        get
-        {
-            if (mainCamera == null)
-            {
-                mainCamera = FindOrCreateMainCamera();
-            }
-            return mainCamera;
-        }
-    }
-
+    private Camera mainCamera = null;
+    private Camera MainCamera => mainCamera ?? (mainCamera = FindOrCreateMainCamera());
     private CamController cameraCtrl = null;
     private CamController CameraCtrl
     {
@@ -36,18 +15,12 @@ public class CameraManager : BaseManager<CameraManager>
             if(cameraCtrl == null)
             {
                 CameraModeType = Define.CameraMode.None;
-                Debug.LogWarning("");
+                Util.LogWarning();
                 SetDefualtCamMode();
             }
-
             return cameraCtrl;
         }
     }
-
-    //public static void SetCameraManager(Camera pMainCamera)
-    //{
-    //    mainCamera_ref = pMainCamera;
-    //}
 
     protected override void OnInitialized()
     {
@@ -57,7 +30,7 @@ public class CameraManager : BaseManager<CameraManager>
         SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_CameraManager);
     }
 
-    public override void OnReset()
+    public override void OnRelease()
     {
         ResetCameraMode();
     }
@@ -67,7 +40,7 @@ public class CameraManager : BaseManager<CameraManager>
         /// 카메라 초기화 확인
         if (CameraModeType != Define.CameraMode.None)
         {
-            Debug.LogWarning("");
+            Util.LogWarning();
             return;
         }
 
@@ -81,7 +54,7 @@ public class CameraManager : BaseManager<CameraManager>
         /// 카메라 초기화 확인
         if (CameraModeType != Define.CameraMode.None)
         {
-            Debug.LogWarning("");
+            Util.LogWarning();
             return;
         }
 
@@ -96,7 +69,7 @@ public class CameraManager : BaseManager<CameraManager>
     {
         if (CameraModeType != Define.CameraMode.QuarterView)
         {
-            Debug.LogWarning("");
+            Util.LogWarning();
             return;
         }
 
@@ -145,7 +118,6 @@ public class CameraManager : BaseManager<CameraManager>
 
         /// 중복 검사
         Camera[] camera_arr = Camera.allCameras;
-        Debug.Log($"{typeof(Camera).Name} 개수 : {camera_arr.Length}");
         foreach (Camera camera in camera_arr)
         {
             if (camera != null && mainCamera != camera)
@@ -163,39 +135,4 @@ public class CameraManager : BaseManager<CameraManager>
     {
         mainCamera = FindOrCreateMainCamera();
     }
-
-    //private void SetPosition(Vector3 pPos)
-    //{
-    //    mainCamera_ref.transform.localPosition = pPos;
-    //}
-
-    //private void SetLookAt(Vector3 targetPos)
-    //{
-    //    mainCamera_ref.transform.LookAt(targetPos);
-    //}
-
-    //private void SetBackgroundColor(BGColor pColor = BGColor.Black)
-    //{
-    //    Color color = Color.black;
-    //    switch (pColor)
-    //    {
-    //        case BGColor.Black:
-    //            {
-    //                color = Color.black;
-    //            }
-    //            break;
-    //        case BGColor.Blue:
-    //            {
-    //                color = Color.blue;
-    //            }
-    //            break;
-    //        case BGColor.White:
-    //            {
-    //                color = Color.white;
-    //            }
-    //            break;
-    //    }
-
-    //    mainCamera_ref.backgroundColor = color;
-    //}
 }

@@ -67,7 +67,7 @@ public static class Extension
     {
         if (pTrans == null || string.IsNullOrEmpty(pName))
         {
-            Debug.LogWarning($"");
+            Util.LogWarning();
             return null;
         }
 
@@ -82,7 +82,7 @@ public static class Extension
     {
         if (pTrans == null || string.IsNullOrEmpty(pName))
         {
-            Debug.LogWarning($"");
+            Util.LogWarning();
             return null;
         }
 

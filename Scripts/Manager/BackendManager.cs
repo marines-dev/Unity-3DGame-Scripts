@@ -11,7 +11,7 @@ public class BackendManager : BaseManager<BackendManager>
     BackendReturnObject bro = null;
 
     protected override void OnInitialized() { }
-    public override void OnReset()
+    public override void OnRelease()
     {
         gameDataRowInDate = string.Empty;
     }
@@ -24,11 +24,11 @@ public class BackendManager : BaseManager<BackendManager>
 
         if (bro.IsSuccess())
         {
-            Debug.Log($"Success: InitBackendSDK - {bro}");
+            Util.LogSuccess($"Success: InitBackendSDK - {bro}");
         }
         else
         {
-            Debug.LogError($"Failed : InitBackendSDK - {bro}");
+            Util.LogError($"InitBackendSDK - {bro}");
         }
     }
 
@@ -40,21 +40,21 @@ public class BackendManager : BaseManager<BackendManager>
     public bool TokenLogin()
     {
         //string id = Backend.BMember.GetGuestID();
-        //Debug.Log("로컬 기기에 저장된 아이디 :" + id);
+        //Util.LogSuccess("로컬 기기에 저장된 아이디 :" + id);
 
         //bro = Backend.BMember.CheckUserInBackend("federationToken", FederationType.Google);
-        //Debug.Log("federationToken : " + bro);
+        //Util.LogSuccess("federationToken : " + bro);
 
         bro = Backend.BMember.LoginWithTheBackendToken();
 
         if (bro.IsSuccess())
         {
-            Debug.Log($"Success: TokenLogin - {bro}");
+            Util.LogSuccess($"TokenLogin - {bro}");
             return true;
         }
         else
         {
-            Debug.Log($"Failed : TokenLogin - {bro}");
+            Util.LogWarning($"TokenLogin - {bro}");
             return false;
         }
     }
@@ -64,14 +64,14 @@ public class BackendManager : BaseManager<BackendManager>
         bro = Backend.BMember.GuestLogin();
         if (bro.IsSuccess())
         {
-            Debug.Log($"Success: GuestLogIn - {bro}");
+            Util.LogSuccess($"GuestLogIn - {bro}");
             return true;
         }
         else
         {
             DeleteGuestInfo();
 
-            Debug.LogError($"Failed : GuestLogIn - {bro}");
+            Util.LogError($"GuestLogIn - {bro}");
             return false;
         }
     }
@@ -86,11 +86,11 @@ public class BackendManager : BaseManager<BackendManager>
         isSuccess = bro.IsSuccess();
         if (bro.IsSuccess())
         {
-            Debug.Log($"Success: AuthorizeFederation - {bro}");
+            Util.LogSuccess($"AuthorizeFederation - {bro}");
         }
         else
         {
-            Debug.LogError($"Failed : AuthorizeFederation - {bro}");
+            Util.LogError($"AuthorizeFederation - {bro}");
         }
 #endif
 
@@ -107,11 +107,11 @@ public class BackendManager : BaseManager<BackendManager>
         isSuccess = bro.IsSuccess();
         if (isSuccess)
         {
-            Debug.Log($"Success: CheckFederationAccount - {bro}");
+            Util.LogSuccess($"CheckFederationAccount - {bro}");
         }
         else
         {
-            Debug.LogError($"Failed : CheckFederationAccount - {bro}");
+            Util.LogError($"CheckFederationAccount - {bro}");
 
             OpenSignUpPopupObject(selectAccoutType);
         }
@@ -126,11 +126,11 @@ public class BackendManager : BaseManager<BackendManager>
         bool isSuccess = bro.IsSuccess();
         if (bro.IsSuccess())
         {
-            Debug.Log($"Success: FederationLogOut - {bro}");
+            Util.LogSuccess($"FederationLogOut - {bro}");
         }
         else
         {
-            Debug.LogError($"Failed : FederationLogOut - {bro}");
+            Util.LogError($"FederationLogOut - {bro}");
         }
 
         return isSuccess;
@@ -142,11 +142,11 @@ public class BackendManager : BaseManager<BackendManager>
         bool isSuccess = bro.IsSuccess();
         if (bro.IsSuccess())
         {
-            Debug.Log($"Success: SignOut - {bro}");
+            Util.LogSuccess($"SignOut - {bro}");
         }
         else
         {
-            Debug.LogError($"Failed : SignOut - {bro}");
+            Util.LogError($"Failed : SignOut - {bro}");
         }
 
         return isSuccess;
@@ -160,17 +160,17 @@ public class BackendManager : BaseManager<BackendManager>
     // Nickname
     public bool CreateNickname(string _nickname)
     {
-        Debug.Log("Input Nickname : " + _nickname);
+        Util.LogMessage("Input Nickname : " + _nickname);
 
         bro = Backend.BMember.CreateNickname(_nickname);
         bool isSuccess = bro.IsSuccess();
         if (isSuccess)
         {
-            Debug.Log($"Success: CreateNickname - {bro}");
+            Util.LogSuccess($": CreateNickname - {bro}");
         }
         else
         {
-            Debug.LogError($"Failed : CreateNickname - {bro}");
+            Util.LogError($"CreateNickname - {bro}");
         }
 
         return isSuccess;
@@ -198,16 +198,16 @@ public class BackendManager : BaseManager<BackendManager>
 
     public LitJson.JsonData LoadBackendData(string _table)
     {
-        Debug.Log("게임 정보 조회 함수를 호출합니다.");
+        Util.LogSuccess("게임 정보 조회 함수를 호출합니다.");
         var bro = Backend.GameData.GetMyData(_table, new Where()); // _table = "USER_DATA"
         if (bro.IsSuccess())
         {
-            Debug.Log("게임 정보 조회에 성공했습니다. : " + bro);
+            Util.LogSuccess("게임 정보 조회에 성공했습니다. : " + bro);
             LitJson.JsonData gameDataJson = bro.FlattenRows(); // Json으로 리턴된 데이터를 받아옵니다.  
 
             if (gameDataJson.Count <= 0)
             {
-                Debug.LogWarning("데이터가 존재하지 않습니다.");
+                Util.LogWarning("데이터가 존재하지 않습니다.");
             }
             else
             {
@@ -217,7 +217,7 @@ public class BackendManager : BaseManager<BackendManager>
         }
         else
         {
-            Debug.LogError("게임 정보 조회에 실패했습니다. : " + bro);
+            Util.LogError("게임 정보 조회에 실패했습니다. : " + bro);
         }
 
         return null;
@@ -225,20 +225,20 @@ public class BackendManager : BaseManager<BackendManager>
 
     public void SaveBackendData(string _table, ref Param _param)
     {
-        Debug.LogWarning("서버 업데이트 목록에 해당 데이터들을 추가합니다.");
+        Util.LogWarning("서버 업데이트 목록에 해당 데이터들을 추가합니다.");
         // 게임정보 데이터 삽입을 요청합니다.
         var bro = Backend.GameData.Insert(_table, _param);
 
         if (bro.IsSuccess())
         {
-            Debug.Log("게임정보 데이터 삽입에 성공했습니다. : " + bro);
+            Util.LogSuccess("게임정보 데이터 삽입에 성공했습니다. : " + bro);
 
             //삽입한 게임정보의 고유값입니다.  
             gameDataRowInDate = bro.GetInDate();
         }
         else
         {
-            Debug.LogError("게임정보 데이터 삽입에 실패했습니다. : " + bro);
+            Util.LogError("게임정보 데이터 삽입에 실패했습니다. : " + bro);
         }
     }
 
@@ -248,24 +248,24 @@ public class BackendManager : BaseManager<BackendManager>
 
         if (string.IsNullOrEmpty(gameDataRowInDate))
         {
-            Debug.Log("내 제일 최신 게임정보 데이터 수정을 요청합니다.");
+            Util.LogSuccess("내 제일 최신 게임정보 데이터 수정을 요청합니다.");
 
             bro = Backend.GameData.Update(_table, new Where(), _param);
         }
         else
         {
-            Debug.Log($"{gameDataRowInDate}의 게임정보 데이터 수정을 요청합니다.");
+            Util.LogSuccess($"{gameDataRowInDate}의 게임정보 데이터 수정을 요청합니다.");
 
             bro = Backend.GameData.UpdateV2(_table, gameDataRowInDate, Backend.UserInDate, _param);
         }
 
         if (bro.IsSuccess())
         {
-            Debug.Log("게임정보 데이터 수정에 성공했습니다. : " + bro);
+            Util.LogSuccess("게임정보 데이터 수정에 성공했습니다. : " + bro);
         }
         else
         {
-            Debug.LogError("게임정보 데이터 수정에 실패했습니다. : " + bro);
+            Util.LogError("게임정보 데이터 수정에 실패했습니다. : " + bro);
         }
     }
 

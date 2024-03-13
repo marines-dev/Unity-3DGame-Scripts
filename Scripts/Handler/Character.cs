@@ -27,6 +27,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         public int currentHp;
         public int attack;
         public int defense;
+        public float runSpeed;
     }
     private ActorStat stat;
     protected ActorStat Stat { get { return stat; } }
@@ -39,7 +40,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         {
             if (value == baseAnimType)
             {
-                Debug.Log("Failed : ");
+                Util.LogWarning();
                 return;
             }
 
@@ -77,7 +78,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         {
             if (value == upperAnimType || value == Define.UpperAnim.None)
             {
-                Debug.Log($"Failed : ");
+                Util.LogWarning();
                 return;
             }
 
@@ -177,15 +178,9 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         //
         shader.SetMateriasColorAlpha(1f, false);
 
-        string tempAnimator = "Humanoid_Animator";
-        string tempAvatar = "CharactersAvatar";
-        string temp_beforUpperReadyClip = "Humanoid_Ready_Hand";
-        string temp_beforUpperAttackClip = "Humanoid_Attack_Hand";
-        string temp_afterUpperReadyClip = "Humanoid_Ready_Gun";
-        string temp_afterUpperAttackClip = "Humanoid_Attack_Gun";
-        animator.SetAnimatorController(tempAnimator, tempAvatar);
-        animator.SwapAnimationClip(temp_beforUpperReadyClip, temp_afterUpperReadyClip);
-        animator.SwapAnimationClip(temp_beforUpperAttackClip, temp_afterUpperAttackClip);
+        animator.SetAnimatorController(characterData.animator, characterData.avatar);
+        animator.SwapAnimationClip("Humanoid_Ready_Hand", characterData.upperReadyClip);
+        animator.SwapAnimationClip("Humanoid_Attack_Hand", characterData.upperAttackClip);
 
         // Stat
         {
@@ -195,8 +190,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
             stat.currentHp = statData.maxHp;
             stat.attack = statData.attack;
             stat.defense = statData.defense;
-
-            //this.runSpeed = statData.moveSpeed;
+            stat.runSpeed = statData.moveSpeed;
             //this.statData.maxExp = statData.maxExp;
         }
 
@@ -405,7 +399,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         Transform weponTrans = Array.Find(children, x => x.name == "Hand_L");
         if (weponTrans == null)
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             return;
         }
 
@@ -413,7 +407,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         GameObject go = ResourceManager.Instance.Instantiate(tempPath, weponTrans);
         if (go == null)
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             return;
         }
 

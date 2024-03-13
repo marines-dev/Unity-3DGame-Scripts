@@ -81,7 +81,7 @@ public class LoadScene : BaseScene
         yield return null;
 
         yield return UnloadSceneAsync(preSceneName);
-        ManagerLoader.ResetManagers();
+        ManagerLoader.ReleaseManagers();
         yield return null;
 
         /// 메모리 정리(임시)

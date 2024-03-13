@@ -72,7 +72,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
         if (trans == null)
         {
-            Debug.LogWarning($"Failed : {trans}는 null입니다.");
+            Util.LogWarning($"{trans}는 null입니다.");
         }
 
         return trans;
@@ -85,7 +85,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
         if (trans == null)
         {
-            Debug.LogWarning($"Failed : {trans}는 null입니다.");
+            Util.LogWarning($"{trans}는 null입니다.");
         }
 
         return trans.gameObject;
@@ -98,13 +98,13 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
         if (trans == null)
         {
-            Debug.LogWarning($"Failed : {trans}는 null입니다.");
+            Util.LogWarning($"{trans}는 null입니다.");
         }
 
         T component = trans.GetComponent<T>();
         if(component == null)
         {
-            Debug.LogWarning($"Failed : {component.ToString()}의 {typeof(T).Name} 컴포넌트는 존재하지 않습니다.");
+            Util.LogWarning($"{component.ToString()}의 {typeof(T).Name} 컴포넌트는 존재하지 않습니다.");
         }
 
         return component;
@@ -120,7 +120,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         Sprite[] arr_sprite = Resources.LoadAll<Sprite>(_spritePath);
         if (arr_sprite == null)
         {
-            Debug.LogWarning($"Failed : {_spritePath} 경로의 리소스를 찾을 수 없습니다.");
+            Util.LogWarning($"{_spritePath} 경로의 리소스를 찾을 수 없습니다.");
             return;
         }
 
@@ -132,7 +132,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         }
 
         image.sprite = arr_sprite[_spriteIndex];
-        Debug.LogWarning("Failed : IndexTest필요");
+        Util.LogWarning($"IndexTest필요");
     }
 
     protected void SetTextUI(Enum _enum, string _text)

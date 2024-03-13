@@ -94,7 +94,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
         spawnerData = TableManager.Instance.CreateOrGetBaseTable<SpawnerTable>().GetTableData(pSpawnerID);
         if(spawnerData == null)
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             return;
         }
 
@@ -184,7 +184,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
             //    }
         }
 
-        Debug.LogWarning($"Failed : ");
+        Util.LogWarning();
         return string.Empty;
     }
 
@@ -192,7 +192,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
     //{
     //    if (pooled)
     //    {
-    //        Debug.LogWarning($"Failed : ");
+    //        Util.LogWarning();
     //        return;
     //    }
 

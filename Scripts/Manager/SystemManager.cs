@@ -68,7 +68,7 @@ public class SystemManager : BaseManager<SystemManager>
         SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_SystemManager);
     }
 
-    public override void OnReset()
+    public override void OnRelease()
     {
         //player = null;
     }

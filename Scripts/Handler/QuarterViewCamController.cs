@@ -7,13 +7,14 @@ public class QuarterViewCamController : CamController
     private readonly Vector3 deltaPos = Config.followCam_deltaPos;
 
     protected Camera followCam_ref = null;
-    private Transform temp_target = null;
+    private Transform target = null;
+
 
     public new static QuarterViewCamController CreateCameraController()
     {
         if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
-            Debug.LogWarning("");
+            Util.LogWarning();
             return null;
         }
 
@@ -24,7 +25,7 @@ public class QuarterViewCamController : CamController
     {
         if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
-            Debug.LogWarning("");
+            Util.LogWarning();
             Destroy(gameObject);
             return;
         }
@@ -35,18 +36,18 @@ public class QuarterViewCamController : CamController
         if (!IsPlaying)
             return;
 
-        if (temp_target != null)
+        if (target != null)
         {
             RaycastHit hit;
-            if (Physics.Raycast(temp_target.position, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
+            if (Physics.Raycast(target.position, deltaPos, out hit, deltaPos.magnitude, 1 << (int)Define.Layer.Block))
             {
-                float dist = (hit.point - temp_target.position).magnitude * 0.8f;
-                followCam_ref.transform.position = temp_target.position + deltaPos.normalized * dist;
+                float dist = (hit.point - target.position).magnitude * 0.8f;
+                followCam_ref.transform.position = target.position + deltaPos.normalized * dist;
             }
             else
             {
-                followCam_ref.transform.position = temp_target.position + deltaPos;
-                followCam_ref.transform.LookAt(temp_target.position);
+                followCam_ref.transform.position = target.position + deltaPos;
+                followCam_ref.transform.LookAt(target.position);
             }
         }
     }
@@ -59,12 +60,12 @@ public class QuarterViewCamController : CamController
     {
         if (pFollowCam == null || pTarget == null)
         {
-            Debug.LogWarning("");
+            Util.LogWarning();
             return;
         }
 
         followCam_ref = pFollowCam;
-        temp_target = pTarget;
+        target = pTarget;
         Stop();
     }
 }

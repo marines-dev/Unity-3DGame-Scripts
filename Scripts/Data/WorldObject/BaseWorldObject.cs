@@ -64,7 +64,7 @@ public abstract class BaseWorldObject : MonoBehaviour
     {
         if (pWorldObjID <= 0)
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             Despawn();
         }
 

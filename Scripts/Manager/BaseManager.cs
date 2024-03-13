@@ -1,10 +1,5 @@
-using System;
+using Interface;
 using UnityEngine;
-
-public interface IBaseManager
-{
-    public void OnReset();
-}
 
 public abstract class BaseManager<TMng> : IBaseManager where TMng : class, IBaseManager, new()
 {
@@ -23,16 +18,16 @@ public abstract class BaseManager<TMng> : IBaseManager where TMng : class, IBase
 
     public BaseManager()
     {
-        Debug.Log($"Success : <{typeof(TMng).ToString()}> Manager가 생성되었습니다.");
+        Util.LogSuccess($"<{typeof(TMng).ToString()}> Manager가 생성되었습니다.");
 
         OnInitialized();
     }
 
     ~BaseManager()
     {
-        Debug.Log($"Success : <{typeof(TMng).ToString()}> Manager가 삭제되었습니다.");
+        Util.LogSuccess($"<{typeof(TMng).ToString()}> Manager가 삭제되었습니다.");
     }
 
     protected abstract void OnInitialized();
-    public abstract void OnReset();
+    public abstract void OnRelease();
 }

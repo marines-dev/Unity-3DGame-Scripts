@@ -4,15 +4,10 @@ using System.Linq;
 using Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
-// MainUI /  PopupUI 구분 처리 필요
-// UIID로 변경 필요
-// EventSystem : Canvas 생성 시 자동 생성 확인 필요
+
 
 public class UIManager : BaseManager<UIManager>
 {
-    Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
-    //List<BaseUI> LoadedBaseUI_list = new List<BaseUI>();
-
     Canvas mainCanvas = null;
     public Canvas MainCanvas
     {
@@ -39,6 +34,8 @@ public class UIManager : BaseManager<UIManager>
         }
     }
 
+    Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
+
 
     protected override void OnInitialized()
     {
@@ -48,7 +45,7 @@ public class UIManager : BaseManager<UIManager>
         SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_UIManager);
     }
 
-    public override void OnReset() 
+    public override void OnRelease() 
     {
         // DestroyBaseUIAll
         {

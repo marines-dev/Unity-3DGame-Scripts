@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using UnityEngine;
 
 
@@ -27,7 +25,7 @@ public class LogInManager : BaseManager<LogInManager>
     public bool isDone { get; private set; } = false;
 
     protected override void OnInitialized() { }
-    public override void OnReset() { }
+    public override void OnRelease() { }
 
 
     public void InitLogInState()

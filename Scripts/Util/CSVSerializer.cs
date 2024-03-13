@@ -76,7 +76,7 @@ public class CSVSerializer
     {
         if (value == null || value == "")
         {
-            Debug.Log("Failed : ");
+            Util.LogWarning();
             return;
         }
 

@@ -9,7 +9,7 @@ public class CamController : BaseHandler
     {
         if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
         {
-            Debug.LogWarning("");
+            Util.LogWarning("");
             return null;
         }
 
@@ -20,8 +20,8 @@ public class CamController : BaseHandler
     {
         if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
         {
-            Debug.LogWarning("");
-            Destroy(gameObject);
+            Util.LogWarning("");
+            ResourceManager.Instance.DestroyGameObject(gameObject);
             return;
         }
     }

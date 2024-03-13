@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Interface;
 using UnityEngine;
 
 
@@ -20,8 +21,6 @@ public static class ManagerLoader
         CreateManager<GPGSManager>();
         CreateManager<LogInManager>();
         CreateManager<UserManager>();
-        //CreateManager<InputManager>();
-        //CreateManager<GUIManager>();
     }
 
     public static TMng CreateManager<TMng>() where TMng : class, IBaseManager, new()
@@ -46,13 +45,13 @@ public static class ManagerLoader
         }
     }
 
-    public static void ResetManagers()
+    public static void ReleaseManagers()
     {
         lock (lockObject)
         {
             foreach (IBaseManager manager in managerHashSet)
             {
-                manager?.OnReset();
+                manager?.OnRelease();
                 Debug.Log($"Success : <{manager.GetType().ToString()}> Manager가 리셋되었습니다.");
             }
         }

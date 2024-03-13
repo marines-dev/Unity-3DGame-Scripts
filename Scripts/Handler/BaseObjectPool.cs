@@ -66,7 +66,7 @@ public abstract class BaseObjectPool : BaseHandler
             return go;
         }
 
-        Debug.LogWarning($"Failed : ");
+        Util.LogWarning();
         return null;
     }
 
@@ -74,13 +74,13 @@ public abstract class BaseObjectPool : BaseHandler
     {
         if (pObj == null)
         {
-            Debug.LogWarning($"Failed : ");
+            Util.LogWarning();
             return;
         }
 
         if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == Define.SpawnState.Despawn)
         {
-            Debug.LogWarning($"Failed : ");
+            Util.LogWarning();
         }
 
         objectPool_dic[pObj] = Define.SpawnState.Despawn;

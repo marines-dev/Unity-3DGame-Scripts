@@ -93,17 +93,6 @@ namespace Table
 
             return newTableDatas;
         }
-
-        //protected TData LoadBaseData(int pId)
-        //{
-        //    if (baseData_dic.ContainsKey(pId) == false)
-        //    {
-        //        Debug.LogWarning("Failed : ");
-        //        return null;
-        //    }
-
-        //    return baseData_dic[pId].Copy();
-        //}
     }
 
     public class SpawnerTable : BaseTable<SpawnerTable.Data>
@@ -132,21 +121,6 @@ namespace Table
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
-
-                Debug.Log($"Success({this.GetType()})\n"
-                        + $"id : {data.id}\n"
-                        + $"poolAmount : {data.poolAmount}\n"
-                        + $"keepCount : {data.keepCount}\n"
-                        + $"minSpawnTime : {data.minSpawnTime}\n"
-                        + $"maxSpawnTime : {data.maxSpawnTime}\n"
-                        + $"spawnRadius : {data.spawnRadius}\n"
-                        + $"spawnPos : {data.spawnPos}\n"
-                        + $"spawnRot : {data.spawnRot}\n"
-                        + $"poolExpand : {data.poolExpand}\n"
-                        + $"worldObjType : {data.worldObjType}\n"
-                        + $"worldObjID : {data.worldObjID}\n"
-                        + $"actorType : {data.actorType}\n"
-                        + $"actorID : {data.actorID}\n");
             }
         }
     }
@@ -160,37 +134,11 @@ namespace Table
             public Define.Character characterType = Define.Character.None;
             public string characterName         = string.Empty;
             public string prefabName            = string.Empty;
-        }
-
-        protected override void LoadTableDataDic()
-        {
-            Data[] datas = LoadTableDatas();
-            foreach (Data data in datas)
-            {
-                baseData_dic.Add(data.id, data);
-
-                Debug.Log($"Success({this.GetType()})\n"
-                    + $"id : {data.id}\n"
-                    + $"characterType : {data.characterType}\n"
-                    + $"characterName : {data.characterName}\n"
-                    + $"prefabName : {data.prefabName}\n");
-            }
-        }
-    }
-
-    public class ActorTable : BaseTable<ActorTable.Data>
-    {
-        [Serializable]
-        public class Data : BaseData
-        {
-            public int id = 0;
-            public Define.Actor actorType = Define.Actor.None;
-            public string animatorController = string.Empty;
-            public string animatorAvatar = string.Empty;
-            public Define.BaseAnim initStateType = Define.BaseAnim.Idle;
-            //public int level = 0;
-            //public int coin = 0;
-            //public int statID = 0;
+            public string animator = string.Empty;
+            public string avatar = string.Empty;
+            public string upperReadyClip = string.Empty;
+            public string upperAttackClip = string.Empty;
+            public int statID = 0;
             public int weaponID = 0;
         }
 
@@ -200,13 +148,6 @@ namespace Table
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
-
-                Debug.Log($"Success({this.GetType()})\n"
-                    + $"id : {data.id}\n"
-                    + $"animatorController : {data.animatorController}\n"
-                    + $"animatorAvatar : {data.animatorAvatar}\n"
-                    + $"initStateType : {data.initStateType}\n"
-                    + $"weaponID : {data.weaponID}\n");
             }
         }
     }
@@ -235,19 +176,6 @@ namespace Table
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
-
-                Debug.Log($"Success({this.GetType()})\n"
-                    + $"id : {data.id}\n"
-                    + $"maxHp : {data.maxHp}\n"
-                    + $"maxHp_levelUp_rate : {data.maxHp_levelUp_rate}\n"
-                    + $"attack : {data.attack}\n"
-                    + $"attack_levelUp_rate : {data.attack_levelUp_rate}\n"
-                    + $"defense : {data.defense}\n"
-                    + $"defense_levelUp_rate : {data.defense_levelUp_rate}\n"
-                    + $"moveSpeed : {data.moveSpeed}\n"
-                    + $"moveSpeed_levelUp_rate : {data.moveSpeed_levelUp_rate}\n"
-                    + $"maxExp : {data.maxExp}\n"
-                    + $"maxExp_levelUp_rate : {data.maxExp_levelUp_rate}\n");
             }
         }
     }
@@ -277,20 +205,6 @@ namespace Table
             foreach (Data data in datas)
             {
                 baseData_dic.Add(data.id, data);
-
-                Debug.Log($"Success({this.GetType()})\n"
-                    + $"id : {data.id}\n"
-                    + $"weaponType : {data.weaponType}\n"
-                    + $"prefabName : {data.prefabName}\n"
-                    + $"equipParentName : {data.equipParentName}\n"
-                    + $"readyPosition : {data.readyPosition}\n"
-                    + $"readyRotation : {data.readyRotation}\n"
-                    + $"attackPosition : {data.attackPosition}\n"
-                    + $"attackRotation : {data.attackRotation}\n"
-                    + $"sfxPrefabName : {data.sfxPrefabName}\n"
-                    + $"sfxPosition : {data.sfxPosition}\n"
-                    + $"sfxRotation : {data.sfxRotation}\n"
-                    + $"attackValue : {data.attackValue}\n");
             }
         }
     }
@@ -326,6 +240,32 @@ namespace Table
     //    //    Data data = baseData.Copy() as Data; //°´Ã¼ º¹»ç
     //    //    return data;
     //    //}
+    //}
+
+    //public class ActorTable : BaseTable<ActorTable.Data>
+    //{
+    //    [Serializable]
+    //    public class Data : BaseData
+    //    {
+    //        public int id = 0;
+    //        public Define.Actor actorType = Define.Actor.None;
+    //        public string animatorController = string.Empty;
+    //        public string animatorAvatar = string.Empty;
+    //        public Define.BaseAnim initStateType = Define.BaseAnim.Idle;
+    //        //public int level = 0;
+    //        //public int coin = 0;
+    //        //public int statID = 0;
+    //        public int weaponID = 0;
+    //    }
+
+    //    protected override void LoadTableDataDic()
+    //    {
+    //        Data[] datas = LoadTableDatas();
+    //        foreach (Data data in datas)
+    //        {
+    //            baseData_dic.Add(data.id, data);
+    //        }
+    //    }
     //}
 
     //public class SpawningTable_Legacy : BaseTable<SpawningTable_Legacy.Data>

@@ -10,7 +10,7 @@ public class Util
         return enumType;
     }
 
-    public static T GetOrAddComponent<T>(GameObject go) where T : UnityEngine.Component
+    public static T GetOrAddComponent<T>(GameObject go) where T : Component
     {
         T component = go.GetComponent<T>();
 		if (component == null)
@@ -61,16 +61,24 @@ public class Util
 
 #if UNITY_EDITOR
 
-    [Obsolete("임시")]
     public static void LogWarning(string pMsg = "")
     {
         Debug.LogWarning($"Failed : {pMsg}");
     }
 
-    [Obsolete("임시")]
     public static void LogError(string pMsg = "")
     {
         Debug.LogError($"Failed : {pMsg}");
+    }
+
+    public static void LogSuccess(string pMsg = "")
+    {
+        Debug.Log($"Success : {pMsg}");
+    }
+
+    public static void LogMessage(string pMsg = "")
+    {
+        Debug.Log($"{pMsg}");
     }
 
 #endif

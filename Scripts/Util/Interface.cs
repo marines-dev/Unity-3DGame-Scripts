@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace Interface
 {
+    public interface IBaseManager
+    {
+        public void OnRelease();
+    }
+
     public interface IBaseTable
     {
     }

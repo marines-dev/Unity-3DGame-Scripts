@@ -54,7 +54,7 @@ public class Animator_Util : MonoBehaviour
             RuntimeAnimatorController runtimeAnimatorController = ResourceManager.Instance.Load<RuntimeAnimatorController>(path);
             if (runtimeAnimatorController == null)
             {
-                Debug.LogWarning("Failed : ");
+                Util.LogWarning();
                 return;
             }
             animator.runtimeAnimatorController = runtimeAnimatorController;
@@ -67,7 +67,7 @@ public class Animator_Util : MonoBehaviour
             Avatar avatar = ResourceManager.Instance.Load<Avatar>(path);
             if (avatar == null)
             {
-                Debug.LogWarning("Failed : ");
+                Util.LogWarning();
                 return;
             }
             animator.avatar = avatar;
@@ -82,12 +82,12 @@ public class Animator_Util : MonoBehaviour
 
         //foreach (KeyValuePair<AnimationClip, AnimationClip> clipOverride in clipOverrides)
         //{
-        //    Debug.Log("clipOverride.Key : " + clipOverride.Key.name);
+        //    Util.LogSuccess("clipOverride.Key : " + clipOverride.Key.name);
         //}
         //animatorOverrideController.ApplyOverrides(clipOverrides);
 
         // Layer
-        int     upperLayerIndex = animator.GetLayerIndex("Upper Layer");
+        int upperLayerIndex = animator.GetLayerIndex("Upper Layer");
         float   layerWeight     = 1f;
         animator.SetLayerWeight(upperLayerIndex, layerWeight);
     }
@@ -121,14 +121,14 @@ public class Animator_Util : MonoBehaviour
     {
         if (animatorOverrideController == null)
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             return;
         }
 
-        AnimationClip animationClip = Resources.Load<AnimationClip>($"Animations/Upper/{pAfterAnimationClip}"); //임시
+        AnimationClip animationClip = Resources.Load<AnimationClip>($"Animations/{pAfterAnimationClip}"); //임시
         if (animationClip == null)
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             return;
         }
 
