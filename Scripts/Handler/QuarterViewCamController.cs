@@ -12,7 +12,7 @@ public class QuarterViewCamController : CamController
 
     public new static QuarterViewCamController CreateCameraController()
     {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
+        if (CameraManager.CameraModeType != Define.CameraMode.QuarterView)
         {
             Util.LogWarning();
             return null;
@@ -23,7 +23,7 @@ public class QuarterViewCamController : CamController
 
     protected override void Awake()
     {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
+        if (CameraManager.CameraModeType != Define.CameraMode.QuarterView)
         {
             Util.LogWarning();
             Destroy(gameObject);

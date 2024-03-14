@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class LoadScene : BaseScene
+public class LoadScene : BaseScene<LoadScene>
 {
     /// <summary>
     /// Table
@@ -27,8 +27,8 @@ public class LoadScene : BaseScene
     protected override void OnAwake()
     {
         /// LoadUI
-        UIManager.Instance.CloseBaseUIAll();
-        loadUI = UIManager.Instance.CreateOrGetBaseUI<LoadingUI>();
+        Manager.UIMng.CloseBaseUIAll();
+        loadUI = Manager.UIMng.CreateOrGetBaseUI<LoadingUI>();
     }
 
     protected override void OnStart() 
@@ -52,7 +52,7 @@ public class LoadScene : BaseScene
         ClearLoadingProcess();
 
         /// Complete
-        Debug.Log($"Success : {SceneManager.Instance.ActiveSceneName} 씬 로드를 완료했습니다.");
+        Debug.Log($"Success : {Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
 
     void LoadingProcess()
@@ -76,12 +76,12 @@ public class LoadScene : BaseScene
     {
         yield return null;
 
-        preSceneName = SceneManager.Instance.PreSceneName;
-        nextSceneName = SceneManager.Instance.NextSceneName;
+        preSceneName = Manager.SceneMng.PreSceneName;
+        nextSceneName = Manager.SceneMng.NextSceneName;
         yield return null;
 
         yield return UnloadSceneAsync(preSceneName);
-        ManagerLoader.ReleaseManagers();
+        Manager.ReleaseManagers();
         yield return null;
 
         /// 메모리 정리(임시)

@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-public class ResourceManager : BaseManager<ResourceManager>
+public class ResourceManager : Manager//BaseManager<ResourceManager>
 {
     protected override void OnInitialized() { }
     public override void OnRelease() { }
@@ -29,7 +29,7 @@ public class ResourceManager : BaseManager<ResourceManager>
         GameObject original = Load<GameObject>(path);
         if (original == null)
         {
-            Debug.LogError($"Failed to load prefab : {path}");
+            Util.LogWarning($"Instantiate prefab : {path}");
             return null;
         }
 
@@ -38,7 +38,7 @@ public class ResourceManager : BaseManager<ResourceManager>
 
         GameObject go = UnityEngine.Object.Instantiate(original, parent);
         go.name = original.name;
-        Debug.Log($"Success to load prefab : {path}");
+        //Util.LogSuccess($"Instantiate prefab : {path}");
         return go;
     }
 

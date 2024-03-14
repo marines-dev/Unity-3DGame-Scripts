@@ -39,35 +39,32 @@ public class Enemy : Character
 
     protected override void OnHitEvent()
     {
-        if (WorldScene.Instance.IsGamePlay)
+        Player target = null;
+        Collider[] hitColliders = Physics.OverlapBox(transform.position + (transform.forward / 2f) + transform.up, transform.localScale, Quaternion.identity);
+        foreach (var hitCollider in hitColliders)
         {
-            Player target = null;
-            Collider[] hitColliders = Physics.OverlapBox(transform.position + (transform.forward / 2f) + transform.up, transform.localScale, Quaternion.identity);
-            foreach (var hitCollider in hitColliders)
+            if (hitCollider.tag == "Player")
             {
-                if (hitCollider.tag == "Player")
-                {
-                    target = hitCollider.GetComponent<Player>();
-                    if (target != null)
-                        target.OnDamage(Stat.attack);
+                target = hitCollider.GetComponent<Player>();
+                if (target != null)
+                    target.OnDamage(Stat.attack);
 
-                    break;
-                }
+                break;
             }
-
-            //if (target != null && target.StateType != Define.State.Die)
-            //{
-            //    float distance = (this.target.transform.position - transform.position).magnitude;
-            //    if (distance <= attackRange)
-            //        SetStateType(Define.State.Attack);
-            //    else
-            //        SetStateType(Define.State.Run);
-            //}
-            //else
-            //{
-            //    SetStateType(Define.State.Idle);
-            //}
         }
+
+        //if (target != null && target.StateType != Define.State.Die)
+        //{
+        //    float distance = (this.target.transform.position - transform.position).magnitude;
+        //    if (distance <= attackRange)
+        //        SetStateType(Define.State.Attack);
+        //    else
+        //        SetStateType(Define.State.Run);
+        //}
+        //else
+        //{
+        //    SetStateType(Define.State.Idle);
+        //}
     }
 
     void UpdateBaseState(Define.BaseAnim pBaseState)
@@ -113,48 +110,42 @@ public class Enemy : Character
     {
         float distance = 0f;
 
-        if (WorldScene.Instance.IsGamePlay)
+        if (UpperAnimType == Define.UpperAnim.Attack)
         {
-            if (UpperAnimType == Define.UpperAnim.Attack)
-            {
-                return;
-            }
-
-            temp_destPos = WorldScene.Instance.PlayerCtrl.Position;
-            distance = (temp_destPos - Position).magnitude;
-            if (distance <= temp_scanRange && CalculateNavMeshPath(temp_destPos))
-            {
-                //target = Managers.Game.GamePlayer.gameObject;
-                BaseAnimType = Define.BaseAnim.Run;
-                return;
-            }
-
-            //// 랜덤 이동
-            //Vector3 randomPos = RandomPos();
-            //distance = (randomPos - transPosition).magnitude;
-            //if (distance <= scanRange && CalculateNavMeshPath(destPos))
-            //{
-            //    destPos = randomPos;
-            //    SetBaseStateType(Define.BaseState.Run);
-            //    return;
-            //}
+            return;
         }
+
+        temp_destPos = WorldScene.Instance.PlayerCtrl.Position;
+        distance = (temp_destPos - Position).magnitude;
+        if (distance <= temp_scanRange && CalculateNavMeshPath(temp_destPos))
+        {
+            //target = Managers.Game.GamePlayer.gameObject;
+            BaseAnimType = Define.BaseAnim.Run;
+            return;
+        }
+
+        //// 랜덤 이동
+        //Vector3 randomPos = RandomPos();
+        //distance = (randomPos - transPosition).magnitude;
+        //if (distance <= scanRange && CalculateNavMeshPath(destPos))
+        //{
+        //    destPos = randomPos;
+        //    SetBaseStateType(Define.BaseState.Run);
+        //    return;
+        //}
     }
 
     void UpdateRun()
     {
         float distance = 0f;
         //행동 변경 검사 : 공격 범위 이내이면 -> Attack
-        if (WorldScene.Instance.IsGamePlay /*&& target != null*/)
+        distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
+        if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
         {
-            distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
-            if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
-            {
-                navMeshAgent.SetDestination(transform.position);
-                BaseAnimType = Define.BaseAnim.Idle;
-                //SetUpperStateType(Define.UpperState.Attack);
-                return;
-            }
+            navMeshAgent.SetDestination(transform.position);
+            BaseAnimType = Define.BaseAnim.Idle;
+            //SetUpperStateType(Define.UpperState.Attack);
+            return;
         }
 
         Vector3 dir = temp_destPos - transform.position; //방향
@@ -171,21 +162,18 @@ public class Enemy : Character
 
     void UpdateUpperReady()
     {
-        if (WorldScene.Instance.IsGamePlay)
+        float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
+        if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
         {
-            float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
-            if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
-            {
-                UpperAnimType = Define.UpperAnim.Attack;
-                //return;
-            }
+            UpperAnimType = Define.UpperAnim.Attack;
+            //return;
         }
     }
 
     void UpdateUpperAttack()
     {
-        if (WorldScene.Instance.IsGamePlay)
-        {
+        //if (WorldScene.Instance.IsGamePlay)
+        //{
             float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
             if (distance > temp_attackRange)
             {
@@ -196,10 +184,10 @@ public class Enemy : Character
             Vector3 dir = WorldScene.Instance.PlayerCtrl.Position - Position;
             Quaternion quat = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
-        }
-        else
-        {
-            UpperAnimType = Define.UpperAnim.Ready;
-        }
+        //}
+        //else
+        //{
+         //   UpperAnimType = Define.UpperAnim.Ready;
+        //}
     }
 }

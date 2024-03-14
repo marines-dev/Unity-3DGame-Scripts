@@ -5,12 +5,12 @@ using Interface;
 using UnityEngine;
 
 
-public class TableManager : BaseManager<TableManager>
+public class TableManager : Manager//BaseManager<TableManager>
 {
     /// <summary>
     /// Table
     /// </summary>
-    private Dictionary<string, IBaseTable> baseTable_dic = new Dictionary<string, IBaseTable>();
+    private Dictionary<string, ITableLoader> baseTable_dic = new Dictionary<string, ITableLoader>();
 
     /// <summary>
     /// Json
@@ -27,7 +27,7 @@ public class TableManager : BaseManager<TableManager>
     {
         // RemoveBaseTableAll
         {
-            IBaseTable[] baseTable_arr = baseTable_dic.Values.ToArray();
+            ITableLoader[] baseTable_arr = baseTable_dic.Values.ToArray();
             for (int i = 0; i < baseTable_arr.Length; ++i)
             {
                 if (baseTable_arr[i] != null)
@@ -39,7 +39,7 @@ public class TableManager : BaseManager<TableManager>
         }
     }
 
-    public TTable CreateOrGetBaseTable<TTable>() where TTable : class, IBaseTable, new()
+    public TTable CreateOrGetBaseTable<TTable>() where TTable : class, ITableLoader, new()
     {
         TTable baseTable = null;
         string name = typeof(TTable).Name;
@@ -55,7 +55,11 @@ public class TableManager : BaseManager<TableManager>
         /// Create
         {
             string tableName = typeof(TTable).Name;
+            string path = $"Data/Table/{tableName}";
+            TextAsset textAsset = ResourceMng.Load<TextAsset>(path);
+            
             baseTable = new TTable();
+            baseTable.Initialized(textAsset);
 
             baseTable_dic.Add(tableName, baseTable);
             return baseTable;

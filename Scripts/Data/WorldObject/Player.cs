@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-public interface IControllHndl_Temp
+public interface IPlayerCtrl
 {
     public Vector3 Position { get; }
     public Vector3 Rotation { get; }
@@ -14,12 +13,26 @@ public interface IControllHndl_Temp
     //public void IncreaseExp(int pAddExpValue);
 }
 
-public class Player : Character, IControllHndl_Temp
+public class NullPlayer : IPlayerCtrl
+{
+    public Vector3 Position { get { return Vector3.zero; } }
+    public Vector3 Rotation { get { return Vector3.zero; } }
+
+    public void OnMove(Vector3 pEulerAngles) { }
+    public void OnStop() { }
+    public void OnAttack() { }
+    public void OnReady() { }
+
+}
+
+public class Player : Character, IPlayerCtrl
 {
     int temp_userLevelValue = 0;
     int temp_userExpValue = 0;
 
     ITargetHandler_Temp target = null;
+
+    Action deadAction = null;
 
     protected override void Update()
     {
@@ -34,7 +47,7 @@ public class Player : Character, IControllHndl_Temp
                 target.OnDisableTargetOutline();
                 target = null;
             }
-            else if (target.BaseAnimType == Define.BaseAnim.Die)
+            else if (target.SurvivalStateType == SurvivalState.Dead)
             {
                 target.OnDisableTargetOutline();
                 target = null;
@@ -47,7 +60,7 @@ public class Player : Character, IControllHndl_Temp
             if (hitCollider.tag == "Monster")
             {
                 ITargetHandler_Temp tempTarget = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
-                if (tempTarget != null && tempTarget.BaseAnimType != Define.BaseAnim.Die)
+                if (tempTarget != null && tempTarget.SurvivalStateType != SurvivalState.Dead)
                 {
                     if (target != null) //가까운 타겟팅
                     {
@@ -84,22 +97,31 @@ public class Player : Character, IControllHndl_Temp
         {
             Temp_Tag = "Player";
 
-            temp_userExpValue = UserManager.Instance.ExpValue;
-            temp_userLevelValue = UserManager.Instance.LevelValue;
-            int currentHp = UserManager.Instance.HpValue;
+            temp_userExpValue = WorldScene.Instance.GetUserExpValue();
+            temp_userLevelValue = WorldScene.Instance.GetUserLevelValue();
+            int currentHp = WorldScene.Instance.GetUserHpValue();
 
             //SetStat(temp_userLevelValue);
             SetHP(currentHp);
         }
     }
 
+    public void SetPlayerDeadEvent(Action pDeadAction)
+    {
+        deadAction = pDeadAction;
+    }
+
     protected override void SetDead()
     {
-        int currentHp = UserManager.Instance.SetUserHP(Stat.maxHp);
+        base.SetDead();
+
+        int currentHp = WorldScene.Instance.SetGetUserHP(Stat.maxHp);
         SetHP(currentHp);
 
-        WorldScene.Instance.SetPlayerDead();
-        base.SetDead();
+        if (deadAction != null)
+        {
+            deadAction.Invoke();
+        }
     }
 
     protected override void OnHitEvent()

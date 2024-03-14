@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 public interface ITargetHandler_Temp
 {
-    public Define.BaseAnim BaseAnimType { get; set; }
+    public SurvivalState SurvivalStateType { get; }
 
     public Vector3 Position { get; }
     public Vector3 Rotation { get; }
@@ -14,6 +14,12 @@ public interface ITargetHandler_Temp
     public void OnDisableTargetOutline();
 
     public void OnDamage(int pValue);
+}
+
+public enum SurvivalState
+{
+    Dead,
+    Alive,
 }
 
 public class Character : BaseWorldObject, ITargetHandler_Temp
@@ -32,6 +38,8 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
     private ActorStat stat;
     protected ActorStat Stat { get { return stat; } }
 
+    public SurvivalState SurvivalStateType { get; private set; }
+
     private Define.BaseAnim baseAnimType = Define.BaseAnim.Idle;
     public Define.BaseAnim BaseAnimType
     {
@@ -39,10 +47,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         set
         {
             if (value == baseAnimType)
-            {
-                Util.LogWarning();
                 return;
-            }
 
             baseAnimType = value;
 
@@ -168,12 +173,15 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
     {
         base.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
 
-        characterData = TableManager.Instance.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(pWorldObjID);
+        characterData = WorldScene.Instance.CharacterTable.GetTableData(pWorldObjID);
     }
 
     public override void Spawn(Vector3 pPos, Vector3 pRot)
     {
         base.Spawn(pPos, pRot);
+
+        //
+        SurvivalStateType = SurvivalState.Alive;
 
         //
         shader.SetMateriasColorAlpha(1f, false);
@@ -184,7 +192,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
 
         // Stat
         {
-            Table.StatTable.Data statData = TableManager.Instance.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+            Table.StatTable.Data statData = WorldScene.Instance.StatTable.GetTableData(1); //임시
 
             stat.maxHp = statData.maxHp;
             stat.currentHp = statData.maxHp;
@@ -223,7 +231,9 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
 
     protected virtual void SetDead()
     {
-        if(hpBarUI != null)
+        SurvivalStateType = SurvivalState.Dead;
+
+        if (hpBarUI != null)
             hpBarUI.Close(); //임시
 
         navMeshAgent.isStopped = true;
@@ -372,12 +382,12 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         {
             if (hpBarUI != null)
             {
-                ResourceManager.Instance.DestroyGameObject(hpBarUI.gameObject);
+                GlobalScene.Instance.DestroyGameObject(hpBarUI.gameObject);
                 hpBarUI = null;
             }
         }
 
-        hpBarUI = UIManager.Instance.CreateBaseSpaceUI<HPBarUI>(transform);
+        hpBarUI = WorldScene.Instance.CreateBaseSpaceUI<HPBarUI>(transform);
     }
 
     void CreateWeapon(int pWeaponID)
@@ -389,7 +399,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         {
             if (weapon != null)
             {
-                ResourceManager.Instance.DestroyGameObject(weapon.gameObject);
+                GlobalScene.Instance.DestroyGameObject(weapon.gameObject);
                 weapon = null;
             }
         }
@@ -404,7 +414,7 @@ public class Character : BaseWorldObject, ITargetHandler_Temp
         }
 
         string tempPath = $"Prefabs/Weapon/SM_Wep_Watergun_02";
-        GameObject go = ResourceManager.Instance.Instantiate(tempPath, weponTrans);
+        GameObject go = GlobalScene.Instance.InstantiateResource(tempPath, weponTrans);
         if (go == null)
         {
             Util.LogWarning();

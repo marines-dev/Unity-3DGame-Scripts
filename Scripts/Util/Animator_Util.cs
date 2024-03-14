@@ -51,7 +51,7 @@ public class Animator_Util : MonoBehaviour
         if (animator.runtimeAnimatorController == null)
         {
             path = $"Animators/{pAnimatorController}";
-            RuntimeAnimatorController runtimeAnimatorController = ResourceManager.Instance.Load<RuntimeAnimatorController>(path);
+            RuntimeAnimatorController runtimeAnimatorController = GlobalScene.Instance.LoadResource<RuntimeAnimatorController>(path);
             if (runtimeAnimatorController == null)
             {
                 Util.LogWarning();
@@ -64,7 +64,7 @@ public class Animator_Util : MonoBehaviour
         if (animator.avatar == null)
         {
             path = $"Animators/{pAnimatorAvatar}";
-            Avatar avatar = ResourceManager.Instance.Load<Avatar>(path);
+            Avatar avatar = GlobalScene.Instance.LoadResource<Avatar>(path);
             if (avatar == null)
             {
                 Util.LogWarning();

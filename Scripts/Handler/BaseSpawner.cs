@@ -8,7 +8,7 @@ public class CharacterSpawner : BaseSpawner<Enemy> , ISpawner
     public static Player CreateCharacter(Define.WorldObject pWorldObjType, int pWorldObjID, Action<GameObject> pDespawnAction)
     {
         string findPrefabPath = FindPrefabPath(pWorldObjType, pWorldObjID);
-        Player character = ResourceManager.Instance.Instantiate(findPrefabPath).GetOrAddComponent<Player>();
+        Player character = GlobalScene.Instance.InstantiateResource(findPrefabPath).GetOrAddComponent<Player>();
         character.SetWorldObject(pWorldObjType, pWorldObjID, pDespawnAction);
 
         return character;
@@ -91,7 +91,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
 
     public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction)
     {
-        spawnerData = TableManager.Instance.CreateOrGetBaseTable<SpawnerTable>().GetTableData(pSpawnerID);
+        spawnerData = WorldScene.Instance.SpawnerTable.GetTableData(pSpawnerID);
         if(spawnerData == null)
         {
             Util.LogWarning();
@@ -174,7 +174,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
         {
             case Define.WorldObject.Character:
                 {
-                    CharacterTable.Data characterData = TableManager.Instance.CreateOrGetBaseTable<CharacterTable>().GetTableData(pWorldObjectID);
+                    CharacterTable.Data characterData = WorldScene.Instance.CharacterTable.GetTableData(pWorldObjectID);
                     return $"Prefabs/WorldObject/{pWorldObjType.ToString()}/{characterData.prefabName}";
                 }
             //case Define.WorldObject.Item:

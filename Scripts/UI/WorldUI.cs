@@ -27,7 +27,7 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
     }
 
     private float r = 0f;
-    private float moveSpeed               = 4f;
+    //private float moveSpeed               = 4f;
     private bool isAttackButtonPressed   = false;
     private Vector2 beginPos = Vector3.zero;
     private Vector2 dragPos = Vector3.zero;
@@ -37,9 +37,10 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
     private RectTransform pointerRectTrans      = null;
     //private Action<bool> attackButtonAction     = null;
 
+
     private void FixedUpdate()
     {
-        if (IsOpen && WorldScene.Instance.IsGamePlay)
+        //if (IsOpen && WorldScene.Instance.IsGamePlay)
         {
             if (Vector2.Distance(dragPos, beginPos) > 10) // Move
             {

@@ -7,7 +7,7 @@ public class CamController : BaseHandler
 {
     public static CamController CreateCameraController()
     {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.QuarterView)
+        if (CameraManager.CameraModeType != Define.CameraMode.QuarterView)
         {
             Util.LogWarning("");
             return null;
@@ -18,10 +18,10 @@ public class CamController : BaseHandler
 
     protected virtual void Awake()
     {
-        if (CameraManager.Instance.CameraModeType != Define.CameraMode.Defualt)
+        if (CameraManager.CameraModeType != Define.CameraMode.Defualt)
         {
             Util.LogWarning("");
-            ResourceManager.Instance.DestroyGameObject(gameObject);
+            GlobalScene.Instance.DestroyGameObject(gameObject);
             return;
         }
     }

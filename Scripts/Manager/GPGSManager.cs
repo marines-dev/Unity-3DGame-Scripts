@@ -4,7 +4,7 @@ using UnityEngine;
 //using GooglePlayGames.BasicApi;
 
 
-public class GPGSManager : BaseManager<GPGSManager>
+public class GPGSManager : Manager
 {
     protected override void OnInitialized() { }
     public override void OnRelease() { }

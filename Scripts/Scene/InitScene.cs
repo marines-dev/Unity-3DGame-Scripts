@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class InitScene : BaseScene
+public class InitScene : BaseScene<InitScene>
 {
     public static bool IsInitSceneLoaded { get; private set; } = false;
 
@@ -8,14 +8,15 @@ public class InitScene : BaseScene
     protected override void OnAwake()
     {
         /// LoadManager
-        ManagerLoader.CreateManagers();
+        Manager.InitializedManagers();
+        GlobalScene.CreateGlobalScene();
 
         IsInitSceneLoaded = true;
     }
 
     protected override void OnStart()
     {
-        SceneManager.Instance.LoadBaseScene<TitleScene>();
+        Manager.SceneMng.LoadBaseScene<TitleScene>();
     }
 
     protected override void OnDestroy_()

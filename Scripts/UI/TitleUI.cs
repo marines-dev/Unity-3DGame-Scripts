@@ -116,7 +116,7 @@ class TitleUI : BaseUI<TitleUI.UI>
         DebugTestPopup_Text_Desc,
     }
 
-    public LogInManager.AccountType selectAccountType { get; private set; } = LogInManager.AccountType.None;
+    public AccountType selectAccountType { get; private set; } = AccountType.None;
     public string inputNickname { get; private set; } = string.Empty;
     bool debugSelectAble = true;
 
@@ -147,7 +147,7 @@ class TitleUI : BaseUI<TitleUI.UI>
 
     protected override void OnOpen()
     {
-        selectAccountType   = LogInManager.AccountType.None;
+        selectAccountType   = AccountType.None;
         debugSelectAble     = true;
         onLogInState        = null;
 
@@ -170,7 +170,7 @@ class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_TitleUI_Button_Guest()
     {
-        OpenTitleUI_Panel_SignUpPopup(LogInManager.AccountType.Guest);
+        OpenTitleUI_Panel_SignUpPopup(AccountType.Guest);
     }
 
     void OnClick_TitleUI_Button_Google()
@@ -203,7 +203,7 @@ class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_SignUpPopup_Button_GuestConfirm()
     {
-        selectAccountType = LogInManager.AccountType.Guest;
+        selectAccountType = AccountType.Guest;
 
         if (onLogInState != null)
             onLogInState();
@@ -266,15 +266,15 @@ class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_DebugTestPopup_Button_TestLogout()
     {
-        switch (LogInManager.Instance.currAccountType)
+        switch (TitleScene.Instance.GetCurrAccountType())
         {
-            case LogInManager.AccountType.Guest:
+            case AccountType.Guest:
                 {
                     OpenTitleUI_Panel_GuestLogoutPopup();
                 }
                 break;
 
-            case LogInManager.AccountType.Google:
+            case AccountType.Google:
                 {
                     Debug.LogWarning("개발 진행 중 입니다.");
                     //LoginManager.Instance.SetLogOut(LoginManager.AccountType.Google);
@@ -297,7 +297,7 @@ class TitleUI : BaseUI<TitleUI.UI>
 
         if (_titleProcessType == TitleScene.TitleProcessType.LogIn)
         {
-            switch (LogInManager.Instance.currLogInProcessType)
+            switch (TitleScene.Instance.GetCurrLogInProcessType())
             {
                 //case LoginManager.LoginProcessType.UserLogOut:
                 //    {
@@ -310,7 +310,7 @@ class TitleUI : BaseUI<TitleUI.UI>
                 //    }
                 //    break;
 
-                case LogInManager.LogInProcessType.UpdateNickname:
+                case LogInProcessType.UpdateNickname:
                     {
                         OpenTitleUI_Panel_NicknamePopup();
                     }
@@ -332,8 +332,8 @@ class TitleUI : BaseUI<TitleUI.UI>
 
         if(_titleProcessType == TitleScene.TitleProcessType.LogIn)
         {
-            SetActiveUI(UI.TitleUI_Object_Login, LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.AccountAuth);
-            SetActiveUI(UI.TitleUI_Object_Logout, LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.UserLogOut);
+            SetActiveUI(UI.TitleUI_Object_Login, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
+            SetActiveUI(UI.TitleUI_Object_Logout, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogOut);
         }
     }
 
@@ -341,11 +341,11 @@ class TitleUI : BaseUI<TitleUI.UI>
 
     #region TitleUI_Panel_SignUpPopup
 
-    void OpenTitleUI_Panel_SignUpPopup(LogInManager.AccountType _accountType)
+    void OpenTitleUI_Panel_SignUpPopup(AccountType _accountType)
     {
         SetActiveUI(UI.TitleUI_Panel_SignUpPopup, true);
 
-        selectAccountType = LogInManager.AccountType.None;
+        selectAccountType = AccountType.None;
         UpdateTitleUI_Panel_SignUpPopup(_accountType);
     }
 
@@ -354,10 +354,10 @@ class TitleUI : BaseUI<TitleUI.UI>
         SetActiveUI(UI.TitleUI_Panel_SignUpPopup, false);
     }
 
-    void UpdateTitleUI_Panel_SignUpPopup(LogInManager.AccountType _accountType)
+    void UpdateTitleUI_Panel_SignUpPopup(AccountType _accountType)
     {
-        SetActiveUI(UI.SignUpPopup_Object_Guest,     _accountType == LogInManager.AccountType.Guest);
-        SetActiveUI(UI.SignUpPopup_Object_Google,    _accountType == LogInManager.AccountType.Google);
+        SetActiveUI(UI.SignUpPopup_Object_Guest,     _accountType == AccountType.Guest);
+        SetActiveUI(UI.SignUpPopup_Object_Google,    _accountType == AccountType.Google);
     }
 
     #endregion TitleUI_Panel_SignUpPopup
@@ -439,10 +439,9 @@ class TitleUI : BaseUI<TitleUI.UI>
             return;
 
         SetTextUI(UI.DebugTestPopup_Text_Desc, _logMessage);
-        SetActiveUI(UI.DebugTestPopup_Object_TestLogout, LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
+        SetActiveUI(UI.DebugTestPopup_Object_TestLogout, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogIn);
 
-        string format = string.Format("[DebugLog]\n{0}", _logMessage);
-        Debug.Log(format);
+        Debug.Log($"[DebugLog]\n{_logMessage}");
     }
 
     #endregion TitleUI_Panel_DebugTestPopup

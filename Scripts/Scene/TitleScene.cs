@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class TitleScene : BaseScene
+public class TitleScene : BaseScene<TitleScene>
 {
     public enum TitleProcessType
     {
@@ -23,7 +23,7 @@ public class TitleScene : BaseScene
 
     protected override void OnAwake()
     {
-        titleUI = UIManager.Instance.CreateOrGetBaseUI<TitleUI>();
+        titleUI = Manager.UIMng.CreateOrGetBaseUI<TitleUI>();
     }
 
     protected override void OnStart()
@@ -56,6 +56,9 @@ public class TitleScene : BaseScene
             testDebugProcessCoroutine = null;
         }
     }
+
+    [Obsolete("임시")] public AccountType GetCurrAccountType() { return Manager.LogInMng.currAccountType; }
+    [Obsolete("임시")] public LogInProcessType GetCurrLogInProcessType() { return Manager.LogInMng.currLogInProcessType; }
 
     void TitleProcess()
     {
@@ -101,9 +104,9 @@ public class TitleScene : BaseScene
     IEnumerator InitDataProcessCoroutine()
     {
         // Server
-        BackendManager.Instance.InitBackendSDK();
-        GPGSManager.Instance.InitGPGSAuth();
-        LogInManager.Instance.InitLogInState();
+        Manager.BackendMng.InitBackendSDK();
+        Manager.GPGSMng.InitGPGSAuth();
+        Manager.LogInMng.InitLogInState();
         yield return null;
     }
 
@@ -111,7 +114,7 @@ public class TitleScene : BaseScene
     {
         titleUI.SetTitleUI(currTitleProcessType);
         titleUI.Set_OnLogInState(OnLogInState);
-        yield return new WaitUntil(() => LogInManager.Instance.currLogInProcessType == LogInManager.LogInProcessType.UserLogIn);
+        yield return new WaitUntil(() => Manager.LogInMng.currLogInProcessType == LogInProcessType.UserLogIn);
     }
 
     void OnLogInState()
@@ -120,38 +123,38 @@ public class TitleScene : BaseScene
         {
             case TitleProcessType.LogIn:
                 {
-                    switch (LogInManager.Instance.currLogInProcessType)
+                    switch (Manager.LogInMng.currLogInProcessType)
                     {
-                        case LogInManager.LogInProcessType.UserLogOut:
+                        case LogInProcessType.UserLogOut:
                             {
-                                if (titleUI.selectAccountType == LogInManager.AccountType.None)
+                                if (titleUI.selectAccountType == AccountType.None)
                                     return;
 
-                                bool isSignUp = LogInManager.Instance.SetSignUp(titleUI.selectAccountType);
+                                bool isSignUp = Manager.LogInMng.SetSignUp(titleUI.selectAccountType);
                                 if(isSignUp)
                                 {
                                     TitleProcess();
                                     return;
                                 }
                                 
-                                if(titleUI.selectAccountType == LogInManager.AccountType.Google)
+                                if(titleUI.selectAccountType == AccountType.Google)
                                 {
                                     
                                 }
                             }
                             break;
 
-                        case LogInManager.LogInProcessType.AccountAuth:
+                        case LogInProcessType.AccountAuth:
                             {
-                                LogInManager.Instance.SetUserLogIn();
+                                Manager.LogInMng.SetUserLogIn();
                             }
                             break;
 
-                        case LogInManager.LogInProcessType.UpdateNickname:
+                        case LogInProcessType.UpdateNickname:
                             {
                                 if (string.IsNullOrEmpty(titleUI.inputNickname) == false)
                                 {
-                                    LogInManager.Instance.SetUpdateNickname(titleUI.inputNickname);
+                                    Manager.LogInMng.SetUpdateNickname(titleUI.inputNickname);
                                 }
 
                                 TitleProcess();
@@ -164,7 +167,7 @@ public class TitleScene : BaseScene
             case TitleProcessType.LoadUserData:
                 {
                     Debug.LogWarning("Debug 테스트용");
-                    LogInManager.Instance.SetUserLogOut();
+                    Manager.LogInMng.SetUserLogOut();
 
                     TitleProcess();
                 }
@@ -178,16 +181,16 @@ public class TitleScene : BaseScene
         titleUI.SetTitleUI(currTitleProcessType);
         yield return new WaitForSeconds(2f); // 테스트 코드
 
-        if (UserManager.Instance.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
+        if (Manager.UserMng.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
         {
             // 유저 데이터 생성 및 저장
-            UserManager.Instance.CreateUserData();
+            Manager.UserMng.CreateUserData();
         }
     }
 
     IEnumerator LoadGameSceneProcessCoroutine()
     {
-        SceneManager.Instance.LoadBaseScene<WorldScene>();
+        Manager.SceneMng.LoadBaseScene<WorldScene>();
         yield return null;
 
         titleUI.Close();
@@ -218,12 +221,12 @@ public class TitleScene : BaseScene
     {
         try
         {
-            string inData = BackendManager.Instance.GetInData();
-            string nickname = BackendManager.Instance.GetNickname();
+            string inData = Manager.BackendMng.GetInData();
+            string nickname = Manager.BackendMng.GetNickname();
             string format = string.Format(
                 "[TitleProcess] " + currTitleProcessType.ToString() + '\n' +
-                "[LoginProcess] " + LogInManager.Instance.currLogInProcessType.ToString() + '\n' +
-                "[AccountType] " + LogInManager.Instance.currAccountType.ToString() + '\n' +
+                "[LoginProcess] " + Manager.LogInMng.currLogInProcessType.ToString() + '\n' +
+                "[AccountType] " + Manager.LogInMng.currAccountType.ToString() + '\n' +
                 "[InData] " + inData + '\n' +
                 "[nickname] " + nickname + '\n');
 

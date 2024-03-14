@@ -4,22 +4,24 @@ using Interface;
 using UnityEngine;
 
 
-public class WorldScene : BaseScene
+public class WorldScene : BaseScene<WorldScene>
 {
-    static WorldScene instance;
-    public static WorldScene Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
+    /// <summary>
+    /// Table
+    /// </summary>
+    Table.SpawnerTable spawnerTable = null;
+    public Table.SpawnerTable SpawnerTable => spawnerTable ?? (spawnerTable = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>());
+
+    Table.CharacterTable characterTable = null;
+    public Table.CharacterTable CharacterTable => characterTable ?? (characterTable = Manager.TableMng.CreateOrGetBaseTable<Table.CharacterTable>());
+
+    Table.StatTable statTable = null;
+    public Table.StatTable StatTable => statTable ?? (statTable = Manager.TableMng.CreateOrGetBaseTable<Table.StatTable>());
 
     /// <summary>
     /// MainUI
     /// </summary>
     private WorldUI worldUI = null;
-    //public BaseInput BaseInput { get; }
 
     /// <summary>
     /// Input
@@ -28,40 +30,19 @@ public class WorldScene : BaseScene
 
     #region World
 
-    public bool IsGamePlay
+    private Player player = null;
+    private NullPlayer nullPlayer = new NullPlayer();
+    public IPlayerCtrl PlayerCtrl
     {
         get
         {
-            bool isWorldScene = SceneManager.Instance.IsActiveScene<WorldScene>();
-            bool isSpawnPlayer = temp_player != null;
-            bool isLivePlayer = temp_player != null && temp_player.BaseAnimType != Define.BaseAnim.Die;
-
-            //
-            bool isGamePlay = isWorldScene && isSpawnPlayer && isLivePlayer;
-            if (isGamePlay)
+            if (player == null || player.ExistenceStateType == Define.ExistenceState.Despawn || player.SurvivalStateType == SurvivalState.Dead)
             {
-                return true;
-            }
-            else
-            {
-                Util.LogWarning("Failed : 게임을 플레이할 수 없습니다.");
-                return false;
+                Util.LogWarning($"플레이어를 사용할 수 없으므로 {nullPlayer.GetType()}를 반환합니다.");
+                return nullPlayer;
             }
 
-        }
-    }
-
-    Player temp_player = null;
-    public IControllHndl_Temp PlayerCtrl
-    {
-        get
-        {
-            if (! IsGamePlay)
-            {
-                Util.LogWarning();
-                return null;
-            }
-            return temp_player;
+            return player;
         }
     }
 
@@ -75,39 +56,32 @@ public class WorldScene : BaseScene
 
     protected override void OnAwake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         /// CreateTable
         {
-            TableManager.Instance.CreateOrGetBaseTable<Table.SpawnerTable>();
-            TableManager.Instance.CreateOrGetBaseTable<Table.CharacterTable>();
+            spawnerTable = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>();
+            characterTable = Manager.TableMng.CreateOrGetBaseTable<Table.CharacterTable>();
+            statTable = Manager.TableMng.CreateOrGetBaseTable<Table.StatTable>();
         }
 
         /// CreateUI
         {
             // Joystick
-            worldUI = UIManager.Instance.CreateOrGetBaseUI<WorldUI>();
+            worldUI = Manager.UIMng.CreateOrGetBaseUI<WorldUI>();
             worldUI.Close();
         }
 
         // Spawner
         {
             // Player
-            UserManager.Instance.LoadUserData();
-            temp_player = CharacterSpawner.CreateCharacter(Define.WorldObject.Character, 1, DespawnPlayerEvent); //임시
+            Manager.UserMng.LoadUserData();
+            player = CharacterSpawner.CreateCharacter(Define.WorldObject.Character, 1, OnDespawnPlayerEvent); //임시
+            player.SetPlayerDeadEvent(OnPlayerDeadEvent);
 
             // Enemy
-            Table.SpawnerTable.Data[] spawnerDatas = TableManager.Instance.CreateOrGetBaseTable<Table.SpawnerTable>().GetTableDatasAll();
+            Table.SpawnerTable.Data[] spawnerDatas = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>().GetTableDatasAll();
             foreach (Table.SpawnerTable.Data spawnerData in spawnerDatas)
             {
-                ISpawner worldSpawner = CharacterSpawner.CreateSpawner(spawnerData.id, SpawnEnemyEvent, DespawnEnemyEvent);
+                ISpawner worldSpawner = CharacterSpawner.CreateSpawner(spawnerData.id, OnSpawnEnemyEvent, OnDespawnEnemyEvent);
                 //worldSpawner.SetWorldSpawner(spawnerData.id, SpawnEnemyEvent, DespawnEnemyEvent);
                 
                 ///
@@ -115,11 +89,8 @@ public class WorldScene : BaseScene
             }
         }
 
-        // Controller
-        //GlobalScene.GUIMng.SetWorldSceneController();
-
         /// Camera
-        CameraManager.Instance.SetQuarterViewCamMode(temp_player.transform);
+        Manager.CamMng.SetQuarterViewCamMode(player.transform);
     }
 
     protected override void OnStart()
@@ -129,7 +100,7 @@ public class WorldScene : BaseScene
             ///Player
             Vector3 spawnPos = new Vector3(7.5f, 0f, 1f); //임시
             Vector3 spawnRot = Quaternion.identity.eulerAngles; //임시
-            temp_player.Spawn(spawnPos, spawnRot);
+            player.Spawn(spawnPos, spawnRot);
 
             /// Enemy
             PlaySpawnersPooling(true);
@@ -138,19 +109,17 @@ public class WorldScene : BaseScene
         worldUI.Open();
 
         /// Camera
-        CameraManager.Instance.PlayQuarterViewCam(true);
-
-        //GlobalScene.GUIMng.StartJoystickController();
+        Manager.CamMng.PlayQuarterViewCam(true);
     }
 
     protected override void OnDestroy_()
     {
-        if(instance != null && instance.gameObject != null)
-        {
-            ResourceManager.Instance.DestroyGameObject(instance.gameObject);
-        }
+        //if(instance != null && instance.gameObject != null)
+        //{
+        //    ResourceManager.Instance.DestroyGameObject(instance.gameObject);
+        //}
 
-        instance = null;
+        //instance = null;
     }
 
     #region Spawner
@@ -160,12 +129,12 @@ public class WorldScene : BaseScene
     //    return Util.CreateGameObject<TSpawner>();
     //}
 
-    void SpawnEnemyEvent(GameObject pGO, Define.Actor pAactorType, int actorID)
+    void OnSpawnEnemyEvent(GameObject pGO, Define.Actor pAactorType, int actorID)
     {
         //
     }
 
-    void DespawnEnemyEvent(GameObject pGO)
+    void OnDespawnEnemyEvent(GameObject pGO)
     {
         //SetDespawnWorldObj(pGO);
     }
@@ -203,14 +172,14 @@ public class WorldScene : BaseScene
     //    SetSpawnPlayer();
     //}
 
-    void DespawnPlayerEvent(GameObject pGO)
+    void OnDespawnPlayerEvent(GameObject pGO)
     {
         /// Respawn
-        UserManager.Instance.UpdateUserData();
-        SceneManager.Instance.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
+        Manager.UserMng.UpdateUserData();
+        Manager.SceneMng.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
     }
 
-    public void PlaySpawnersPooling(bool pSwitch)
+    private void PlaySpawnersPooling(bool pSwitch)
     {
         foreach(ISpawner spawner in worldSpawner_hashSet)
         {
@@ -226,10 +195,10 @@ public class WorldScene : BaseScene
 
     #endregion Spawner
 
-    public void SetPlayerDead()
+    private void OnPlayerDeadEvent()
     {
         worldUI.Close();
-        CameraManager.Instance.PlayQuarterViewCam(false);
+        Manager.CamMng.PlayQuarterViewCam(false);
         PlaySpawnersPooling(false);
     }
 
@@ -249,5 +218,31 @@ public class WorldScene : BaseScene
         }
 
         return baseCharacter;
+    }
+
+    public int GetUserExpValue()
+    {
+        return Manager.UserMng.UserData.expValue;
+    }
+
+    public int GetUserLevelValue()
+    {
+        return Manager.UserMng.UserData.levelValue;
+    }
+
+    public int GetUserHpValue()
+    {
+        return Manager.UserMng.UserData.hpValue;
+    }
+
+    public int SetGetUserHP(int pHP)
+    {
+        return Manager.UserMng.SetUserHP(pHP);
+    }
+
+    [Obsolete("임시")]
+    public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
+    {
+        return Manager.UIMng.CreateBaseSpaceUI<TSpaceUI>(pParent);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
-public class UIManager : BaseManager<UIManager>
+public class UIManager : Manager
 {
     Canvas mainCanvas = null;
     public Canvas MainCanvas
@@ -42,7 +42,7 @@ public class UIManager : BaseManager<UIManager>
         mainCanvas = FindOrCreateMainCanvas();
         mainEventSystem = FindOrCreateMainEventSystem();
 
-        SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_UIManager);
+        SceneMng.AddSceneLoadedEvent(AddSceneLoadedEvent_UIManager);
     }
 
     public override void OnRelease() 
@@ -73,7 +73,7 @@ public class UIManager : BaseManager<UIManager>
         {
             string uiName = typeof(TBaseUI).Name;
             string path = $"Prefabs/UI/{uiName}";
-            baseUI = ResourceManager.Instance.Instantiate(path, MainCanvas.transform).GetOrAddComponent<TBaseUI>();
+            baseUI = ResourceMng.Instantiate(path, MainCanvas.transform).GetOrAddComponent<TBaseUI>();
         }
 
         ///
@@ -133,17 +133,17 @@ public class UIManager : BaseManager<UIManager>
     //    return baseUI;
     //}
 
-    [Obsolete("임시")]
-    public T CreateBaseSpaceUI<T>(Transform pParent = null) where T : Component, IBaseUI
+
+    public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
     {
-        string name = typeof(T).Name;
-        GameObject go = ResourceManager.Instance.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
+        string name = typeof(TSpaceUI).Name;
+        GameObject go = ResourceMng.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
 
         Canvas canvas = go.GetOrAddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.worldCamera = Camera.main;
 
-        T baseUI = go.GetOrAddComponent<T>();
+        TSpaceUI baseUI = go.GetOrAddComponent<TSpaceUI>();
         baseUI.Close();
 
         return baseUI;
@@ -151,12 +151,6 @@ public class UIManager : BaseManager<UIManager>
 
     public void OpenBaseUIAll()
     {
-        if (baseUI_dic.Count == 0)
-        {
-            Debug.Log("열기 위한 UI가 없습니다.");
-            return;
-        }
-
         foreach (IBaseUI baseUI in baseUI_dic.Values)
         {
             if (baseUI != null)
@@ -168,12 +162,6 @@ public class UIManager : BaseManager<UIManager>
 
     public void CloseBaseUIAll()
     {
-        if (baseUI_dic.Count == 0)
-        {
-            Debug.Log("닫기 위한 UI가 없습니다.");
-            return;
-        }
-
         foreach (IBaseUI baseUI in baseUI_dic.Values)
         {
             if (baseUI != null)
@@ -245,7 +233,7 @@ public class UIManager : BaseManager<UIManager>
         {
             if (canvas != null && canvas.renderMode != RenderMode.WorldSpace && canvas != mainCanvas)
             {
-                ResourceManager.Instance.DestroyGameObject(canvas.gameObject);
+                ResourceMng.DestroyGameObject(canvas.gameObject);
             }
         }
 
@@ -273,7 +261,7 @@ public class UIManager : BaseManager<UIManager>
         {
             if (eventSystem != null && eventSystem != mainEventSystem)
             {
-                ResourceManager.Instance.DestroyGameObject(eventSystem.gameObject);
+                ResourceMng.DestroyGameObject(eventSystem.gameObject);
             }
         }
 

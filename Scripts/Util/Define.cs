@@ -44,7 +44,7 @@ public class Define
         //NPC,
     }
 
-    public enum SpawnState
+    public enum ExistenceState
     {
         Despawn,
         Spawn,

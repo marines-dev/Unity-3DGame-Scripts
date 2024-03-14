@@ -7,7 +7,7 @@ public abstract class BaseObjectPool : BaseHandler
     protected string prefabPath = string.Empty;
     protected bool poolExpand = true;
 
-    Dictionary<GameObject, Define.SpawnState> objectPool_dic = new Dictionary<GameObject, Define.SpawnState>();
+    Dictionary<GameObject, Define.ExistenceState> objectPool_dic = new Dictionary<GameObject, Define.ExistenceState>();
 
 
     protected virtual void SetObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand)
@@ -25,16 +25,16 @@ public abstract class BaseObjectPool : BaseHandler
 
     protected virtual GameObject CreateObject()
     {
-        GameObject go = ResourceManager.Instance.Instantiate(prefabPath, transform);
+        GameObject go = GlobalScene.Instance.InstantiateResource(prefabPath, transform);
 
         if (!objectPool_dic.ContainsKey(go))
         {
-            objectPool_dic.Add(go, Define.SpawnState.Despawn);
+            objectPool_dic.Add(go, Define.ExistenceState.Despawn);
 
         }
         else
         {
-            objectPool_dic[go] = Define.SpawnState.Despawn;
+            objectPool_dic[go] = Define.ExistenceState.Despawn;
         }
 
         return go;
@@ -43,9 +43,9 @@ public abstract class BaseObjectPool : BaseHandler
     public virtual GameObject SpawnObject()
     {
         GameObject go = null;
-        foreach (KeyValuePair<GameObject, Define.SpawnState> pair in objectPool_dic)
+        foreach (KeyValuePair<GameObject, Define.ExistenceState> pair in objectPool_dic)
         {
-            if (pair.Value == Define.SpawnState.Despawn)
+            if (pair.Value == Define.ExistenceState.Despawn)
             {
                 go = pair.Key;
             }
@@ -53,7 +53,7 @@ public abstract class BaseObjectPool : BaseHandler
 
         if (go != null)
         {
-            objectPool_dic[go] = Define.SpawnState.Spawn;
+            objectPool_dic[go] = Define.ExistenceState.Spawn;
             go.gameObject.SetActive(true);
             return go;
         }
@@ -61,7 +61,7 @@ public abstract class BaseObjectPool : BaseHandler
         if (go == null && poolExpand)
         {
             go = CreateObject();
-            objectPool_dic[go] = Define.SpawnState.Spawn;
+            objectPool_dic[go] = Define.ExistenceState.Spawn;
             go.gameObject.SetActive(true);
             return go;
         }
@@ -78,12 +78,12 @@ public abstract class BaseObjectPool : BaseHandler
             return;
         }
 
-        if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == Define.SpawnState.Despawn)
+        if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == Define.ExistenceState.Despawn)
         {
             Util.LogWarning();
         }
 
-        objectPool_dic[pObj] = Define.SpawnState.Despawn;
+        objectPool_dic[pObj] = Define.ExistenceState.Despawn;
         pObj.gameObject.SetActive(false);
     }
 }

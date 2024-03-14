@@ -3,7 +3,7 @@ using UnityEngine;
 using BackEnd;
 
 
-public class BackendManager : BaseManager<BackendManager>
+public class BackendManager : Manager
 {
     string gameDataRowInDate = string.Empty;
 

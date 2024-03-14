@@ -7,22 +7,22 @@ public abstract class BaseWorldObject : MonoBehaviour
     Define.WorldObject worldObjType = Define.WorldObject.None;
     int worldObjID = 0;
 
-    Define.SpawnState spawnState = Define.SpawnState.Despawn;
-    public Define.SpawnState SpawnState
+    Define.ExistenceState existenceStateType = Define.ExistenceState.Despawn;
+    public Define.ExistenceState ExistenceStateType
     {
-        get { return spawnState; }
-        set
+        get { return existenceStateType; }
+        private set
         {
-            spawnState = value;
+            existenceStateType = value;
 
-            switch (spawnState)
+            switch (existenceStateType)
             {
-                case Define.SpawnState.Despawn:
+                case Define.ExistenceState.Despawn:
                     {
                         gameObject.SetActive(false);
                     }
                     break;
-                case Define.SpawnState.Spawn:
+                case Define.ExistenceState.Spawn:
                     {
                         gameObject.SetActive(true);
                     }
@@ -72,7 +72,7 @@ public abstract class BaseWorldObject : MonoBehaviour
         worldObjID = pWorldObjID;
         despawnAction = pDespawnAction;
 
-        SpawnState = Define.SpawnState.Despawn;
+        ExistenceStateType = Define.ExistenceState.Despawn;
     }
 
     public virtual void Spawn(Vector3 pPos, Vector3 pRot)
@@ -81,7 +81,7 @@ public abstract class BaseWorldObject : MonoBehaviour
         Position = pPos;
         Rotation = pRot;
 
-        SpawnState = Define.SpawnState.Spawn;
+        ExistenceStateType = Define.ExistenceState.Spawn;
     }
 
     protected virtual void Despawn()
@@ -89,6 +89,6 @@ public abstract class BaseWorldObject : MonoBehaviour
         if (despawnAction != null)
             despawnAction.Invoke(gameObject);
 
-        SpawnState = Define.SpawnState.Despawn;
+        ExistenceStateType = Define.ExistenceState.Despawn;
     }
 }

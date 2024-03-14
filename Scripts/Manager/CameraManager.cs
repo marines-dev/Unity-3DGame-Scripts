@@ -1,9 +1,9 @@
 using UnityEngine;
 
 
-public class CameraManager : BaseManager<CameraManager>
+public class CameraManager : Manager//BaseManager<CameraManager>
 {
-    public Define.CameraMode CameraModeType { get; private set; } = Define.CameraMode.Defualt;
+    public static Define.CameraMode CameraModeType { get; private set; } = Define.CameraMode.Defualt;
 
     private Camera mainCamera = null;
     private Camera MainCamera => mainCamera ?? (mainCamera = FindOrCreateMainCamera());
@@ -27,7 +27,7 @@ public class CameraManager : BaseManager<CameraManager>
         mainCamera = FindOrCreateMainCamera();
         ResetCameraMode();
 
-        SceneManager.Instance.AddSceneLoadedEvent(AddSceneLoadedEvent_CameraManager);
+        SceneMng.AddSceneLoadedEvent(AddSceneLoadedEvent_CameraManager);
     }
 
     public override void OnRelease()
@@ -89,7 +89,7 @@ public class CameraManager : BaseManager<CameraManager>
 
         if (cameraCtrl != null)
         {
-            ResourceManager.Instance.DestroyGameObject(cameraCtrl.gameObject);
+            ResourceMng.DestroyGameObject(cameraCtrl.gameObject);
             cameraCtrl = null;
         }
 
@@ -122,7 +122,7 @@ public class CameraManager : BaseManager<CameraManager>
         {
             if (camera != null && mainCamera != camera)
             {
-                ResourceManager.Instance.DestroyGameObject(camera.gameObject);
+                ResourceMng.DestroyGameObject(camera.gameObject);
             }
         }
 

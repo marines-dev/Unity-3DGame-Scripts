@@ -21,28 +21,28 @@ namespace ServerData
 }
 
 
-public class UserManager : BaseManager<UserManager>
+public class UserManager : Manager
 {
     // Backend
-    string InData { get { return BackendManager.Instance.GetInData(); } }
-    string NickName { get { return BackendManager.Instance.GetNickname(); } }
+    string InData { get { return BackendMng.GetInData(); } }
+    string NickName { get { return BackendMng.GetNickname(); } }
 
     // ServerData.UserData
-    ServerData.UserData userData = new ServerData.UserData();
-    public int SpawnerID { get { return userData.spawnerID; } }
-    public Define.Prefabs PrefabType { get { return userData.prefabType; } }
-    public int CharacterID { get { return userData.characterID; } }
-    public int LevelValue { get { return userData.levelValue; } }
-    public int ExpValue { get { return userData.expValue; } }
-    public int CoinValue { get { return userData.coinValue; } }
-    public int HpValue { get { return userData.hpValue; } }
-    public int WeaponID { get { return userData.weaponID; } }
+    public ServerData.UserData UserData { get; private set; } = new ServerData.UserData();
+    //public int SpawnerID { get { return UserData.spawnerID; } }
+    //public Define.Prefabs PrefabType { get { return UserData.prefabType; } }
+    //public int CharacterID { get { return UserData.characterID; } }
+    //public int LevelValue { get { return UserData.levelValue; } }
+    //public int ExpValue { get { return UserData.expValue; } }
+    //public int CoinValue { get { return UserData.coinValue; } }
+    //public int HpValue { get { return UserData.hpValue; } }
+    //public int WeaponID { get { return UserData.weaponID; } }
 
 
     protected override void OnInitialized()
     {
-        if (userData == null)
-            userData = new ServerData.UserData();
+        if (UserData == null)
+            UserData = new ServerData.UserData();
     }
 
     public override void OnRelease() { }
@@ -58,13 +58,13 @@ public class UserManager : BaseManager<UserManager>
         result.AppendLine($"nickName : {NickName.ToString()}");
 
         // Player
-        result.AppendLine($"spawnerID : {userData.spawnerID.ToString()}");
-        result.AppendLine($"characterID : {userData.characterID.ToString()}");
-        result.AppendLine($"currentLevel : {userData.levelValue.ToString()}");
-        result.AppendLine($"currentExp : {userData.expValue.ToString()}");
-        result.AppendLine($"currentCoin : {userData.coinValue.ToString()}");
-        result.AppendLine($"currentHP : {userData.hpValue.ToString()}");
-        result.AppendLine($"weaponID : {userData.weaponID.ToString()}");
+        result.AppendLine($"spawnerID : {UserData.spawnerID.ToString()}");
+        result.AppendLine($"characterID : {UserData.characterID.ToString()}");
+        result.AppendLine($"currentLevel : {UserData.levelValue.ToString()}");
+        result.AppendLine($"currentExp : {UserData.expValue.ToString()}");
+        result.AppendLine($"currentCoin : {UserData.coinValue.ToString()}");
+        result.AppendLine($"currentHP : {UserData.hpValue.ToString()}");
+        result.AppendLine($"weaponID : {UserData.weaponID.ToString()}");
 
         //result.AppendLine($"inventory");
         //foreach (var itemKey in test_inventory.Keys)
@@ -101,35 +101,35 @@ public class UserManager : BaseManager<UserManager>
     /// </summary>
     public int SetUserHP(int pHpValue)
     {
-        if (pHpValue == userData.hpValue)
+        if (pHpValue == UserData.hpValue)
         {
-            Debug.LogWarning($"Faild : 변경하려는 Exp({pHpValue}) 값이 유저의 현재 Exp({userData.hpValue})와 같으므로 변경할 수 없습니다.");
-            return userData.hpValue;
+            Debug.LogWarning($"Faild : 변경하려는 Exp({pHpValue}) 값이 유저의 현재 Exp({UserData.hpValue})와 같으므로 변경할 수 없습니다.");
+            return UserData.hpValue;
         }
 
-        Table.CharacterTable.Data characterData = TableManager.Instance.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.characterID);
-        Table.StatTable.Data statData = TableManager.Instance.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
+        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
+        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
         if (pHpValue > statData.maxHp)
         {
             Debug.Log($"Warning : HP({pHpValue}) 값 초과로 MaxHP({statData.maxHp})으로 저장합니다.");
-            userData.hpValue  = statData.maxHp;
+            UserData.hpValue  = statData.maxHp;
         }
         else if(pHpValue < 0)
         {
             Debug.Log($"Warning : HP({pHpValue}) 값 초과로 0으로 저장합니다.");
-            userData.hpValue = 0;
+            UserData.hpValue = 0;
         }
         else
         {
-            userData.hpValue = pHpValue;
+            UserData.hpValue = pHpValue;
         }
 
         //
         UpdateUserData();
 
         //
-        Debug.Log($"Success : 유저의 변경된 hpValue는 {userData.hpValue}입니다.");
-        return userData.hpValue;
+        Debug.Log($"Success : 유저의 변경된 hpValue는 {UserData.hpValue}입니다.");
+        return UserData.hpValue;
     }
 
     /// <summary>
@@ -137,59 +137,59 @@ public class UserManager : BaseManager<UserManager>
     /// </summary>
     public int SetUserExp(int pExpValue)
     {
-        if (pExpValue <= userData.expValue)
+        if (pExpValue <= UserData.expValue)
         {
-            Debug.LogWarning($"Faild : 변경하려는 Exp({pExpValue}) 값이 유저의 현재 Exp({userData.expValue})와 작거나 같으므로 변경할 수 없습니다.");
-            return userData.expValue;
+            Debug.LogWarning($"Faild : 변경하려는 Exp({pExpValue}) 값이 유저의 현재 Exp({UserData.expValue})와 작거나 같으므로 변경할 수 없습니다.");
+            return UserData.expValue;
         }
 
-        Table.CharacterTable.Data characterData = TableManager.Instance.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.characterID);
-        Table.StatTable.Data statData = TableManager.Instance.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
+        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
         if (pExpValue > statData.maxExp)
         {
             Debug.Log($"Warning : exp({pExpValue}) 값 초과로 MaxExp({statData.maxExp})으로 저장합니다.");
             Debug.Log($"Warning : 유저의 레벨을 증가해 주세요!");
-            userData.expValue = statData.maxExp;
+            UserData.expValue = statData.maxExp;
         }
         else if (pExpValue < 0)
         {
             Debug.Log($"Warning : exp({pExpValue}) 값 초과로 0으로 저장합니다.");
-            userData.expValue = 0;
+            UserData.expValue = 0;
         }
         else
         {
-            userData.expValue = pExpValue;
+            UserData.expValue = pExpValue;
         }
 
         //
         UpdateUserData();
 
         //
-        Debug.Log($"Success : 유저의 변경된 Exp는 {userData.expValue}입니다.");
-        return userData.expValue;
+        Debug.Log($"Success : 유저의 변경된 Exp는 {UserData.expValue}입니다.");
+        return UserData.expValue;
     }
 
     [Obsolete("임시")]
     public int SetUserLevelUp()
     {
-        Table.CharacterTable.Data characterData = TableManager.Instance.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.characterID);
-        Table.StatTable.Data statData = TableManager.Instance.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
-        if (userData.expValue < statData.maxExp)
+        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
+        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
+        if (UserData.expValue < statData.maxExp)
         {
-            Debug.LogWarning($"Failed : 유저의 Exp({userData.expValue})가 MaxExp({statData.maxExp})보다 작아 LevelUp할 수 없습니다.");
-            return userData.levelValue;
+            Debug.LogWarning($"Failed : 유저의 Exp({UserData.expValue})가 MaxExp({statData.maxExp})보다 작아 LevelUp할 수 없습니다.");
+            return UserData.levelValue;
         }
 
-        userData.levelValue += 1;
-        userData.expValue = 0;
+        UserData.levelValue += 1;
+        UserData.expValue = 0;
 
         //
         UpdateUserData();
 
         //
-        Debug.Log($"Success : 유저의 변경된 levelValue는 {userData.levelValue}입니다.");
-        Debug.Log($"Success : 유저의 expValue가 {userData.expValue}으로 초기화되었습니다. 변경된 값으로 적용해 주세요.");
-        return userData.levelValue;
+        Debug.Log($"Success : 유저의 변경된 levelValue는 {UserData.levelValue}입니다.");
+        Debug.Log($"Success : 유저의 expValue가 {UserData.expValue}으로 초기화되었습니다. 변경된 값으로 적용해 주세요.");
+        return UserData.levelValue;
     }
 
     [Obsolete("임시")]
@@ -201,7 +201,7 @@ public class UserManager : BaseManager<UserManager>
             return;
         }
 
-        userData.weaponID = pWeaponID;
+        UserData.weaponID = pWeaponID;
 
         //
         UpdateUserData();
@@ -229,14 +229,14 @@ public class UserManager : BaseManager<UserManager>
     public void CreateUserData()
     {
         // ServerData.UserData
-        userData.spawnerID      = Config.gamePlayer_spawnerID;
-        userData.prefabType     = Config.gamePlayer_prefabType;
-        userData.characterID    = Config.gamePlayer_characterID;
-        userData.levelValue     = Config.gamePlayer_levelUpCount;
-        userData.expValue       = Config.gamePlayer_expValue;
-        userData.coinValue      = Config.gamePlayer_coinValue;
-        userData.hpValue        = Config.gamePlayer_hpValue;
-        userData.weaponID       = Config.gamePlayer_weaponID;
+        UserData.spawnerID      = Config.gamePlayer_spawnerID;
+        UserData.prefabType     = Config.gamePlayer_prefabType;
+        UserData.characterID    = Config.gamePlayer_characterID;
+        UserData.levelValue     = Config.gamePlayer_levelUpCount;
+        UserData.expValue       = Config.gamePlayer_expValue;
+        UserData.coinValue      = Config.gamePlayer_coinValue;
+        UserData.hpValue        = Config.gamePlayer_hpValue;
+        UserData.weaponID       = Config.gamePlayer_weaponID;
 
         //
         SaveUserData();
@@ -245,7 +245,7 @@ public class UserManager : BaseManager<UserManager>
     [Obsolete("테스트 필요 : 서버 저장 방식 확인")]
     public void SaveUserData() // Backend 데이터에 저장합니다.
     {
-        if (userData == null)
+        if (UserData == null)
         {
             Debug.LogError("Failed : 서버에서 다운받거나 새로 삽입한 데이터가 존재하지 않습니다. Init 혹은 Load를 통해 데이터를 생성해주세요.");
             return;
@@ -254,14 +254,14 @@ public class UserManager : BaseManager<UserManager>
         Param param = new Param();
 
         // ServerData.UserData
-        param.Add("spawnerID", userData.spawnerID.ToString());
-        param.Add("prefabType", userData.prefabType.ToString());
-        param.Add("characterID", userData.characterID.ToString());
-        param.Add("levelUpCount", userData.levelValue.ToString());
-        param.Add("expValue", userData.expValue.ToString());
-        param.Add("coinValue", userData.coinValue.ToString());
-        param.Add("hpValue", userData.hpValue.ToString());
-        param.Add("weaponID", userData.weaponID.ToString());
+        param.Add("spawnerID", UserData.spawnerID.ToString());
+        param.Add("prefabType", UserData.prefabType.ToString());
+        param.Add("characterID", UserData.characterID.ToString());
+        param.Add("levelUpCount", UserData.levelValue.ToString());
+        param.Add("expValue", UserData.expValue.ToString());
+        param.Add("coinValue", UserData.coinValue.ToString());
+        param.Add("hpValue", UserData.hpValue.ToString());
+        param.Add("weaponID", UserData.weaponID.ToString());
 
         // Test
         //userData.info = "친추는 언제나 환영입니다.";
@@ -272,13 +272,13 @@ public class UserManager : BaseManager<UserManager>
         //Managers.Backend.SaveBackendData<List<string>>("level", test_equipment);
 
         // SaveBackend
-        BackendManager.Instance.SaveBackendData(Config.user_tableName, ref param);
+        BackendMng.SaveBackendData(Config.user_tableName, ref param);
     }
 
     [Obsolete("테스트 필요 : 서버 저장 방식 확인")]
     public void UpdateUserData() // Backend 데이터에 저장합니다.
     {
-        if (userData == null)
+        if (UserData == null)
         {
             Debug.LogError($"Failed : 서버에서 다운받거나 새로 삽입한 데이터가 존재하지 않습니다. Init 혹은 Load를 통해 데이터를 생성해주세요.");
             return;
@@ -287,36 +287,36 @@ public class UserManager : BaseManager<UserManager>
         Param param = new Param();
 
         // ServerData.UserData
-        param.Add("spawnerID", userData.spawnerID.ToString());
-        param.Add("prefabType", userData.prefabType.ToString());
-        param.Add("characterID", userData.characterID.ToString());
-        param.Add("levelUpCount", userData.levelValue.ToString());
-        param.Add("expValue", userData.expValue.ToString());
-        param.Add("coinValue", userData.coinValue.ToString());
-        param.Add("hpValue", userData.hpValue.ToString());
-        param.Add("weaponID", userData.weaponID.ToString());
+        param.Add("spawnerID", UserData.spawnerID.ToString());
+        param.Add("prefabType", UserData.prefabType.ToString());
+        param.Add("characterID", UserData.characterID.ToString());
+        param.Add("levelUpCount", UserData.levelValue.ToString());
+        param.Add("expValue", UserData.expValue.ToString());
+        param.Add("coinValue", UserData.coinValue.ToString());
+        param.Add("hpValue", UserData.hpValue.ToString());
+        param.Add("weaponID", UserData.weaponID.ToString());
 
         // UpdateBackend
-        BackendManager.Instance.UpdateBackendData(Config.user_tableName, ref param);
+        BackendMng.UpdateBackendData(Config.user_tableName, ref param);
     }
 
     public bool LoadUserData() // Backend 데이터를 불러옵니다.
     {
-        LitJson.JsonData gameDataJson = BackendManager.Instance.LoadBackendData(Config.user_tableName);
+        LitJson.JsonData gameDataJson = BackendMng.LoadBackendData(Config.user_tableName);
         if (gameDataJson == null)
         {
             Debug.LogWarning($"유저 데이터가 존재하지 않습니다.");
             return false;
         }
 
-        userData.spawnerID = int.Parse(gameDataJson[0]["spawnerID"].ToString());
-        userData.prefabType = (Define.Prefabs)Enum.Parse(typeof(Define.Prefabs), gameDataJson[0]["prefabType"].ToString());
-        userData.characterID = int.Parse(gameDataJson[0]["characterID"].ToString());
-        userData.levelValue = int.Parse(gameDataJson[0]["levelUpCount"].ToString());
-        userData.expValue = int.Parse(gameDataJson[0]["expValue"].ToString());
-        userData.coinValue = int.Parse(gameDataJson[0]["coinValue"].ToString());
-        userData.hpValue = int.Parse(gameDataJson[0]["hpValue"].ToString());
-        userData.weaponID = int.Parse(gameDataJson[0]["weaponID"].ToString());
+        UserData.spawnerID = int.Parse(gameDataJson[0]["spawnerID"].ToString());
+        UserData.prefabType = (Define.Prefabs)Enum.Parse(typeof(Define.Prefabs), gameDataJson[0]["prefabType"].ToString());
+        UserData.characterID = int.Parse(gameDataJson[0]["characterID"].ToString());
+        UserData.levelValue = int.Parse(gameDataJson[0]["levelUpCount"].ToString());
+        UserData.expValue = int.Parse(gameDataJson[0]["expValue"].ToString());
+        UserData.coinValue = int.Parse(gameDataJson[0]["coinValue"].ToString());
+        UserData.hpValue = int.Parse(gameDataJson[0]["hpValue"].ToString());
+        UserData.weaponID = int.Parse(gameDataJson[0]["weaponID"].ToString());
 
         //Test
         //userData.info = gameDataJson[0]["info"].ToString();

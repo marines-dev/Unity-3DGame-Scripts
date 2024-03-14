@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Table
 {
-    public abstract class BaseTable<TData> : IBaseTable where TData : BaseTable<TData>.BaseData
+    public abstract class BaseTable<TData> : ITableLoader where TData : BaseTable<TData>.BaseData
     {
         [Serializable]
         public abstract class BaseData
@@ -22,13 +22,15 @@ namespace Table
             }
         }
 
+        private TextAsset textAsset = null;
+
         // <id, BaseData>
         protected Dictionary<int, TData> baseData_dic = new Dictionary<int, TData>();
 
         public BaseTable()
         {
-            Debug.Log($"Success : {this.GetType().Name} 테이블 데이터 로드");
-            LoadTableDataDic();
+            Debug.Log($"Success : {this.GetType().Name} 테이블 데이터를 생성하였습니다.");
+            //LoadTableDataDic();
         }
 
         ~BaseTable()
@@ -37,25 +39,37 @@ namespace Table
             ClearTableDataDic();
         }
 
+        public void Initialized(TextAsset pTextAsset)
+        {
+            if (pTextAsset == null)
+            {
+                Util.LogError();
+                return;
+            }
+
+            textAsset = pTextAsset;
+            LoadTableDataDic();
+        }
+
         protected abstract void LoadTableDataDic();
 
         protected TData[] LoadTableDatas()
         {
             ClearTableDataDic();
 
-            string tableName    = this.GetType().Name;
-            string path         = $"Data/Table/{tableName}";
-            TextAsset textAsset = ResourceManager.Instance.Load<TextAsset>(path);
+            //string tableName    = this.GetType().Name;
+            //string path         = $"Data/Table/{tableName}";
+            //textAsset = ResourceManager.Instance.Load<TextAsset>(path);
             if (textAsset == null)
             {
-                Debug.LogWarning("Failed : ");
+                Util.LogError();
                 return null;
             }
 
             TData[] _baseDatas = CSVSerializer.DeserializeData<TData>(textAsset.text);
             if (_baseDatas == null || _baseDatas.Length <= 0)
             {
-                Debug.LogWarning("Failed : ");
+                Util.LogError();
                 return null;
             }
 
@@ -75,7 +89,7 @@ namespace Table
         {
             if (baseData_dic.ContainsKey(pID) == false)
             {
-                Debug.LogWarning("Failed : ");
+                Util.LogWarning();
                 return null;
             }
 

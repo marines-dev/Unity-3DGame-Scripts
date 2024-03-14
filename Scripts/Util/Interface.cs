@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace Interface
 {
+    public interface IBaseScene
+    {
+    }
+
     public interface IBaseManager
     {
         public void OnRelease();
-    }
-
-    public interface IBaseTable
-    {
     }
 
     public interface IBaseUI
@@ -19,6 +19,11 @@ namespace Interface
         public void Open();
         public void Close();
         public void DestroySelf();
+    }
+
+    public interface ITableLoader
+    {
+        public void Initialized(TextAsset pTextAsset);
     }
 
     public interface ISpawner
