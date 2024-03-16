@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseObjectPool : BaseHandler
+public abstract class BaseObjectPool : MonoBehaviour
 {
     protected string prefabPath = string.Empty;
     protected bool poolExpand = true;

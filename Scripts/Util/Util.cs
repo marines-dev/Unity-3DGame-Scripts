@@ -94,7 +94,7 @@ public class Util
         go.transform.localPosition = Vector3.zero;
         go.transform.localRotation = Quaternion.identity;
 
-        Util.LogSuccess($"<{go.gameObject}>의 게임 오브젝트를 생성하였습니다.");
+        Util.LogSuccess($"<{typeof(T).Name}>의 게임 오브젝트를 생성하였습니다.");
         return go.AddComponent<T>();
     }
 

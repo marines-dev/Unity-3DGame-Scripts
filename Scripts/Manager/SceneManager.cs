@@ -38,17 +38,17 @@ public class SceneManager : Manager
         return typeof(TScene).Name;
     }
 
-    public void AddSceneLoadedEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
-    {
-        if (pSceneLoadedEvent == null)
-        {
-            Debug.LogWarning("");
-            return;
-        }
+    //public void AddSceneLoadedEvent(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> pSceneLoadedEvent)
+    //{
+    //    if (pSceneLoadedEvent == null)
+    //    {
+    //        Debug.LogWarning("");
+    //        return;
+    //    }
 
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= pSceneLoadedEvent;
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded += pSceneLoadedEvent;
-    }
+    //    UnityEngine.SceneManagement.SceneManager.sceneLoaded -= pSceneLoadedEvent;
+    //    UnityEngine.SceneManagement.SceneManager.sceneLoaded += pSceneLoadedEvent;
+    //}
 
     public void LoadInitScene()
     {

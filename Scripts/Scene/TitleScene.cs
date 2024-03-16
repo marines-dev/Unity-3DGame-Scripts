@@ -23,7 +23,8 @@ public class TitleScene : BaseScene<TitleScene>
 
     protected override void OnAwake()
     {
-        titleUI = Manager.UIMng.CreateOrGetBaseUI<TitleUI>();
+        titleUI = Manager.UIMng.CreateOrGetBaseUI<TitleUI>(MainCanvas);
+        titleUI.Close();
     }
 
     protected override void OnStart()

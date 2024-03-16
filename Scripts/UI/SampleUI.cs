@@ -1,6 +1,6 @@
 using UnityEngine;
 
-class SampleUI : BaseUI<SampleUI.UI>
+public class SampleUI : BaseUI<SampleUI.UI>
 {
     public enum UI
     {

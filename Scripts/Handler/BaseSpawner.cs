@@ -24,26 +24,7 @@ public class CharacterSpawner : BaseSpawner<Enemy> , ISpawner
 
 public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : BaseWorldObject
 {
-    //public bool switchPlay = false;
-    //public bool SwitchPooling 
-    //{ 
-    //    private get { return switchPlay; }
-    //    set
-    //    {
-    //        if(value ==  switchPlay) 
-    //            return;
-
-    //        switchPlay = value;
-    //        if (switchPlay)
-    //        {
-    //            //OnPlay();
-    //        }
-    //        else
-    //        {
-    //            //OnStop();
-    //        }
-    //    }
-    //}
+    public bool SwitchPooling { private get; set; }
 
     /// <summary>
     /// TableData
@@ -65,7 +46,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
 
     private void Update()
     {
-        if (!IsPlaying)
+        if (!SwitchPooling)
             return;
 
         /// UpdatePooling
@@ -112,7 +93,7 @@ public abstract class BaseSpawner<TWorldObj> : BaseObjectPool where TWorldObj : 
         spawnAction = pSpawnAction;
         despawnAction = pDespawnAction;
 
-        Stop();
+        SwitchPooling = false;
     }
 
     protected override void SetObjectPool(string pPrefabPath, int pSpawner_poolAmount, bool pPoolExpand)

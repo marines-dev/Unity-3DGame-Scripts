@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-class TitleUI : BaseUI<TitleUI.UI>
+public class TitleUI : BaseUI<TitleUI.UI>
 {
     public enum UI
     {

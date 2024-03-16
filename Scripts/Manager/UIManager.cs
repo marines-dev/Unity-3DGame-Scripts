@@ -8,41 +8,41 @@ using UnityEngine.EventSystems;
 
 public class UIManager : Manager
 {
-    Canvas mainCanvas = null;
-    public Canvas MainCanvas
-    {
-        get
-        {
-            if (mainCanvas == null)
-            {
-                mainCanvas = FindOrCreateMainCanvas();
-            }
-            return mainCanvas;
-        }
-    }
+    //Canvas mainCanvas = null;
+    //public Canvas MainCanvas
+    //{
+    //    get
+    //    {
+    //        if (mainCanvas == null)
+    //        {
+    //            mainCanvas = FindOrCreateMainCanvas();
+    //        }
+    //        return mainCanvas;
+    //    }
+    //}
 
-    EventSystem mainEventSystem = null;
-    public EventSystem MainEventSystem
-    {
-        get
-        {
-            if (mainEventSystem == null)
-            {
-                mainEventSystem = FindOrCreateMainEventSystem();
-            }
-            return mainEventSystem;
-        }
-    }
+    //EventSystem mainEventSystem = null;
+    //public EventSystem MainEventSystem
+    //{
+    //    get
+    //    {
+    //        if (mainEventSystem == null)
+    //        {
+    //            mainEventSystem = FindOrCreateMainEventSystem();
+    //        }
+    //        return mainEventSystem;
+    //    }
+    //}
 
     Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
 
 
     protected override void OnInitialized()
     {
-        mainCanvas = FindOrCreateMainCanvas();
-        mainEventSystem = FindOrCreateMainEventSystem();
+        //mainCanvas = FindOrCreateMainCanvas();
+        //mainEventSystem = FindOrCreateMainEventSystem();
 
-        SceneMng.AddSceneLoadedEvent(AddSceneLoadedEvent_UIManager);
+        //SceneMng.AddSceneLoadedEvent(AddSceneLoadedEvent_UIManager);
     }
 
     public override void OnRelease() 
@@ -61,8 +61,14 @@ public class UIManager : Manager
 
     #region BaseUI
 
-    public TBaseUI CreateOrGetBaseUI<TBaseUI>() where TBaseUI : Component, IBaseUI
+    public TBaseUI CreateOrGetBaseUI<TBaseUI>(Canvas pCanvas) where TBaseUI : Component, IBaseUI
     {
+        if(pCanvas == null)
+        {
+            Util.LogError();
+            return null;
+        }
+
         TBaseUI baseUI = null;
         string name = typeof(TBaseUI).Name;
         if (baseUI_dic.ContainsKey(name)) /// Get
@@ -73,12 +79,49 @@ public class UIManager : Manager
         {
             string uiName = typeof(TBaseUI).Name;
             string path = $"Prefabs/UI/{uiName}";
-            baseUI = ResourceMng.Instantiate(path, MainCanvas.transform).GetOrAddComponent<TBaseUI>();
+            baseUI = ResourceMng.Instantiate(path, pCanvas.transform).GetOrAddComponent<TBaseUI>();
         }
 
         ///
         baseUI.Close();
         return baseUI;
+    }
+
+    public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
+    {
+        string name = typeof(TSpaceUI).Name;
+        GameObject go = ResourceMng.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
+
+        Canvas canvas = go.GetOrAddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = Camera.main;
+
+        TSpaceUI baseUI = go.GetOrAddComponent<TSpaceUI>();
+        baseUI.Close();
+
+        return baseUI;
+    }
+
+    public void OpenBaseUIAll()
+    {
+        foreach (IBaseUI baseUI in baseUI_dic.Values)
+        {
+            if (baseUI != null)
+            {
+                baseUI.Open();
+            }
+        }
+    }
+
+    public void CloseBaseUIAll()
+    {
+        foreach (IBaseUI baseUI in baseUI_dic.Values)
+        {
+            if (baseUI != null)
+            {
+                baseUI.Close();
+            }
+        }
     }
 
     //public TBaseUI CreateOrGetBaseUI<TBaseUI>() where TBaseUI : Component, IBaseUI
@@ -133,44 +176,6 @@ public class UIManager : Manager
     //    return baseUI;
     //}
 
-
-    public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
-    {
-        string name = typeof(TSpaceUI).Name;
-        GameObject go = ResourceMng.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
-
-        Canvas canvas = go.GetOrAddComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.worldCamera = Camera.main;
-
-        TSpaceUI baseUI = go.GetOrAddComponent<TSpaceUI>();
-        baseUI.Close();
-
-        return baseUI;
-    }
-
-    public void OpenBaseUIAll()
-    {
-        foreach (IBaseUI baseUI in baseUI_dic.Values)
-        {
-            if (baseUI != null)
-            {
-                baseUI.Open();
-            }
-        }
-    }
-
-    public void CloseBaseUIAll()
-    {
-        foreach (IBaseUI baseUI in baseUI_dic.Values)
-        {
-            if (baseUI != null)
-            {
-                baseUI.Close();
-            }
-        }
-    }
-
     #endregion BaseUI
 
     #region Load
@@ -203,78 +208,78 @@ public class UIManager : Manager
     //    return string.Empty;
     //}
 
-    private Canvas FindOrCreateMainCanvas()
-    {
-        Canvas[] canvas_arr = null;
-        if (mainCanvas == null)
-        {
-            canvas_arr = GameObject.FindObjectsOfType<Canvas>();
-            Debug.Log($"{typeof(Canvas).Name} 개수 : {canvas_arr.Length}");
-            foreach (Canvas canvas in canvas_arr)
-            {
-                if (canvas != null && canvas.renderMode != RenderMode.WorldSpace)
-                {
-                    mainCanvas = canvas;
-                    break;
-                }
-            }
+    //private Canvas FindOrCreateMainCanvas()
+    //{
+    //    Canvas[] canvas_arr = null;
+    //    if (mainCanvas == null)
+    //    {
+    //        canvas_arr = GameObject.FindObjectsOfType<Canvas>();
+    //        Debug.Log($"{typeof(Canvas).Name} 개수 : {canvas_arr.Length}");
+    //        foreach (Canvas canvas in canvas_arr)
+    //        {
+    //            if (canvas != null && canvas.renderMode != RenderMode.WorldSpace)
+    //            {
+    //                mainCanvas = canvas;
+    //                break;
+    //            }
+    //        }
 
-            if(mainCanvas == null)
-            {
-                mainCanvas = Util.CreateGameObject<Canvas>();
-            }
+    //        if(mainCanvas == null)
+    //        {
+    //            mainCanvas = Util.CreateGameObject<Canvas>();
+    //        }
 
-            mainCanvas.gameObject.name = $"@{typeof(Canvas).Name}";
-        }
+    //        mainCanvas.gameObject.name = $"@{typeof(Canvas).Name}";
+    //    }
 
-        /// 중복 검사
-        canvas_arr = GameObject.FindObjectsOfType<Canvas>();
-        foreach (Canvas canvas in canvas_arr)
-        {
-            if (canvas != null && canvas.renderMode != RenderMode.WorldSpace && canvas != mainCanvas)
-            {
-                ResourceMng.DestroyGameObject(canvas.gameObject);
-            }
-        }
+    //    /// 중복 검사
+    //    canvas_arr = GameObject.FindObjectsOfType<Canvas>();
+    //    foreach (Canvas canvas in canvas_arr)
+    //    {
+    //        if (canvas != null && canvas.renderMode != RenderMode.WorldSpace && canvas != mainCanvas)
+    //        {
+    //            ResourceMng.DestroyGameObject(canvas.gameObject);
+    //        }
+    //    }
 
-        ///
-        GameObject.DontDestroyOnLoad(mainCanvas);
-        return mainCanvas;
-    }
+    //    ///
+    //    GameObject.DontDestroyOnLoad(mainCanvas);
+    //    return mainCanvas;
+    //}
 
-    private EventSystem FindOrCreateMainEventSystem()
-    {
-        if (mainEventSystem == null)
-        {
-            mainEventSystem = GameObject.FindObjectOfType<EventSystem>();
-            if (mainEventSystem == null)
-            {
-                mainEventSystem = Util.CreateGameObject<EventSystem>();
-            }
+    //private EventSystem FindOrCreateMainEventSystem()
+    //{
+    //    if (mainEventSystem == null)
+    //    {
+    //        mainEventSystem = GameObject.FindObjectOfType<EventSystem>();
+    //        if (mainEventSystem == null)
+    //        {
+    //            mainEventSystem = Util.CreateGameObject<EventSystem>();
+    //        }
 
-            mainEventSystem.gameObject.name = $"@{typeof(EventSystem).Name}";
-        }
+    //        mainEventSystem.gameObject.name = $"@{typeof(EventSystem).Name}";
+    //    }
 
-        /// 중복 검사
-        EventSystem[] eventSystem_arr = GameObject.FindObjectsOfType<EventSystem>();
-        foreach (EventSystem eventSystem in eventSystem_arr)
-        {
-            if (eventSystem != null && eventSystem != mainEventSystem)
-            {
-                ResourceMng.DestroyGameObject(eventSystem.gameObject);
-            }
-        }
+    //    /// 중복 검사
+    //    EventSystem[] eventSystem_arr = GameObject.FindObjectsOfType<EventSystem>();
+    //    foreach (EventSystem eventSystem in eventSystem_arr)
+    //    {
+    //        if (eventSystem != null && eventSystem != mainEventSystem)
+    //        {
+    //            ResourceMng.DestroyGameObject(eventSystem.gameObject);
+    //        }
+    //    }
 
-        ///
-        GameObject.DontDestroyOnLoad(mainEventSystem);
-        return mainEventSystem;
-    }
+    //    ///
+    //    GameObject.DontDestroyOnLoad(mainEventSystem);
+    //    return mainEventSystem;
+    //}
 
-    private void AddSceneLoadedEvent_UIManager(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
-    {
-        mainCanvas = FindOrCreateMainCanvas();
-        mainEventSystem = FindOrCreateMainEventSystem();
-    }
+    //private void AddSceneLoadedEvent_UIManager(UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode pLoadSceneMode)
+    //{
+    //    mainCanvas = FindOrCreateMainCanvas();
+    //    mainEventSystem = FindOrCreateMainEventSystem();
+    //}
 
     //public static void SetUIManager(Canvas pCanvas, EventSystem pEventSystem)
     //{

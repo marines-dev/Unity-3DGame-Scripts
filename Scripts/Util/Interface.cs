@@ -28,8 +28,9 @@ namespace Interface
 
     public interface ISpawner
     {
-        public void Play();
-        public void Stop();
+        public bool SwitchPooling { set; }
+        //public void Play();
+        //public void Stop();
         //public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction);
     }
 }

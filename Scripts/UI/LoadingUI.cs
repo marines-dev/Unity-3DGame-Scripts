@@ -1,6 +1,6 @@
 using UnityEngine;
 
-class LoadingUI : BaseUI<LoadingUI.UI>
+public class LoadingUI : BaseUI<LoadingUI.UI>
 {
     public enum UI
     {

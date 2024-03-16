@@ -59,14 +59,14 @@ public class WorldScene : BaseScene<WorldScene>
         /// CreateTable
         {
             spawnerTable = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>();
-            characterTable = Manager.TableMng.CreateOrGetBaseTable<Table.CharacterTable>();
+            //characterTable = Manager.TableMng.CreateOrGetBaseTable<Table.CharacterTable>();
             statTable = Manager.TableMng.CreateOrGetBaseTable<Table.StatTable>();
         }
 
         /// CreateUI
         {
             // Joystick
-            worldUI = Manager.UIMng.CreateOrGetBaseUI<WorldUI>();
+            worldUI = Manager.UIMng.CreateOrGetBaseUI<WorldUI>(MainCanvas);
             worldUI.Close();
         }
 
@@ -88,9 +88,6 @@ public class WorldScene : BaseScene<WorldScene>
                 worldSpawner_hashSet.Add(worldSpawner);
             }
         }
-
-        /// Camera
-        Manager.CamMng.SetQuarterViewCamMode(player.transform);
     }
 
     protected override void OnStart()
@@ -107,9 +104,7 @@ public class WorldScene : BaseScene<WorldScene>
         }
 
         worldUI.Open();
-
-        /// Camera
-        Manager.CamMng.PlayQuarterViewCam(true);
+        CamCtrl.SwitchQuarterViewMoed = true;
     }
 
     protected override void OnDestroy_()
@@ -185,10 +180,7 @@ public class WorldScene : BaseScene<WorldScene>
         {
             if(spawner != null)
             {
-                if(pSwitch)
-                    spawner.Play();
-                else
-                    spawner.Stop();
+                spawner.SwitchPooling = pSwitch;
             }
         }
     }
@@ -198,7 +190,7 @@ public class WorldScene : BaseScene<WorldScene>
     private void OnPlayerDeadEvent()
     {
         worldUI.Close();
-        Manager.CamMng.PlayQuarterViewCam(false);
+        CamCtrl.SwitchQuarterViewMoed = false;
         PlaySpawnersPooling(false);
     }
 

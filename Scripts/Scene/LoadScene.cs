@@ -28,7 +28,8 @@ public class LoadScene : BaseScene<LoadScene>
     {
         /// LoadUI
         Manager.UIMng.CloseBaseUIAll();
-        loadUI = Manager.UIMng.CreateOrGetBaseUI<LoadingUI>();
+        loadUI = Manager.UIMng.CreateOrGetBaseUI<LoadingUI>(MainCanvas);
+        loadUI.Close();
     }
 
     protected override void OnStart() 
@@ -44,13 +45,9 @@ public class LoadScene : BaseScene<LoadScene>
 
     protected override void OnDestroy_() 
     {
-        if(loadUI != null)
-        {
-            loadUI.Close();
-        }
-
         ClearLoadingProcess();
 
+        loadUI.Close();
         /// Complete
         Debug.Log($"Success : {Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
     }

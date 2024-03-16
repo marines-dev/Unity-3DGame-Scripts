@@ -8,8 +8,8 @@ public class InitScene : BaseScene<InitScene>
     protected override void OnAwake()
     {
         /// LoadManager
-        Manager.InitializedManagers();
-        GlobalScene.CreateGlobalScene();
+        Manager.CreateManagers();
+        CreateGlobalScene();
 
         IsInitSceneLoaded = true;
     }
@@ -21,5 +21,18 @@ public class InitScene : BaseScene<InitScene>
 
     protected override void OnDestroy_()
     {
+    }
+
+    private void CreateGlobalScene()
+    {
+        /// Destroy
+        GlobalScene instnace = FindObjectOfType<GlobalScene>();
+        if (instnace != null)
+        {
+            Manager.ResourceMng.DestroyGameObject(instnace.gameObject);
+        }
+
+        /// Create
+        Util.CreateGlobalObject<GlobalScene>();
     }
 }
