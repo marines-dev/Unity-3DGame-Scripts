@@ -1,23 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Interface;
+using Table;
 using UnityEngine;
+using static Define;
 
 
 public class WorldScene : BaseScene<WorldScene>
 {
-    /// <summary>
-    /// Table
-    /// </summary>
-    Table.SpawnerTable spawnerTable = null;
-    public Table.SpawnerTable SpawnerTable => spawnerTable ?? (spawnerTable = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>());
-
-    Table.CharacterTable characterTable = null;
-    public Table.CharacterTable CharacterTable => characterTable ?? (characterTable = Manager.TableMng.CreateOrGetBaseTable<Table.CharacterTable>());
-
-    Table.StatTable statTable = null;
-    public Table.StatTable StatTable => statTable ?? (statTable = Manager.TableMng.CreateOrGetBaseTable<Table.StatTable>());
-
     /// <summary>
     /// MainUI
     /// </summary>
@@ -31,7 +21,7 @@ public class WorldScene : BaseScene<WorldScene>
     #region World
 
     private Player player = null;
-    private NullPlayer nullPlayer = new NullPlayer();
+    private NullObject nullPlayer = new NullObject();
     public IPlayerCtrl PlayerCtrl
     {
         get
@@ -46,21 +36,20 @@ public class WorldScene : BaseScene<WorldScene>
         }
     }
 
-    /// <summary>
-    /// Spawner
-    /// </summary>
-    HashSet<ISpawner> worldSpawner_hashSet = new HashSet<ISpawner>();
-
+    Dictionary<GameObject, int> fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
+    Dictionary<int, WorldSpawner> worldSpawner_dic = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
 
     #endregion World
+
 
     protected override void OnAwake()
     {
         /// CreateTable
         {
-            spawnerTable = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>();
-            //characterTable = Manager.TableMng.CreateOrGetBaseTable<Table.CharacterTable>();
-            statTable = Manager.TableMng.CreateOrGetBaseTable<Table.StatTable>();
+            Manager.TableMng.CreateOrGetBaseTable<SpawnerTable>();
+            Manager.TableMng.CreateOrGetBaseTable<EnemyTable>();
+            Manager.TableMng.CreateOrGetBaseTable<CharacterTable>();
+            Manager.TableMng.CreateOrGetBaseTable<StatTable>();
         }
 
         /// CreateUI
@@ -70,22 +59,30 @@ public class WorldScene : BaseScene<WorldScene>
             worldUI.Close();
         }
 
-        // Spawner
+        /// Spawner
         {
-            // Player
+            /// Player
             Manager.UserMng.LoadUserData();
-            player = CharacterSpawner.CreateCharacter(Define.WorldObject.Character, 1, OnDespawnPlayerEvent); //임시
-            player.SetPlayerDeadEvent(OnPlayerDeadEvent);
+            Vector3 spawnPos = new Vector3(7.5f, 0f, 1f);
+            Vector3 spawnRot = Quaternion.identity.eulerAngles; 
+            GameObject player_go = WorldSpawner.CreateGameObject(Define.Spawning.Player, 1, spawnPos, spawnRot);//임시
+            player = player_go.GetOrAddComponent<Player>();
 
-            // Enemy
-            Table.SpawnerTable.Data[] spawnerDatas = Manager.TableMng.CreateOrGetBaseTable<Table.SpawnerTable>().GetTableDatasAll();
-            foreach (Table.SpawnerTable.Data spawnerData in spawnerDatas)
+            /// Enemy
+            SpawnerTable.Data[] spawnerData_arr = GlobalScene.Instance.SpawnerTable.GetTableDatasAll();
+            foreach (SpawnerTable.Data spawnerData in spawnerData_arr)
             {
-                ISpawner worldSpawner = CharacterSpawner.CreateSpawner(spawnerData.id, OnSpawnEnemyEvent, OnDespawnEnemyEvent);
-                //worldSpawner.SetWorldSpawner(spawnerData.id, SpawnEnemyEvent, DespawnEnemyEvent);
+                WorldSpawner worldSpawner = WorldSpawner.CreateSpawner(spawnerData.ID);
                 
                 ///
-                worldSpawner_hashSet.Add(worldSpawner);
+                if(worldSpawner_dic.ContainsKey(spawnerData.ID))
+                {
+                    Util.LogWarning();
+                    worldSpawner = worldSpawner_dic[spawnerData.ID];
+                    GlobalScene.Instance.DestroyGameObject(worldSpawner.gameObject);
+                }
+
+                worldSpawner_dic.Add(spawnerData.ID, worldSpawner);
             }
         }
     }
@@ -95,12 +92,11 @@ public class WorldScene : BaseScene<WorldScene>
         // Spawn
         {
             ///Player
-            Vector3 spawnPos = new Vector3(7.5f, 0f, 1f); //임시
-            Vector3 spawnRot = Quaternion.identity.eulerAngles; //임시
-            player.Spawn(spawnPos, spawnRot);
+            SetSpawning(player.gameObject, Spawning.Player);
+            
 
             /// Enemy
-            PlaySpawnersPooling(true);
+            SwitchSpawnersPooling(true);
         }
 
         worldUI.Open();
@@ -119,66 +115,76 @@ public class WorldScene : BaseScene<WorldScene>
 
     #region Spawner
 
-    //public static ISpawner CreateWorldSpawner<TSpawner>() where TSpawner : Component, ISpawner
-    //{
-    //    return Util.CreateGameObject<TSpawner>();
-    //}
-
-    void OnSpawnEnemyEvent(GameObject pGO, Define.Actor pAactorType, int actorID)
+    public void SetSpawnSpawning(GameObject pGO, int SpawnerID)
     {
-        //
-    }
+        SpawnerTable.Data spawnerData = GlobalScene.Instance.SpawnerTable.GetTableData(SpawnerID);
+        SetSpawning(pGO, spawnerData.SpawningType, spawnerData.SpawningID);
 
-    void OnDespawnEnemyEvent(GameObject pGO)
-    {
-        //SetDespawnWorldObj(pGO);
-    }
-
-    //void InitPlayerEvent(GameObject pGO)
-    //{
-    //    Player player = InitWorldObj<Player>(pGO);
-    //    SetSpawnPlayer(player);
-    //}
-
-    //void InitEnemyEvent(GameObject pGO)
-    //{
-    //    Enemy enemy = InitWorldObj<Enemy>(pGO);
-    //}
-
-    //public T InitWorldObj<T>(GameObject pGO) where T : BaseWorldObj
-    //{
-    //    if (pGO == null)
-    //    {
-    //        Debug.LogError($"Failed : ");
-    //        return null;
-    //    }
-
-    //    T worldObj = pGO.GetOrAddComponent<T>();
-    //    worldObj.Initialize(pPrefabType, pPrefabID, OnDespawnEvent);
-
-    //    return worldObj;
-    //}
-
-    //void SpawnPlayerEvent(ICharacter pCharacter, int pSpawnerID)
-    //{
-    //    // ICharacter에서 Actor을 가져온다.
-    //    Player player = SetSpawnWorldObj<Player>(pGO, pSpawnerID);
-
-    //    SetSpawnPlayer();
-    //}
-
-    void OnDespawnPlayerEvent(GameObject pGO)
-    {
-        /// Respawn
-        Manager.UserMng.UpdateUserData();
-        Manager.SceneMng.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
-    }
-
-    private void PlaySpawnersPooling(bool pSwitch)
-    {
-        foreach(ISpawner spawner in worldSpawner_hashSet)
+        if(fieldSpawning_dic.ContainsKey(pGO))
         {
-            if(spawner != null)
+            Util.LogWarning();
+            fieldSpawning_dic.Remove(pGO);
+        }
+
+        fieldSpawning_dic.Add(pGO, SpawnerID);
+    }
+
+    private void SetSpawning(GameObject pGO, Spawning pSpawningType, int pSpawningID = 0)
+    {
+        switch (pSpawningType)
+        {
+            case Spawning.Player:
+                {
+                    Player player = pGO.GetOrAddComponent<Player>();
+                    player.Spawn(Actor.Player, OnPlayerDeadEvent);
+                }
+                break;
+            case Spawning.Enemy:
+                {
+                    Enemy enemy = pGO.GetOrAddComponent<Enemy>();
+                    enemy.Spawn(Actor.Enemy, pSpawningID);
+                }
+                break;
+        }
+    }
+
+    public void SetDespawnSpawning(GameObject pGO, Actor pActorType)
+    {
+        switch (pActorType)
+        {
+            case Actor.Player:
+                {
+                    /// Respawn
+                    Manager.UserMng.UpdateUserData();
+                    Manager.SceneMng.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
+                }
+                break;
+            case Actor.Enemy:
+                {
+                    if(fieldSpawning_dic.ContainsKey(pGO))
+                    {
+                        int spawnerID = fieldSpawning_dic[pGO];
+                        if (worldSpawner_dic.ContainsKey(spawnerID))
+                        {
+                            WorldSpawner worldSpawner = worldSpawner_dic[spawnerID];
+                            worldSpawner.Despawn(pGO);
+                            fieldSpawning_dic.Remove(pGO);
+                            return;
+                        }
+                    }
+
+                    Util.LogWarning();
+                    GlobalScene.Instance.DestroyGameObject(pGO);
+                }
+                break;
+        }
+    }
+
+    private void SwitchSpawnersPooling(bool pSwitch)
+    {
+        foreach (WorldSpawner spawner in worldSpawner_dic.Values)
+        {
+            if (spawner != null)
             {
                 spawner.SwitchPooling = pSwitch;
             }
@@ -191,25 +197,25 @@ public class WorldScene : BaseScene<WorldScene>
     {
         worldUI.Close();
         CamCtrl.SwitchQuarterViewMoed = false;
-        PlaySpawnersPooling(false);
+        SwitchSpawnersPooling(false);
     }
 
-    public ITargetHandler_Temp GetTargetCharacter(GameObject pTarget)
+    public ITarget_Temp GetTargetCharacter(GameObject pTarget)
     {
         if (pTarget == null)
         {
-            Debug.LogWarning("Falied : ");
+            Util.LogWarning();
             return null;
         }
 
-        Character baseCharacter = pTarget.GetComponent<Character>();
-        if (baseCharacter == null)
+        BaseActor baseActor = pTarget.GetComponent<BaseActor>();
+        if (baseActor == null)
         {
-            Debug.LogWarning("Falied : ");
+            Util.LogWarning();
             return null;
         }
 
-        return baseCharacter;
+        return baseActor;
     }
 
     public int GetUserExpValue()
@@ -237,4 +243,6 @@ public class WorldScene : BaseScene<WorldScene>
     {
         return Manager.UIMng.CreateBaseSpaceUI<TSpaceUI>(pParent);
     }
+
+
 }

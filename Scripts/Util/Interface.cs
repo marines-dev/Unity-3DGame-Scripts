@@ -21,16 +21,21 @@ namespace Interface
         public void DestroySelf();
     }
 
+    public interface ITable
+    {
+
+    }
+
     public interface ITableLoader
     {
         public void Initialized(TextAsset pTextAsset);
     }
 
-    public interface ISpawner
-    {
-        public bool SwitchPooling { set; }
-        //public void Play();
-        //public void Stop();
-        //public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction);
-    }
+    //public interface ISpawner
+    //{
+    //    public bool SwitchPooling { set; }
+    //    //public void Play();
+    //    //public void Stop();
+    //    //public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction);
+    //}
 }

@@ -14,11 +14,19 @@ public class Define
     //    //SampleScene,
     //}
 
-    public enum Prefabs
+    public enum Prefab
     {
         None,
         Character,
         Weapon,
+    }
+
+    public enum Spawning
+    {
+        None,
+        Player,
+        Enemy,
+        Item,
     }
 
     public enum WorldObject
@@ -48,6 +56,12 @@ public class Define
     {
         Despawn,
         Spawn,
+    }
+
+    public enum SurvivalState
+    {
+        Dead,
+        Alive,
     }
 
     public enum BaseAnim

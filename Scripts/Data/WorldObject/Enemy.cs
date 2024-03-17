@@ -1,7 +1,9 @@
+using Table;
 using UnityEngine;
+using static Define;
 
 
-public class Enemy : Character
+public class Enemy : BaseActor
 {
     float temp_attackRange = 1.5f;
     Vector3 temp_destPos = Vector3.zero;
@@ -10,20 +12,20 @@ public class Enemy : Character
     {
         base.Update();
 
-        if (BaseAnimType == Define.BaseAnim.Die)
+        if (BaseAnimType == BaseAnim.Die)
             return;
 
         UpdateBaseState(BaseAnimType);
         UpdateUpperState(UpperAnimType);
     }
 
-    public override void Spawn(Vector3 pPos, Vector3 pRot)
-    {
-        base.Spawn(pPos, pRot);
 
-        /// Temp
+    public override void Spawn(Actor pActorType, int pActorID = 0)
+    {
+        base.Spawn(pActorType, pActorID);
+
+        // Temp
         Temp_Tag = "Monster";
-        //SetStateType(Define.State.Idle);
     }
 
     protected override void SetDead()
@@ -32,23 +34,25 @@ public class Enemy : Character
         //if (Manager.World.IsGamePlay)
         //    Manager.World.playerCtrl.IncreaseExp(stat.maxExp);
 
-        shader.OnDisableOutline();
+        OnDisableTargetOutline();
 
         base.SetDead();
     }
 
-    protected override void OnHitEvent()
+    protected override void OnHit()
     {
-        Player target = null;
+        base.OnHit();
+
         Collider[] hitColliders = Physics.OverlapBox(transform.position + (transform.forward / 2f) + transform.up, transform.localScale, Quaternion.identity);
         foreach (var hitCollider in hitColliders)
         {
             if (hitCollider.tag == "Player")
             {
-                target = hitCollider.GetComponent<Player>();
-                if (target != null)
-                    target.OnDamage(Stat.attack);
-
+                ITarget_Temp player = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
+                if (player != null)
+                {
+                    player.OnDamage(Stat.attack);
+                }
                 break;
             }
         }
@@ -142,7 +146,7 @@ public class Enemy : Character
         distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
         if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
         {
-            navMeshAgent.SetDestination(transform.position);
+            NevAgent.SetDestination(transform.position);
             BaseAnimType = Define.BaseAnim.Idle;
             //SetUpperStateType(Define.UpperState.Attack);
             return;
@@ -155,8 +159,11 @@ public class Enemy : Character
             return;
         }
 
-        navMeshAgent.speed = Stat.runSpeed;
-        navMeshAgent.SetDestination(temp_destPos);
+        EnemyTable.Data enemeyData = GlobalScene.Instance.EnemyTable.GetTableData(actorID);
+        CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(enemeyData.CharacterID);
+
+        NevAgent.speed = characterData.RunSpeed_Temp;
+        NevAgent.SetDestination(temp_destPos);
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
     }
 

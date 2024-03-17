@@ -13,7 +13,7 @@ public static class Config
     #region GamePlayer
 
     public static readonly int gamePlayer_spawnerID = 1;
-    public static readonly Define.Prefabs gamePlayer_prefabType = Define.Prefabs.Character;
+    public static readonly Define.Prefab gamePlayer_prefabType = Define.Prefab.Character;
     public static readonly int gamePlayer_characterID   = 1;
     public static readonly int gamePlayer_levelUpCount  = 1;
     public static readonly int gamePlayer_expValue      = 0;

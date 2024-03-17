@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static Define;
 
 public interface IPlayerCtrl
 {
@@ -13,26 +14,15 @@ public interface IPlayerCtrl
     //public void IncreaseExp(int pAddExpValue);
 }
 
-public class NullPlayer : IPlayerCtrl
-{
-    public Vector3 Position { get { return Vector3.zero; } }
-    public Vector3 Rotation { get { return Vector3.zero; } }
-
-    public void OnMove(Vector3 pEulerAngles) { }
-    public void OnStop() { }
-    public void OnAttack() { }
-    public void OnReady() { }
-
-}
-
-public class Player : Character, IPlayerCtrl
+public class Player : BaseActor, IPlayerCtrl
 {
     int temp_userLevelValue = 0;
     int temp_userExpValue = 0;
 
-    ITargetHandler_Temp target = null;
+    ITarget_Temp target = null;
 
     Action deadAction = null;
+
 
     protected override void Update()
     {
@@ -59,7 +49,7 @@ public class Player : Character, IPlayerCtrl
         {
             if (hitCollider.tag == "Monster")
             {
-                ITargetHandler_Temp tempTarget = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
+                ITarget_Temp tempTarget = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
                 if (tempTarget != null && tempTarget.SurvivalStateType != SurvivalState.Dead)
                 {
                     if (target != null) //가까운 타겟팅
@@ -89,11 +79,11 @@ public class Player : Character, IPlayerCtrl
         }
     }
 
-    public override void Spawn(Vector3 pPos, Vector3 pRot)
+    public void Spawn(Actor pActorType, Action pDeadAction)
     {
-        base.Spawn(pPos, pRot);
+        Spawn(pActorType);
 
-        /// InitSpawnCharacter(Temp)
+        /// Temp
         {
             Temp_Tag = "Player";
 
@@ -101,14 +91,15 @@ public class Player : Character, IPlayerCtrl
             temp_userLevelValue = WorldScene.Instance.GetUserLevelValue();
             int currentHp = WorldScene.Instance.GetUserHpValue();
 
-            //SetStat(temp_userLevelValue);
             SetHP(currentHp);
         }
+
+        deadAction = pDeadAction;
     }
 
-    public void SetPlayerDeadEvent(Action pDeadAction)
+    protected new void Spawn(Actor pActorType, int pActorID = 0)
     {
-        deadAction = pDeadAction;
+        base.Spawn(pActorType, pActorID);
     }
 
     protected override void SetDead()
@@ -124,23 +115,6 @@ public class Player : Character, IPlayerCtrl
         }
     }
 
-    protected override void OnHitEvent()
-    {
-        if (weapon != null)
-        {
-            weapon.PlaySFX();
-        }
-
-        if (target != null)
-        {
-            float dist = (target.Position - Position).magnitude;
-            if (dist <= 6f)
-            {
-                target.OnDamage(Stat.attack);
-            }
-        }
-    }
-
     public void OnMove(Vector3 pEulerAngles)
     {
         BaseAnimType = Define.BaseAnim.Run;
@@ -151,8 +125,8 @@ public class Player : Character, IPlayerCtrl
         //transform.eulerAngles = eulerAngles;
 
         transform.eulerAngles = pEulerAngles;
-        Vector3 pos = transform.forward * Time.deltaTime * navMeshAgent.speed;
-        navMeshAgent.Move(pos);
+        Vector3 pos = transform.forward * Time.deltaTime * NevAgent.speed;
+        NevAgent.Move(pos);
     }
 
     public void OnStop()
@@ -160,14 +134,28 @@ public class Player : Character, IPlayerCtrl
         BaseAnimType = Define.BaseAnim.Idle;
     }
 
+    public void OnReady()
+    {
+        UpperAnimType = Define.UpperAnim.Ready;
+    }
+
     public void OnAttack()
     {
         UpperAnimType = Define.UpperAnim.Attack;
     }
 
-    public void OnReady()
+    protected override void OnHit()
     {
-        UpperAnimType = Define.UpperAnim.Ready;
+        base.OnHit();
+
+        if (target != null)
+        {
+            float dist = (target.Position - Position).magnitude;
+            if (dist <= 6f)
+            {
+                target.OnDamage(Stat.attack);
+            }
+        }
     }
 
     //public void IncreaseExp(int pAddExpValue)

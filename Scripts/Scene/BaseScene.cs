@@ -1,12 +1,25 @@
 using System;
 using BackEnd;
 using Interface;
+using Table;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class GlobalScene : BaseScene<GlobalScene>
 {
-    protected override void OnAwake() 
+    /// <summary>
+    /// Table
+    /// </summary>
+    //SpawnerTable spawnerTable = null;
+    //public SpawningTable_Legacy SpawningTable { get { return Manager.TableMng.CreateOrGetBaseTable<SpawningTable_Legacy>(); } }
+    public SpawnerTable SpawnerTable { get { return Manager.TableMng.CreateOrGetBaseTable<SpawnerTable>(); } }
+    public EnemyTable EnemyTable { get { return Manager.TableMng.CreateOrGetBaseTable<EnemyTable>(); } }
+    public CharacterTable CharacterTable { get { return Manager.TableMng.CreateOrGetBaseTable<CharacterTable>(); } }
+    public StatTable StatTable { get { return Manager.TableMng.CreateOrGetBaseTable<StatTable>(); } }
+    public WeaponTable WeaponTable { get { return Manager.TableMng.CreateOrGetBaseTable<WeaponTable>(); } }
+
+
+    protected override void OnAwake()
     {
         RegisteredGlobalObjects();
     }

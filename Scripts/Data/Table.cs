@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Table
 {
-    public abstract class BaseTable<TData> : ITableLoader where TData : BaseTable<TData>.BaseData
+    public abstract class BaseTable<TData> : ITableLoader, ITable where TData : BaseTable<TData>.BaseData
     {
         [Serializable]
         public abstract class BaseData
@@ -114,19 +114,22 @@ namespace Table
         [Serializable]
         public class Data : BaseData
         {
-            public int id           = 0;
-            public int poolAmount   = 0;
-            public int keepCount    = 0;
-            public float minSpawnTime   = 0f;
-            public float maxSpawnTime   = 0f;
-            public float spawnRadius    = 0f;
-            public Vector3 spawnPos = Vector3.zero;
-            public Vector3 spawnRot = Vector3.zero;
-            public bool poolExpand = false;
-            public Define.WorldObject worldObjType = Define.WorldObject.None; //임시
-            public int worldObjID = 0; //임시
-            public Define.Actor actorType = Define.Actor.None;
-            public int actorID = 0;
+            public int ID           = 0;
+            public int PoolAmount   = 0;
+            public int KeepCount    = 0;
+            public float MinSpawnTime   = 0f;
+            public float MaxSpawnTime   = 0f;
+            public float SpawnRadius    = 0f;
+            public Vector3 SpawnPos = Vector3.zero;
+            public Vector3 SpawnRot = Vector3.zero;
+            public bool PoolExpand = false;
+            public Define.Spawning SpawningType = Define.Spawning.None;
+            public int SpawningID = 0;
+            //public int EnemyID = 0;
+            //public Define.WorldObject WorldObjType = Define.WorldObject.None; //임시
+            //public int WorldObjID = 0; //임시
+            //public Define.Actor ActorType = Define.Actor.None;
+            //public int ActorID = 0;
         }
 
         protected override void LoadTableDataDic()
@@ -134,26 +137,64 @@ namespace Table
             Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
-                baseData_dic.Add(data.id, data);
+                baseData_dic.Add(data.ID, data);
             }
         }
     }
+
+    #region Actor
+
+    public class EnemyTable : BaseTable<EnemyTable.Data>
+    {
+        [Serializable]
+        public class Data : BaseData
+        {
+            public int ID = 0;
+            public int CharacterID = 0;
+            public int StatID = 0;
+            public int WeaponID = 0;
+            public int RewardExp = 0;
+            public int RewardCoin = 0;
+            //public Define.Actor actorType = Define.Actor.None;
+            //public string animator = string.Empty;
+            //public string avatar = string.Empty;
+            //public int level = 0;
+            //public int coin = 0;
+        }
+
+        protected override void LoadTableDataDic()
+        {
+            Data[] datas = LoadTableDatas();
+            foreach (Data data in datas)
+            {
+                baseData_dic.Add(data.ID, data);
+            }
+        }
+    }
+
+    #endregion Actor
+
+    #region WorldObject
 
     public class CharacterTable : BaseTable<CharacterTable.Data>
     {
         [Serializable]
         public class Data : BaseData
         {
-            public int id = 0;
-            public Define.Character characterType = Define.Character.None;
-            public string characterName         = string.Empty;
-            public string prefabName            = string.Empty;
-            public string animator = string.Empty;
-            public string avatar = string.Empty;
-            public string upperReadyClip = string.Empty;
-            public string upperAttackClip = string.Empty;
-            public int statID = 0;
-            public int weaponID = 0;
+            public int ID = 0;
+            public Define.Character CharacterType = Define.Character.None;
+            public string CharacterName         = string.Empty;
+            public string PrefabName            = string.Empty;
+            public string Animator = string.Empty;
+            public string Avatar = string.Empty;
+            public string BaseIdleClip = string.Empty;
+            public string BaseRunClip = string.Empty;
+            public string UpperReadyClip = string.Empty;
+            public string UpperAttackClip = string.Empty;
+            public float RunSpeed_Temp = 0f;
+            //public Define.BaseAnim initStateType = Define.BaseAnim.Idle;
+            //public int statID = 0;
+            //public int weaponID = 0;
         }
 
         protected override void LoadTableDataDic()
@@ -161,27 +202,29 @@ namespace Table
             Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
-                baseData_dic.Add(data.id, data);
+                baseData_dic.Add(data.ID, data);
             }
         }
     }
+
+    #endregion WorldObject
 
     public class StatTable : BaseTable<StatTable.Data>
     {
         [Serializable]
         public class Data : BaseData
         {
-            public int id = 0;
-            public int maxHp = 0;
-            public int maxHp_levelUp_rate = 0;
-            public int attack = 0;
-            public int attack_levelUp_rate = 0;
-            public int defense = 0;
-            public int defense_levelUp_rate = 0;
-            public float moveSpeed = 0f;
-            public int moveSpeed_levelUp_rate = 0;
-            public int maxExp = 0;
-            public int maxExp_levelUp_rate = 0;
+            public int ID = 0;
+            public int MaxHp = 0;
+            public int Attack = 0;
+            public int Defense = 0;
+            //public float moveSpeed = 0f;
+            //public int maxExp = 0;
+            //public int moveSpeed_levelUp_rate = 0;
+            //public int defense_levelUp_rate = 0;
+            //public int attack_levelUp_rate = 0;
+            //public int maxHp_levelUp_rate = 0;
+            //public int maxExp_levelUp_rate = 0;
         }
 
         protected override void LoadTableDataDic()
@@ -189,28 +232,28 @@ namespace Table
             Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
-                baseData_dic.Add(data.id, data);
+                baseData_dic.Add(data.ID, data);
             }
         }
     }
 
-    public class EquipmentTable : BaseTable<EquipmentTable.Data>
+    public class WeaponTable : BaseTable<WeaponTable.Data>
     {
         [Serializable]
         public class Data : BaseData
         {
-            public int id = 0;
-            public Define.WeaponType weaponType = Define.WeaponType.Gun;
-            public string prefabName = string.Empty;
-            public string equipParentName = string.Empty;
-            public Vector3 readyPosition = Vector3.zero;
-            public Vector3 readyRotation = Vector3.zero;
-            public Vector3 attackPosition = Vector3.zero;
-            public Vector3 attackRotation = Vector3.zero;
-            public string sfxPrefabName = string.Empty;
-            public Vector3 sfxPosition = Vector3.zero;
-            public Vector3 sfxRotation = Vector3.zero;
-            public int attackValue = 0;
+            public int ID = 0;
+            public Define.WeaponType WeaponType = Define.WeaponType.Gun;
+            public string PrefabName = string.Empty;
+            public string WeaponParentName = string.Empty;
+            public Vector3 ReadyPosition = Vector3.zero;
+            public Vector3 ReadyRotation = Vector3.zero;
+            public Vector3 AttackPosition = Vector3.zero;
+            public Vector3 AttackRotation = Vector3.zero;
+            public string SFXPrefabName = string.Empty;
+            public Vector3 SFXPosition = Vector3.zero;
+            public Vector3 SFXRotation = Vector3.zero;
+            public int AttackValue = 0;
         }
 
         protected override void LoadTableDataDic()
@@ -218,7 +261,7 @@ namespace Table
             Data[] datas = LoadTableDatas();
             foreach (Data data in datas)
             {
-                baseData_dic.Add(data.id, data);
+                baseData_dic.Add(data.ID, data);
             }
         }
     }
@@ -256,41 +299,17 @@ namespace Table
     //    //}
     //}
 
-    //public class ActorTable : BaseTable<ActorTable.Data>
-    //{
-    //    [Serializable]
-    //    public class Data : BaseData
-    //    {
-    //        public int id = 0;
-    //        public Define.Actor actorType = Define.Actor.None;
-    //        public string animatorController = string.Empty;
-    //        public string animatorAvatar = string.Empty;
-    //        public Define.BaseAnim initStateType = Define.BaseAnim.Idle;
-    //        //public int level = 0;
-    //        //public int coin = 0;
-    //        //public int statID = 0;
-    //        public int weaponID = 0;
-    //    }
-
-    //    protected override void LoadTableDataDic()
-    //    {
-    //        Data[] datas = LoadTableDatas();
-    //        foreach (Data data in datas)
-    //        {
-    //            baseData_dic.Add(data.id, data);
-    //        }
-    //    }
-    //}
-
     //public class SpawningTable_Legacy : BaseTable<SpawningTable_Legacy.Data>
     //{
     //    [Serializable]
     //    public class Data : BaseData
     //    {
-    //        public int id = 0;
-    //        public int spawnerID = 0;
-    //        public Define.Prefabs prefabType = Define.Prefabs.None;
-    //        public int prefabID = 0;
+    //        public int ID = 0;
+    //        //public Define.Spawning SpawningType = Define.Spawning.None;
+    //        //public int SpawningID = 0;
+    //        public int SpawnerID = 0;
+    //        //public Define.Prefabs prefabType = Define.Prefabs.None;
+    //        //public int prefabID = 0;
     //    }
 
     //    protected override void LoadTableDataDic()
@@ -298,13 +317,7 @@ namespace Table
     //        Data[] datas = LoadTableDatas();
     //        foreach (Data data in datas)
     //        {
-    //            baseData_dic.Add(data.id, data);
-
-    //            Debug.Log($"Success({this.GetType()})\n"
-    //            + $"id : {data.id}\n"
-    //            + $"spawnerID : {data.spawnerID}\n"
-    //            + $"prefabType : {data.prefabType}\n"
-    //            + $"prefabID : {data.prefabID}\n");
+    //            baseData_dic.Add(data.ID, data);
     //        }
     //    }
     //}

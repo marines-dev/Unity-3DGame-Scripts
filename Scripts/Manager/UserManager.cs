@@ -10,7 +10,7 @@ namespace ServerData
     {
         // Player (총 7개)
         public int spawnerID = 0;
-        public Define.Prefabs prefabType = Define.Prefabs.None;
+        public Define.Prefab prefabType = Define.Prefab.None;
         public int  characterID = 0;
         public int  levelValue  = 0;
         public int  expValue    = 0;
@@ -103,20 +103,20 @@ public class UserManager : Manager
     {
         if (pHpValue == UserData.hpValue)
         {
-            Debug.LogWarning($"Faild : 변경하려는 Exp({pHpValue}) 값이 유저의 현재 Exp({UserData.hpValue})와 같으므로 변경할 수 없습니다.");
+            Util.LogWarning($"변경하려는 Exp({pHpValue}) 값이 유저의 현재 Exp({UserData.hpValue})와 같으므로 변경할 수 없습니다.");
             return UserData.hpValue;
         }
 
         Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
         Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
-        if (pHpValue > statData.maxHp)
+        if (pHpValue > statData.MaxHp)
         {
-            Debug.Log($"Warning : HP({pHpValue}) 값 초과로 MaxHP({statData.maxHp})으로 저장합니다.");
-            UserData.hpValue  = statData.maxHp;
+            Util.LogWarning($"HP({pHpValue}) 값 초과로 MaxHP({statData.MaxHp})으로 저장합니다.");
+            UserData.hpValue  = statData.MaxHp;
         }
         else if(pHpValue < 0)
         {
-            Debug.Log($"Warning : HP({pHpValue}) 값 초과로 0으로 저장합니다.");
+            Util.LogWarning($"HP({pHpValue}) 값 초과로 0으로 저장합니다.");
             UserData.hpValue = 0;
         }
         else
@@ -128,7 +128,7 @@ public class UserManager : Manager
         UpdateUserData();
 
         //
-        Debug.Log($"Success : 유저의 변경된 hpValue는 {UserData.hpValue}입니다.");
+        Util.LogSuccess($"유저의 변경된 hpValue는 {UserData.hpValue}입니다.");
         return UserData.hpValue;
     }
 
@@ -139,21 +139,22 @@ public class UserManager : Manager
     {
         if (pExpValue <= UserData.expValue)
         {
-            Debug.LogWarning($"Faild : 변경하려는 Exp({pExpValue}) 값이 유저의 현재 Exp({UserData.expValue})와 작거나 같으므로 변경할 수 없습니다.");
+            Util.LogWarning($"변경하려는 Exp({pExpValue}) 값이 유저의 현재 Exp({UserData.expValue})와 작거나 같으므로 변경할 수 없습니다.");
             return UserData.expValue;
         }
 
         Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
-        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
-        if (pExpValue > statData.maxExp)
+        //Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
+        int maxExp_Temp =500;
+        if (pExpValue > maxExp_Temp)
         {
-            Debug.Log($"Warning : exp({pExpValue}) 값 초과로 MaxExp({statData.maxExp})으로 저장합니다.");
+            Util.LogWarning($"exp({pExpValue}) 값 초과로 MaxExp({maxExp_Temp})으로 저장합니다.");
             Debug.Log($"Warning : 유저의 레벨을 증가해 주세요!");
-            UserData.expValue = statData.maxExp;
+            UserData.expValue = maxExp_Temp;
         }
         else if (pExpValue < 0)
         {
-            Debug.Log($"Warning : exp({pExpValue}) 값 초과로 0으로 저장합니다.");
+            Util.LogWarning($"exp({pExpValue}) 값 초과로 0으로 저장합니다.");
             UserData.expValue = 0;
         }
         else
@@ -165,7 +166,7 @@ public class UserManager : Manager
         UpdateUserData();
 
         //
-        Debug.Log($"Success : 유저의 변경된 Exp는 {UserData.expValue}입니다.");
+        Util.LogSuccess($"유저의 변경된 Exp는 {UserData.expValue}입니다.");
         return UserData.expValue;
     }
 
@@ -173,10 +174,11 @@ public class UserManager : Manager
     public int SetUserLevelUp()
     {
         Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
-        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
-        if (UserData.expValue < statData.maxExp)
+        //Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
+        int maxExp_Temp = 500;
+        if (UserData.expValue < maxExp_Temp)
         {
-            Debug.LogWarning($"Failed : 유저의 Exp({UserData.expValue})가 MaxExp({statData.maxExp})보다 작아 LevelUp할 수 없습니다.");
+            Util.LogWarning($"유저의 Exp({UserData.expValue})가 MaxExp({maxExp_Temp})보다 작아 LevelUp할 수 없습니다.");
             return UserData.levelValue;
         }
 
@@ -187,8 +189,8 @@ public class UserManager : Manager
         UpdateUserData();
 
         //
-        Debug.Log($"Success : 유저의 변경된 levelValue는 {UserData.levelValue}입니다.");
-        Debug.Log($"Success : 유저의 expValue가 {UserData.expValue}으로 초기화되었습니다. 변경된 값으로 적용해 주세요.");
+        Util.LogSuccess($"유저의 변경된 levelValue는 {UserData.levelValue}입니다.");
+        Util.LogSuccess($"유저의 expValue가 {UserData.expValue}으로 초기화되었습니다. 변경된 값으로 적용해 주세요.");
         return UserData.levelValue;
     }
 
@@ -197,7 +199,7 @@ public class UserManager : Manager
     {
         if (pWeaponID < 0) // Table 범위 검사 필요
         {
-            Debug.LogWarning("Failed : ");
+            Util.LogWarning();
             return;
         }
 
@@ -310,7 +312,7 @@ public class UserManager : Manager
         }
 
         UserData.spawnerID = int.Parse(gameDataJson[0]["spawnerID"].ToString());
-        UserData.prefabType = (Define.Prefabs)Enum.Parse(typeof(Define.Prefabs), gameDataJson[0]["prefabType"].ToString());
+        UserData.prefabType = (Define.Prefab)Enum.Parse(typeof(Define.Prefab), gameDataJson[0]["prefabType"].ToString());
         UserData.characterID = int.Parse(gameDataJson[0]["characterID"].ToString());
         UserData.levelValue = int.Parse(gameDataJson[0]["levelUpCount"].ToString());
         UserData.expValue = int.Parse(gameDataJson[0]["expValue"].ToString());
