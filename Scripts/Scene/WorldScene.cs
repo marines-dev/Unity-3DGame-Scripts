@@ -155,7 +155,6 @@ public class WorldScene : BaseScene<WorldScene>
             case Actor.Player:
                 {
                     /// Respawn
-                    Manager.UserMng.UpdateUserData();
                     Manager.SceneMng.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
                 }
                 break;
@@ -216,26 +215,6 @@ public class WorldScene : BaseScene<WorldScene>
         }
 
         return baseActor;
-    }
-
-    public int GetUserExpValue()
-    {
-        return Manager.UserMng.UserData.expValue;
-    }
-
-    public int GetUserLevelValue()
-    {
-        return Manager.UserMng.UserData.levelValue;
-    }
-
-    public int GetUserHpValue()
-    {
-        return Manager.UserMng.UserData.hpValue;
-    }
-
-    public int SetGetUserHP(int pHP)
-    {
-        return Manager.UserMng.SetUserHP(pHP);
     }
 
     [Obsolete("임시")]

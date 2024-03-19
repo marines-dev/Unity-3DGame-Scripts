@@ -87,9 +87,9 @@ public class Player : BaseActor, IPlayerCtrl
         {
             Temp_Tag = "Player";
 
-            temp_userExpValue = WorldScene.Instance.GetUserExpValue();
-            temp_userLevelValue = WorldScene.Instance.GetUserLevelValue();
-            int currentHp = WorldScene.Instance.GetUserHpValue();
+            temp_userExpValue = GlobalScene.Instance.UserData.ExpValue;
+            temp_userLevelValue = GlobalScene.Instance.UserData.LevelValue;
+            int currentHp = GlobalScene.Instance.UserData.CurrHP;
 
             SetHP(currentHp);
         }
@@ -106,7 +106,8 @@ public class Player : BaseActor, IPlayerCtrl
     {
         base.SetDead();
 
-        int currentHp = WorldScene.Instance.SetGetUserHP(Stat.maxHp);
+        GlobalScene.Instance.UpdateUserData_CurrHPValue(Stat.maxHp);
+        int currentHp = GlobalScene.Instance.UserData.CurrHP;
         SetHP(currentHp);
 
         if (deadAction != null)

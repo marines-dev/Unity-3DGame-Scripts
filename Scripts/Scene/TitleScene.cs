@@ -182,11 +182,7 @@ public class TitleScene : BaseScene<TitleScene>
         titleUI.SetTitleUI(currTitleProcessType);
         yield return new WaitForSeconds(2f); // 테스트 코드
 
-        if (Manager.UserMng.LoadUserData() == false) // 유저 데이터 로드 실패할 경우
-        {
-            // 유저 데이터 생성 및 저장
-            Manager.UserMng.CreateUserData();
-        }
+        Manager.UserMng.LoadUserData();
     }
 
     IEnumerator LoadGameSceneProcessCoroutine()
@@ -209,6 +205,7 @@ public class TitleScene : BaseScene<TitleScene>
         testDebugProcessCoroutine = TestDebugProcessCorouine();
         StartCoroutine(testDebugProcessCoroutine);
     }
+
     IEnumerator TestDebugProcessCorouine()
     {
         while(true)
@@ -218,6 +215,7 @@ public class TitleScene : BaseScene<TitleScene>
             yield return null;
         }
     }
+
     void UpdateTitleProcessDebug()
     {
         try

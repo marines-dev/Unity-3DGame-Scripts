@@ -59,18 +59,6 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         set { transform.rotation = Quaternion.Euler(value); }
     }
 
-    //public bool IsActive { get { return gameObject.activeInHierarchy; } }
-    //public Vector3 LocalPosition
-    //{
-    //    get { return transform.localPosition; }
-    //    set { transform.localPosition = value; }
-    //}
-    //public Vector3 LocalRotation
-    //{
-    //    get { return transform.localEulerAngles; }
-    //    set { transform.localEulerAngles = value; }
-    //}
-
     public struct ActorStat //액터마다 Stat구성 다름
     {
         public int maxHp;
@@ -231,7 +219,7 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
             case Actor.Player:
                 {
                     characterData = GlobalScene.Instance.CharacterTable.GetTableData(1); //임시
-                    statData = GlobalScene.Instance.StatTable.GetTableData(1); //임시
+                    statData = GlobalScene.Instance.StatTable.GetTableData(1); //임시 
                     weaponData = GlobalScene.Instance.WeaponTable.GetTableData(2); //임시
                 }
                 break;

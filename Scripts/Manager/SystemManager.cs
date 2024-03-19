@@ -16,8 +16,8 @@ public class SystemManager : Manager
         if (pause) // 앱이 비활성화 되었을 때 처리
         {
             isPaused = true;
-            if (SceneMng.IsActiveScene<WorldScene>())
-                UserMng.UpdateUserData();
+            //if (SceneMng.IsActiveScene<WorldScene>())
+                //UserMng.UpdateUserData();
         }
         else // 앱이 활성화 되었을 때 처리
         {
@@ -31,7 +31,7 @@ public class SystemManager : Manager
     [Obsolete("테스트 중")]
     void OnApplicationQuit() // 앱이 종료 될 때 처리
     {
-        if (SceneMng.IsActiveScene<WorldScene>())
-            UserMng.UpdateUserData(); //Managers.User.SaveUserData();
+        //if (SceneMng.IsActiveScene<WorldScene>())
+            //UserMng.UpdateUserData(); //Managers.User.SaveUserData();
     }
 }

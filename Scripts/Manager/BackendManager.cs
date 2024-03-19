@@ -24,7 +24,7 @@ public class BackendManager : Manager
 
         if (bro.IsSuccess())
         {
-            Util.LogSuccess($"Success: InitBackendSDK - {bro}");
+            Util.LogSuccess($"InitBackendSDK - {bro}");
         }
         else
         {
@@ -158,11 +158,11 @@ public class BackendManager : Manager
     }
 
     // Nickname
-    public bool CreateNickname(string _nickname)
+    public bool CreateNickname(string pNickname)
     {
-        Util.LogMessage("Input Nickname : " + _nickname);
+        Util.LogMessage("Input Nickname : " + pNickname);
 
-        bro = Backend.BMember.CreateNickname(_nickname);
+        bro = Backend.BMember.CreateNickname(pNickname);
         bool isSuccess = bro.IsSuccess();
         if (isSuccess)
         {
@@ -196,10 +196,10 @@ public class BackendManager : Manager
 
     #region Data
 
-    public LitJson.JsonData LoadBackendData(string _table)
+    public LitJson.JsonData LoadBackendData(string pTable)
     {
         Util.LogSuccess("게임 정보 조회 함수를 호출합니다.");
-        var bro = Backend.GameData.GetMyData(_table, new Where()); // _table = "USER_DATA"
+        var bro = Backend.GameData.GetMyData(pTable, new Where()); // _table = "USER_DATA"
         if (bro.IsSuccess())
         {
             Util.LogSuccess("게임 정보 조회에 성공했습니다. : " + bro);
@@ -223,26 +223,33 @@ public class BackendManager : Manager
         return null;
     }
 
-    public void SaveBackendData(string _table, ref Param _param)
+    public void SaveBackendData(string pTable, ref Param pParam)
     {
-        Util.LogWarning("서버 업데이트 목록에 해당 데이터들을 추가합니다.");
+        if (pParam == null)
+        {
+            Util.LogError();
+            return;
+        }
+
+        Util.LogMessage("서버 업데이트 목록에 게임 정보를 저장합니다.");
+
         // 게임정보 데이터 삽입을 요청합니다.
-        var bro = Backend.GameData.Insert(_table, _param);
+        var bro = Backend.GameData.Insert(pTable, pParam);
 
         if (bro.IsSuccess())
         {
-            Util.LogSuccess("게임정보 데이터 삽입에 성공했습니다. : " + bro);
+            Util.LogSuccess("게임 정보 저장에 성공했습니다. : " + bro);
 
             //삽입한 게임정보의 고유값입니다.  
             gameDataRowInDate = bro.GetInDate();
         }
         else
         {
-            Util.LogError("게임정보 데이터 삽입에 실패했습니다. : " + bro);
+            Util.LogError("게임 정보 저장에 실패했습니다. : " + bro);
         }
     }
 
-    public void UpdateBackendData(string _table, ref Param _param)
+    public void UpdateBackendData(string pTable, ref Param pParam)
     {
         BackendReturnObject bro = null;
 
@@ -250,13 +257,13 @@ public class BackendManager : Manager
         {
             Util.LogSuccess("내 제일 최신 게임정보 데이터 수정을 요청합니다.");
 
-            bro = Backend.GameData.Update(_table, new Where(), _param);
+            bro = Backend.GameData.Update(pTable, new Where(), pParam);
         }
         else
         {
             Util.LogSuccess($"{gameDataRowInDate}의 게임정보 데이터 수정을 요청합니다.");
 
-            bro = Backend.GameData.UpdateV2(_table, gameDataRowInDate, Backend.UserInDate, _param);
+            bro = Backend.GameData.UpdateV2(pTable, gameDataRowInDate, Backend.UserInDate, pParam);
         }
 
         if (bro.IsSuccess())

@@ -6,22 +6,53 @@ public static class Config
 {
     #region User
 
-    public static readonly string user_tableName = "UserData";
+    public static readonly string User_TableName = "UserData";
+    public static readonly int User_MaxExp_init = 500;
+    public static ServerData.UserData UserDataValue
+    {
+        get
+        {
+            ServerData.UserData newUserData = new ServerData.UserData();
+            newUserData.CharacterID = 1;
+            newUserData.StatID = 1;
+            newUserData.WeaponID = 2;
 
-    #endregion User
+            Table.StatTable.Data statData = GlobalScene.Instance.StatTable.GetTableData(newUserData.StatID); //юс╫ц 
+            newUserData.CurrHP = statData.MaxHp;
+            newUserData.LevelValue = 1;
+            newUserData.ExpValue = 0;
+            newUserData.CoinValue = 1000;
+            newUserData.SpawnPos = new Vector3(7.5f, 0f, 1f);
+            newUserData.SpawnRot = Quaternion.identity.eulerAngles;
 
-    #region GamePlayer
+            return newUserData;
+        }
+    }
 
-    public static readonly int gamePlayer_spawnerID = 1;
-    public static readonly Define.Prefab gamePlayer_prefabType = Define.Prefab.Character;
-    public static readonly int gamePlayer_characterID   = 1;
-    public static readonly int gamePlayer_levelUpCount  = 1;
-    public static readonly int gamePlayer_expValue      = 0;
-    public static readonly int gamePlayer_coinValue     = 1000;
-    public static readonly int gamePlayer_hpValue       = 300;
-    public static readonly int gamePlayer_weaponID      = 0;
+    //public static readonly string UserDataKey_CharacterID = "CharacterID";
+    //public static readonly string UserDataKey_StatID = "StatID";
+    //public static readonly string UserDataKey_WeaponID = "WeaponID";
+    //public static readonly string UserDataKey_CurrHP = "CurrHP";
+    //public static readonly string UserDataKey_LevelValue = "LevelValue";
+    //public static readonly string UserDataKey_ExpValue = "ExpValue";
+    //public static readonly string UserDataKey_CoinValue = "CoinValue";
+    //public static readonly string UserDataKey_SpawnPos = "SpawnPos";
+    //public static readonly string UserDataKey_SpawnRot = "SpawnRot";
 
-    #endregion GamePlayer
+    #endregion User 
+
+    //#region GamePlayer
+
+    //public static readonly int gamePlayer_spawnerID = 1;
+    //public static readonly Define.Prefab gamePlayer_prefabType = Define.Prefab.Character;
+    //public static readonly int gamePlayer_characterID   = 1;
+    //public static readonly int gamePlayer_levelUpCount  = 1;
+    //public static readonly int gamePlayer_expValue      = 0;
+    //public static readonly int gamePlayer_coinValue     = 1000;
+    //public static readonly int gamePlayer_hpValue       = 300;
+    //public static readonly int gamePlayer_weaponID      = 0;
+
+    //#endregion GamePlayer
 
     #region Camera
 
@@ -35,7 +66,7 @@ public static class Config
 
     #region UI/GUI
 
-    public static readonly string ui_uiStorageName = "@UIStorage";
+    //public static readonly string ui_uiStorageName = "@UIStorage";
     //public static readonly string gui_controller = "@Controller";
 
     #endregion UI/GUI

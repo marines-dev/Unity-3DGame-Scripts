@@ -1,49 +1,7 @@
 using System;
-using BackEnd;
 using Interface;
-using Table;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
-public class GlobalScene : BaseScene<GlobalScene>
-{
-    /// <summary>
-    /// Table
-    /// </summary>
-    //SpawnerTable spawnerTable = null;
-    //public SpawningTable_Legacy SpawningTable { get { return Manager.TableMng.CreateOrGetBaseTable<SpawningTable_Legacy>(); } }
-    public SpawnerTable SpawnerTable { get { return Manager.TableMng.CreateOrGetBaseTable<SpawnerTable>(); } }
-    public EnemyTable EnemyTable { get { return Manager.TableMng.CreateOrGetBaseTable<EnemyTable>(); } }
-    public CharacterTable CharacterTable { get { return Manager.TableMng.CreateOrGetBaseTable<CharacterTable>(); } }
-    public StatTable StatTable { get { return Manager.TableMng.CreateOrGetBaseTable<StatTable>(); } }
-    public WeaponTable WeaponTable { get { return Manager.TableMng.CreateOrGetBaseTable<WeaponTable>(); } }
-
-
-    protected override void OnAwake()
-    {
-        RegisteredGlobalObjects();
-    }
-    protected override void OnStart() { }
-    protected override void OnDestroy_() { }
-
-    [Obsolete("임시")]
-    public TResource LoadResource<TResource>(string path) where TResource : UnityEngine.Object
-    {
-        return Manager.ResourceMng.Load<TResource>(path);
-    }
-
-    [Obsolete("임시")]
-    public GameObject InstantiateResource(string pPath, Transform pParent = null)
-    {
-        return Manager.ResourceMng.Instantiate(pPath, pParent);
-    }
-
-    [Obsolete("임시")]
-    public void DestroyGameObject(GameObject pGameObject)
-    {
-        Manager.ResourceMng.DestroyGameObject(pGameObject);
-    }
-}
 
 public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene : BaseScene<TScene>
 {

@@ -3,214 +3,156 @@ using System.Text;
 using UnityEngine;
 using BackEnd;
 using ServerData;
+using System.Linq;
+
 
 namespace ServerData
 {
     public class UserData
     {
-        // Player (총 7개)
-        public int spawnerID = 0;
-        public Define.Prefab prefabType = Define.Prefab.None;
-        public int  characterID = 0;
-        public int  levelValue  = 0;
-        public int  expValue    = 0;
-        public int  coinValue   = 0;
-        public int  hpValue     = 0;
-        public int  weaponID    = 0;
+        public int CharacterID = 0;
+        public int StatID = 0;
+        public int WeaponID = 0;
+        public int CurrHP = 0;
+        public int LevelValue = 0;
+        public int ExpValue = 0;
+        public int CoinValue = 0;
+        public Vector3 SpawnPos = Vector3.zero;
+        public Vector3 SpawnRot = Vector3.zero;
+
+        public UserData Copy()
+        {
+            return this.MemberwiseClone() as UserData;
+        }
     }
 }
-
 
 public class UserManager : Manager
 {
     // Backend
-    string InData { get { return BackendMng.GetInData(); } }
-    string NickName { get { return BackendMng.GetNickname(); } }
+    private string InData { get { return BackendMng.GetInData(); } }
+    private string NickName { get { return BackendMng.GetNickname(); } }
 
-    // ServerData.UserData
-    public ServerData.UserData UserData { get; private set; } = new ServerData.UserData();
-    //public int SpawnerID { get { return UserData.spawnerID; } }
-    //public Define.Prefabs PrefabType { get { return UserData.prefabType; } }
-    //public int CharacterID { get { return UserData.characterID; } }
-    //public int LevelValue { get { return UserData.levelValue; } }
-    //public int ExpValue { get { return UserData.expValue; } }
-    //public int CoinValue { get { return UserData.coinValue; } }
-    //public int HpValue { get { return UserData.hpValue; } }
-    //public int WeaponID { get { return UserData.weaponID; } }
+    private UserData userData = new UserData();
+    public UserData UserData {  get { return userData.Copy(); } }
 
-
-    protected override void OnInitialized()
-    {
-        if (UserData == null)
-            UserData = new ServerData.UserData();
-    }
-
+    protected override void OnInitialized() { }
     public override void OnRelease() { }
 
-    // Debug.Log(ToString())
-    [Obsolete("테스트 : 데이터 디버깅")]
-    public override string ToString()
-    {
-        StringBuilder result = new StringBuilder();
-
-        // User
-        result.AppendLine($"inData : {InData.ToString()}");
-        result.AppendLine($"nickName : {NickName.ToString()}");
-
-        // Player
-        result.AppendLine($"spawnerID : {UserData.spawnerID.ToString()}");
-        result.AppendLine($"characterID : {UserData.characterID.ToString()}");
-        result.AppendLine($"currentLevel : {UserData.levelValue.ToString()}");
-        result.AppendLine($"currentExp : {UserData.expValue.ToString()}");
-        result.AppendLine($"currentCoin : {UserData.coinValue.ToString()}");
-        result.AppendLine($"currentHP : {UserData.hpValue.ToString()}");
-        result.AppendLine($"weaponID : {UserData.weaponID.ToString()}");
-
-        //result.AppendLine($"inventory");
-        //foreach (var itemKey in test_inventory.Keys)
-        //{
-        //    result.AppendLine($"| {itemKey} : {test_inventory[itemKey]}개");
-        //}
-        //result.AppendLine($"equipment");
-        //foreach (var equip in test_equipment)
-        //{
-        //    result.AppendLine($"| {equip}");
-        //}
-
-        return result.ToString();
-    }
-
-    //ServerData.UserData GetUserData() 
-    //{
-    //    ServerData.UserData _userData = new ServerData.UserData();
-
-    //    // GamePlayer
-    //    _userData.spawnerID = userData.spawnerID;
-    //    _userData.prefabType = userData.prefabType;
-    //    _userData.characterID = userData.characterID;
-    //    _userData.levelValue = userData.levelValue;
-    //    _userData.expValue = userData.expValue;
-    //    _userData.coinValue = userData.coinValue;
-    //    _userData.hpValue = userData.hpValue;
-
-    //    return _userData; 
-    //}
 
     /// <summary>
-    // 변경할 Hp 값을 검사하여 유저 Hp 스탯에 저장합니다. 반환된 값으로 다시 사용해주세요.
+    // 변경할 CurrHPValue 값을 검사하여 유저 CurrHPValue 스탯에 저장합니다. 반환된 값으로 다시 사용해주세요.
     /// </summary>
-    public int SetUserHP(int pHpValue)
+    public int UpdateUserData_CurrHPValue(int pCurrHP)
     {
-        if (pHpValue == UserData.hpValue)
+        if (pCurrHP == userData.CurrHP)
         {
-            Util.LogWarning($"변경하려는 Exp({pHpValue}) 값이 유저의 현재 Exp({UserData.hpValue})와 같으므로 변경할 수 없습니다.");
-            return UserData.hpValue;
+            Util.LogWarning($"변경하려는 Exp({pCurrHP}) 값이 유저의 현재 Exp({userData.CurrHP})와 같습니다.");
+            return userData.CurrHP;
         }
 
-        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
-        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
-        if (pHpValue > statData.MaxHp)
+        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
+        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(userData.StatID);
+        if (pCurrHP > statData.MaxHp)
         {
-            Util.LogWarning($"HP({pHpValue}) 값 초과로 MaxHP({statData.MaxHp})으로 저장합니다.");
-            UserData.hpValue  = statData.MaxHp;
+            Util.LogWarning($"HP({pCurrHP}) 값 초과로 MaxHP({statData.MaxHp})으로 저장합니다.");
+            userData.CurrHP = statData.MaxHp;
         }
-        else if(pHpValue < 0)
+        else if (pCurrHP < 0)
         {
-            Util.LogWarning($"HP({pHpValue}) 값 초과로 0으로 저장합니다.");
-            UserData.hpValue = 0;
+            Util.LogWarning($"HP({pCurrHP}) 값 초과로 0으로 저장합니다.");
+            userData.CurrHP = 0;
         }
         else
         {
-            UserData.hpValue = pHpValue;
+            userData.CurrHP = pCurrHP;
         }
 
         //
         UpdateUserData();
 
         //
-        Util.LogSuccess($"유저의 변경된 hpValue는 {UserData.hpValue}입니다.");
-        return UserData.hpValue;
+        Util.LogSuccess($"유저의 변경된 hpValue는 {userData.CurrHP}입니다.");
+        return userData.CurrHP;
     }
 
     /// <summary>
     // 변경할 Exp 값을 검사하여 유저 Exp 스탯에 저장합니다. 반환된 값으로 다시 사용해주세요.
     /// </summary>
-    public int SetUserExp(int pExpValue)
+    public int UpdateUserData_ExpValue(int pExpValue)
     {
-        if (pExpValue <= UserData.expValue)
+        if (pExpValue <= userData.ExpValue)
         {
-            Util.LogWarning($"변경하려는 Exp({pExpValue}) 값이 유저의 현재 Exp({UserData.expValue})와 작거나 같으므로 변경할 수 없습니다.");
-            return UserData.expValue;
+            Util.LogWarning($"변경하려는 ExpValue({pExpValue}) 값이 유저의 현재 ExpValue({userData.ExpValue})와 작거나 같으므로 변경할 수 없습니다.");
+            return userData.ExpValue;
         }
 
-        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
+        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
         //Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
-        int maxExp_Temp =500;
-        if (pExpValue > maxExp_Temp)
+        int maxExp = Config.User_MaxExp_init;
+        if (pExpValue > maxExp)
         {
-            Util.LogWarning($"exp({pExpValue}) 값 초과로 MaxExp({maxExp_Temp})으로 저장합니다.");
-            Debug.Log($"Warning : 유저의 레벨을 증가해 주세요!");
-            UserData.expValue = maxExp_Temp;
+            Util.LogSuccess($"ExpValue({pExpValue}) 값 초과로 MaxExp({maxExp})으로 저장합니다.\n유저의 레벨을 증가해 주세요!");
+            userData.ExpValue = maxExp;
         }
         else if (pExpValue < 0)
         {
-            Util.LogWarning($"exp({pExpValue}) 값 초과로 0으로 저장합니다.");
-            UserData.expValue = 0;
+            Util.LogWarning($"ExpValue({pExpValue}) 값은 0 미만일 수 없습니다.");
+            userData.ExpValue = 0;
         }
         else
         {
-            UserData.expValue = pExpValue;
+            userData.ExpValue = pExpValue;
         }
 
         //
         UpdateUserData();
 
         //
-        Util.LogSuccess($"유저의 변경된 Exp는 {UserData.expValue}입니다.");
-        return UserData.expValue;
+        Util.LogSuccess($"유저의 변경된 ExpValue는 {userData.ExpValue}입니다.");
+        return userData.ExpValue;
     }
 
     [Obsolete("임시")]
-    public int SetUserLevelUp()
+    public int UpdateUserData_LevelUp()
     {
-        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(UserData.characterID);
+        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
         //Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
-        int maxExp_Temp = 500;
-        if (UserData.expValue < maxExp_Temp)
+        int maxExp = 500;
+        if (userData.ExpValue < maxExp)
         {
-            Util.LogWarning($"유저의 Exp({UserData.expValue})가 MaxExp({maxExp_Temp})보다 작아 LevelUp할 수 없습니다.");
-            return UserData.levelValue;
+            Util.LogWarning($"유저의 ExpValue({userData.ExpValue})가 MaxExp({maxExp})보다 작아 LevelUp할 수 없습니다.");
+            return userData.LevelValue;
         }
 
-        UserData.levelValue += 1;
-        UserData.expValue = 0;
+        userData.LevelValue += 1;
+        userData.ExpValue = 0;
 
         //
         UpdateUserData();
 
         //
-        Util.LogSuccess($"유저의 변경된 levelValue는 {UserData.levelValue}입니다.");
-        Util.LogSuccess($"유저의 expValue가 {UserData.expValue}으로 초기화되었습니다. 변경된 값으로 적용해 주세요.");
-        return UserData.levelValue;
+        Util.LogSuccess($"유저의 변경된 LevelValue {userData.LevelValue}입니다.");
+        Util.LogSuccess($"유저의 ExpValue {userData.ExpValue}으로 초기화되었습니다. 변경된 값으로 적용해 주세요.");
+        return userData.LevelValue;
     }
 
-    [Obsolete("임시")]
-    public void SetUserWeaponID(int pWeaponID)
+    public void UpdateUserData_WeaponID(int pWeaponID)
     {
-        if (pWeaponID < 0) // Table 범위 검사 필요
+        if (pWeaponID < 1) // Table 범위 검사
         {
             Util.LogWarning();
             return;
         }
 
-        UserData.weaponID = pWeaponID;
+        userData.WeaponID = pWeaponID;
 
         //
         UpdateUserData();
     }
 
     //[Obsolete("임시")]
-    //public void SetUserCoin(int pValue)
+    //public void UpdateUserData_CoinValue(int pValue)
     //{
     //    //
     //    int coinValue = userData.coinValue + pValue;
@@ -227,100 +169,51 @@ public class UserManager : Manager
 
     #region ServerLoad
 
-    [Obsolete("임시")]
-    public void CreateUserData()
+    public void LoadUserData() // Backend 데이터를 불러옵니다.
     {
-        // ServerData.UserData
-        UserData.spawnerID      = Config.gamePlayer_spawnerID;
-        UserData.prefabType     = Config.gamePlayer_prefabType;
-        UserData.characterID    = Config.gamePlayer_characterID;
-        UserData.levelValue     = Config.gamePlayer_levelUpCount;
-        UserData.expValue       = Config.gamePlayer_expValue;
-        UserData.coinValue      = Config.gamePlayer_coinValue;
-        UserData.hpValue        = Config.gamePlayer_hpValue;
-        UserData.weaponID       = Config.gamePlayer_weaponID;
-
-        //
-        SaveUserData();
-    }
-
-    [Obsolete("테스트 필요 : 서버 저장 방식 확인")]
-    public void SaveUserData() // Backend 데이터에 저장합니다.
-    {
-        if (UserData == null)
-        {
-            Debug.LogError("Failed : 서버에서 다운받거나 새로 삽입한 데이터가 존재하지 않습니다. Init 혹은 Load를 통해 데이터를 생성해주세요.");
-            return;
-        }
-
-        Param param = new Param();
-
-        // ServerData.UserData
-        param.Add("spawnerID", UserData.spawnerID.ToString());
-        param.Add("prefabType", UserData.prefabType.ToString());
-        param.Add("characterID", UserData.characterID.ToString());
-        param.Add("levelUpCount", UserData.levelValue.ToString());
-        param.Add("expValue", UserData.expValue.ToString());
-        param.Add("coinValue", UserData.coinValue.ToString());
-        param.Add("hpValue", UserData.hpValue.ToString());
-        param.Add("weaponID", UserData.weaponID.ToString());
-
-        // Test
-        //userData.info = "친추는 언제나 환영입니다.";
-        //userData.equipment.Add("전사의 투구");
-        //userData.inventory.Add("빨간포션", 1);
-        //Managers.Backend.SaveBackendData<string>("level", test_info);
-        //Managers.Backend.SaveBackendData<Dictionary<string, int>>("level", test_inventory);
-        //Managers.Backend.SaveBackendData<List<string>>("level", test_equipment);
-
-        // SaveBackend
-        BackendMng.SaveBackendData(Config.user_tableName, ref param);
-    }
-
-    [Obsolete("테스트 필요 : 서버 저장 방식 확인")]
-    public void UpdateUserData() // Backend 데이터에 저장합니다.
-    {
-        if (UserData == null)
-        {
-            Debug.LogError($"Failed : 서버에서 다운받거나 새로 삽입한 데이터가 존재하지 않습니다. Init 혹은 Load를 통해 데이터를 생성해주세요.");
-            return;
-        }
-
-        Param param = new Param();
-
-        // ServerData.UserData
-        param.Add("spawnerID", UserData.spawnerID.ToString());
-        param.Add("prefabType", UserData.prefabType.ToString());
-        param.Add("characterID", UserData.characterID.ToString());
-        param.Add("levelUpCount", UserData.levelValue.ToString());
-        param.Add("expValue", UserData.expValue.ToString());
-        param.Add("coinValue", UserData.coinValue.ToString());
-        param.Add("hpValue", UserData.hpValue.ToString());
-        param.Add("weaponID", UserData.weaponID.ToString());
-
-        // UpdateBackend
-        BackendMng.UpdateBackendData(Config.user_tableName, ref param);
-    }
-
-    public bool LoadUserData() // Backend 데이터를 불러옵니다.
-    {
-        LitJson.JsonData gameDataJson = BackendMng.LoadBackendData(Config.user_tableName);
+        LitJson.JsonData gameDataJson = BackendMng.LoadBackendData(Config.User_TableName);
         if (gameDataJson == null)
         {
-            Debug.LogWarning($"유저 데이터가 존재하지 않습니다.");
-            return false;
+            Util.LogWarning($"유저 데이터가 존재하지 않습니다. 새로운 유저 데이터를 생성합니다.");
+
+            /// CreateUserData
+            {
+                // ServerData.UserData
+                userData.CharacterID = Config.UserDataValue.CharacterID;
+                userData.StatID = Config.UserDataValue.StatID;
+                userData.WeaponID = Config.UserDataValue.WeaponID;
+                userData.CurrHP = Config.UserDataValue.CurrHP;
+                userData.LevelValue = Config.UserDataValue.LevelValue;
+                userData.ExpValue = Config.UserDataValue.ExpValue;
+                userData.CoinValue = Config.UserDataValue.CoinValue;
+                userData.SpawnPos = Config.UserDataValue.SpawnPos;
+                userData.SpawnRot = Config.UserDataValue.SpawnRot;
+
+                /// SaveUserData
+                Param param = AddServerData();
+                BackendMng.SaveBackendData(Config.User_TableName, ref param);
+
+                /// Reload
+                gameDataJson = BackendMng.LoadBackendData(Config.User_TableName);
+                if (gameDataJson == null)
+                {
+                    Util.LogError();
+                    return;
+                }
+            }
         }
 
-        UserData.spawnerID = int.Parse(gameDataJson[0]["spawnerID"].ToString());
-        UserData.prefabType = (Define.Prefab)Enum.Parse(typeof(Define.Prefab), gameDataJson[0]["prefabType"].ToString());
-        UserData.characterID = int.Parse(gameDataJson[0]["characterID"].ToString());
-        UserData.levelValue = int.Parse(gameDataJson[0]["levelUpCount"].ToString());
-        UserData.expValue = int.Parse(gameDataJson[0]["expValue"].ToString());
-        UserData.coinValue = int.Parse(gameDataJson[0]["coinValue"].ToString());
-        UserData.hpValue = int.Parse(gameDataJson[0]["hpValue"].ToString());
-        UserData.weaponID = int.Parse(gameDataJson[0]["weaponID"].ToString());
+        ///
+        userData.CharacterID = StringToInt(gameDataJson[0]["CharacterID"].ToString());
+        userData.StatID = StringToInt(gameDataJson[0]["StatID"].ToString());
+        userData.WeaponID = StringToInt(gameDataJson[0]["WeaponID"].ToString());
+        userData.CurrHP = StringToInt(gameDataJson[0]["CurrHP"].ToString());
+        userData.LevelValue = StringToInt(gameDataJson[0]["LevelValue"].ToString());
+        userData.ExpValue = StringToInt(gameDataJson[0]["ExpValue"].ToString());
+        userData.CoinValue = StringToInt(gameDataJson[0]["CoinValue"].ToString());
+        userData.SpawnPos = StringToVector3(gameDataJson[0]["SpawnPos"].ToString());
+        userData.SpawnRot = StringToVector3(gameDataJson[0]["SpawnRot"].ToString());
 
-        //Test
         //userData.info = gameDataJson[0]["info"].ToString();
         //foreach (string itemKey in gameDataJson[0]["inventory"].Keys)
         //{
@@ -331,11 +224,91 @@ public class UserManager : Manager
         //    userData.equipment.Add(equip.ToString());
         //}
 
-        //
-        Debug.Log(ToString());
-        return true;
+        Util.LogSuccess($"유저 데이터 로드를 성공했습니다. \n{ToString()}");
+    }
+
+    private void UpdateUserData() // Backend 데이터에 저장합니다.
+    {
+        Param param = AddServerData();
+
+        /// UpdateBackend
+        BackendMng.UpdateBackendData(Config.User_TableName, ref param);
+    }
+
+    private Param AddServerData()
+    {
+        Param param = new Param();
+
+        param.Add("CharacterID", userData.CharacterID.ToString());
+        param.Add("StatID", userData.StatID.ToString());
+        param.Add("WeaponID", userData.WeaponID.ToString());
+        param.Add("CurrHP", userData.CurrHP.ToString());
+        param.Add("LevelValue", userData.LevelValue.ToString());
+        param.Add("ExpValue", userData.ExpValue.ToString());
+        param.Add("CoinValue", userData.CoinValue.ToString());
+        param.Add("SpawnPos", userData.SpawnPos.ToString());
+        param.Add("SpawnRot", userData.SpawnRot.ToString());
+
+        return param;
     }
 
     #endregion ServerLoad
+
+    #region Parse
+
+    public int StringToInt(string pStr)
+    {
+        return int.Parse(pStr);
+    }
+
+    public Vector3 StringToVector3(string pStr)
+    {
+        pStr = pStr.Replace("(", "");
+        pStr = pStr.Replace(")", "");
+
+        Vector3 vec = Vector3.zero;
+        float[] elements = pStr.Split(',').Select(x => float.Parse(x)).ToArray();
+        if (elements != null && elements.Length == 3)
+        {
+            vec = new Vector3(elements[0], elements[1], elements[2]);
+        }
+
+        return vec;
+    }
+
+    #endregion Parse
+
+    // Debug.Log(ToString())
+    public override string ToString()
+    {
+        StringBuilder result = new StringBuilder();
+
+        // User
+        result.AppendLine($"inData : {InData.ToString()}");
+        result.AppendLine($"nickName : {NickName.ToString()}");
+
+        // Player
+        result.AppendLine($"CharacterID : {userData.CharacterID.ToString()}");
+        result.AppendLine($"StatID : {userData.StatID.ToString()}");
+        result.AppendLine($"WeaponID : {userData.WeaponID.ToString()}");
+        result.AppendLine($"CurrHP : {userData.CurrHP.ToString()}");
+        result.AppendLine($"LevelValue : {userData.LevelValue.ToString()}");
+        result.AppendLine($"CoinValue : {userData.CoinValue.ToString()}");
+        result.AppendLine($"SpawnPos : {userData.SpawnPos.ToString()}");
+        result.AppendLine($"SpawnRot : {userData.SpawnRot.ToString()}");
+
+        //result.AppendLine($"inventory");
+        //foreach (var itemKey in test_inventory.Keys)
+        //{
+        //    result.AppendLine($"| {itemKey} : {test_inventory[itemKey]}개");
+        //}
+        //result.AppendLine($"equipment");
+        //foreach (var equip in test_equipment)
+        //{
+        //    result.AppendLine($"| {equip}");
+        //}
+
+        return result.ToString();
+    }
 }
 
