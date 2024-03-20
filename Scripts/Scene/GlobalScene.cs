@@ -9,11 +9,11 @@ public class GlobalScene : BaseScene<GlobalScene>
     /// <summary>
     /// Table
     /// </summary>
-    public SpawnerTable SpawnerTable { get { return Manager.TableMng.CreateOrGetBaseTable<SpawnerTable>(); } }
-    public EnemyTable EnemyTable { get { return Manager.TableMng.CreateOrGetBaseTable<EnemyTable>(); } }
-    public CharacterTable CharacterTable { get { return Manager.TableMng.CreateOrGetBaseTable<CharacterTable>(); } }
-    public StatTable StatTable { get { return Manager.TableMng.CreateOrGetBaseTable<StatTable>(); } }
-    public WeaponTable WeaponTable { get { return Manager.TableMng.CreateOrGetBaseTable<WeaponTable>(); } }
+    public SpawnerTable     SpawnerTable    { get { return Manager.TableMng.CreateOrGetBaseTable<SpawnerTable>(); } }
+    public EnemyTable       EnemyTable      { get { return Manager.TableMng.CreateOrGetBaseTable<EnemyTable>(); } }
+    public CharacterTable   CharacterTable  { get { return Manager.TableMng.CreateOrGetBaseTable<CharacterTable>(); } }
+    public StatTable        StatTable       { get { return Manager.TableMng.CreateOrGetBaseTable<StatTable>(); } }
+    public WeaponTable      WeaponTable     { get { return Manager.TableMng.CreateOrGetBaseTable<WeaponTable>(); } }
 
     /// <summary>
     /// UserData

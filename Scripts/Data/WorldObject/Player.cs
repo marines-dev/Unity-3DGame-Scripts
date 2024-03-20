@@ -5,10 +5,7 @@ using static Define;
 
 public class Player : BaseActor, IPlayerCtrl
 {
-    //int temp_userLevelValue = 0;
-    //int temp_userExpValue = 0;
-
-    private ITarget_Temp target = null;
+    private ITarget target = null;
 
     private Action deadAction = null;
 
@@ -33,12 +30,12 @@ public class Player : BaseActor, IPlayerCtrl
         {
             if (hitCollider.tag == "Monster")
             {
-                ITarget_Temp tempTarget = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
+                ITarget tempTarget = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
                 if (tempTarget != null && tempTarget.SurvivalStateType != SurvivalState.Dead)
                 {
                     if (target != null) //가까운 타겟팅
                     {
-                        float targetDist = (target.Position - Position).magnitude;
+                        float targetDist     = (target.Position - Position).magnitude;
                         float tempTargetDist = (tempTarget.Position - Position).magnitude;
                         if (targetDist > tempTargetDist) //타겟의 거리가 더 멀면
                         {
@@ -46,10 +43,7 @@ public class Player : BaseActor, IPlayerCtrl
                             target = tempTarget;
                         }
                     }
-                    else
-                    {
-                        target = tempTarget;
-                    }
+                    else { target = tempTarget; }
 
                     target.OnEnableTargetOutline();
                 }
@@ -59,7 +53,7 @@ public class Player : BaseActor, IPlayerCtrl
         if (UpperAnimType == Define.UpperAnim.Attack && target != null)
         {
             Vector3 dir = (target.Position - Position).normalized;
-            Rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 30 * Time.deltaTime).eulerAngles;
+            Rotation    = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 30 * Time.deltaTime).eulerAngles;
         }
     }
 
@@ -91,16 +85,13 @@ public class Player : BaseActor, IPlayerCtrl
         int currentHp = GlobalScene.Instance.UserData.CurrHP;
         SetHP(currentHp);
 
-        if (deadAction != null)
-        {
-            deadAction.Invoke();
-        }
+        if (deadAction != null) { deadAction.Invoke(); }
     }
 
     protected override void SetAttack()
     {
         temp_isAttacking = true;
-        temp_isHit = false;
+        temp_isHit       = false;
 
         PlayUpperAnimation(UpperAnimType, 0.01f, 1f);
         Weap.SetAttackPos();
@@ -120,20 +111,9 @@ public class Player : BaseActor, IPlayerCtrl
         NevAgent.Move(pos);
     }
 
-    public void OnStop()
-    {
-        BaseAnimType = Define.BaseAnim.Idle;
-    }
-
-    public void OnReady()
-    {
-        UpperAnimType = Define.UpperAnim.Ready;
-    }
-
-    public void OnAttack()
-    {
-        UpperAnimType = Define.UpperAnim.Attack;
-    }
+    public void OnStop() { BaseAnimType = Define.BaseAnim.Idle; }
+    public void OnReady() { UpperAnimType = Define.UpperAnim.Ready; }
+    public void OnAttack() { UpperAnimType = Define.UpperAnim.Attack; }
 
     protected override void OnHit()
     {
@@ -142,10 +122,7 @@ public class Player : BaseActor, IPlayerCtrl
         if (target != null)
         {
             float dist = (target.Position - Position).magnitude;
-            if (dist <= 6f)
-            {
-                target.OnDamage(Stat.attack);
-            }
+            if (dist <= 6f) { target.OnDamage(Stat.attack); }
         }
     }
 
@@ -158,11 +135,12 @@ public class Player : BaseActor, IPlayerCtrl
         }
 
         int userExpValue = GlobalScene.Instance.UserData.ExpValue;
-        int expValue = userExpValue + pAddExpValue;
+        int expValue     = userExpValue + pAddExpValue;
         if (expValue < Config.User_MaxExp_init)
         {
             GlobalScene.Instance.UpdateUserData_ExpValue(expValue);
             userExpValue = GlobalScene.Instance.UserData.ExpValue;
+
             Util.LogSuccess($"userExpValue 증가 : {userExpValue}");
         }
         else
@@ -174,10 +152,10 @@ public class Player : BaseActor, IPlayerCtrl
     private void SetLevelUp()
     {
         int userExpValue = GlobalScene.Instance.UserData.ExpValue;
-        int maxExp = Config.User_MaxExp_init;
+        int maxExp       = Config.User_MaxExp_init;
         if (userExpValue < maxExp)
         {
-            Debug.LogWarning($"Failed : 플레이어의 Exp({userExpValue})가 MaxExp({maxExp})보다 작아 LevelUp할 수 없습니다.");
+            Util.LogWarning($"플레이어의 Exp({userExpValue})가 MaxExp({maxExp})보다 작아 LevelUp할 수 없습니다.");
             return;
         }
 

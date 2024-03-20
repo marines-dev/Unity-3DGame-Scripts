@@ -9,16 +9,15 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
         /// </sammary>
         LoadingUI,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
-        //LoadingUI_Object_BGAnimation,
+        /// Object
 
-        // Button
+        /// Button
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
     }
 
@@ -31,6 +30,7 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
             {
                 bool isCompleted = anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9f;
                 if(isCompleted) { anim.speed = 0f; }
+                
                 return isCompleted;
             }
             return true;
@@ -43,49 +43,13 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
         //BindEventControl<Button>(Control., OnClick_);
     }
 
-    protected override void OnAwake()
-    {
-    }
-
-    protected override void OnOpen()
-    {
-        //yield return null;
-
-        //
-    }
-
-    protected override void OnClose()
-    {
-        //yield return null;
-
-        //
-    }
-
-    //void Update()
-    //{
-    //}
-
-    //public bool IsLoadingUI_AnimationCompleted()
-    //{
-    //    Animator anim = GetUIComponent<Animator>(UI.LoadingUI);
-    //    if (anim != null)
-    //    {
-    //        return anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f;
-    //    }
-
-    //    return true;
-    //}
+    protected override void OnAwake() { }
+    protected override void OnOpen() { }
+    protected override void OnClose() { }
 
     #region Button
-
-    //void OnClick_()
-    //{
-    //    Debug.LogWarning("개발 진행 중 입니다.");
-    //}
-
     #endregion Button
 
     #region LoadingUI
-
     #endregion LoadingUI
 }

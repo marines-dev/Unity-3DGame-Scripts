@@ -10,35 +10,31 @@ namespace ServerData
 {
     public class UserData
     {
-        public int CharacterID = 0;
-        public int StatID = 0;
-        public int WeaponID = 0;
-        public int CurrHP = 0;
-        public int LevelValue = 0;
-        public int ExpValue = 0;
-        public int CoinValue = 0;
+        public int CharacterID  = 0;
+        public int StatID       = 0;
+        public int WeaponID     = 0;
+        public int CurrHP       = 0;
+        public int LevelValue   = 0;
+        public int ExpValue     = 0;
+        public int CoinValue    = 0;
         public Vector3 SpawnPos = Vector3.zero;
         public Vector3 SpawnRot = Vector3.zero;
 
-        public UserData Copy()
-        {
-            return this.MemberwiseClone() as UserData;
-        }
+        public UserData Copy() { return this.MemberwiseClone() as UserData; }
     }
 }
 
 public class UserManager : Manager
 {
     // Backend
-    private string InData { get { return BackendMng.GetInData(); } }
+    private string InData   { get { return BackendMng.GetInData(); } }
     private string NickName { get { return BackendMng.GetNickname(); } }
 
     private UserData userData = new UserData();
-    public UserData UserData {  get { return userData.Copy(); } }
+    public  UserData UserData {  get { return userData.Copy(); } }
 
     protected override void OnInitialized() { }
     public override void OnRelease() { }
-
 
     /// <summary>
     // 변경할 CurrHPValue 값을 검사하여 유저 CurrHPValue 스탯에 저장합니다. 반환된 값으로 다시 사용해주세요.
@@ -52,7 +48,7 @@ public class UserManager : Manager
         }
 
         Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
-        Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(userData.StatID);
+        Table.StatTable.Data      statData      = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(userData.StatID);
         if (pCurrHP > statData.MaxHp)
         {
             Util.LogWarning($"HP({pCurrHP}) 값 초과로 MaxHP({statData.MaxHp})으로 저장합니다.");
@@ -88,7 +84,6 @@ public class UserManager : Manager
         }
 
         Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
-        //Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1); //임시
         int maxExp = Config.User_MaxExp_init;
         if (pExpValue > maxExp)
         {
@@ -117,7 +112,6 @@ public class UserManager : Manager
     public int UpdateUserData_LevelUp()
     {
         Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
-        //Table.StatTable.Data statData = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(1);
         int maxExp = 500;
         if (userData.ExpValue < maxExp)
         {
@@ -126,7 +120,7 @@ public class UserManager : Manager
         }
 
         userData.LevelValue += 1;
-        userData.ExpValue = 0;
+        userData.ExpValue   = 0;
 
         //
         UpdateUserData();
@@ -147,7 +141,7 @@ public class UserManager : Manager
 
         userData.WeaponID = pWeaponID;
 
-        //
+        ///
         UpdateUserData();
     }
 
@@ -180,14 +174,14 @@ public class UserManager : Manager
             {
                 // ServerData.UserData
                 userData.CharacterID = Config.UserDataValue.CharacterID;
-                userData.StatID = Config.UserDataValue.StatID;
-                userData.WeaponID = Config.UserDataValue.WeaponID;
-                userData.CurrHP = Config.UserDataValue.CurrHP;
-                userData.LevelValue = Config.UserDataValue.LevelValue;
-                userData.ExpValue = Config.UserDataValue.ExpValue;
-                userData.CoinValue = Config.UserDataValue.CoinValue;
-                userData.SpawnPos = Config.UserDataValue.SpawnPos;
-                userData.SpawnRot = Config.UserDataValue.SpawnRot;
+                userData.StatID      = Config.UserDataValue.StatID;
+                userData.WeaponID    = Config.UserDataValue.WeaponID;
+                userData.CurrHP      = Config.UserDataValue.CurrHP;
+                userData.LevelValue  = Config.UserDataValue.LevelValue;
+                userData.ExpValue    = Config.UserDataValue.ExpValue;
+                userData.CoinValue   = Config.UserDataValue.CoinValue;
+                userData.SpawnPos    = Config.UserDataValue.SpawnPos;
+                userData.SpawnRot    = Config.UserDataValue.SpawnRot;
 
                 /// SaveUserData
                 Param param = AddServerData();
@@ -205,14 +199,14 @@ public class UserManager : Manager
 
         ///
         userData.CharacterID = StringToInt(gameDataJson[0]["CharacterID"].ToString());
-        userData.StatID = StringToInt(gameDataJson[0]["StatID"].ToString());
-        userData.WeaponID = StringToInt(gameDataJson[0]["WeaponID"].ToString());
-        userData.CurrHP = StringToInt(gameDataJson[0]["CurrHP"].ToString());
-        userData.LevelValue = StringToInt(gameDataJson[0]["LevelValue"].ToString());
-        userData.ExpValue = StringToInt(gameDataJson[0]["ExpValue"].ToString());
-        userData.CoinValue = StringToInt(gameDataJson[0]["CoinValue"].ToString());
-        userData.SpawnPos = StringToVector3(gameDataJson[0]["SpawnPos"].ToString());
-        userData.SpawnRot = StringToVector3(gameDataJson[0]["SpawnRot"].ToString());
+        userData.StatID      = StringToInt(gameDataJson[0]["StatID"].ToString());
+        userData.WeaponID    = StringToInt(gameDataJson[0]["WeaponID"].ToString());
+        userData.CurrHP      = StringToInt(gameDataJson[0]["CurrHP"].ToString());
+        userData.LevelValue  = StringToInt(gameDataJson[0]["LevelValue"].ToString());
+        userData.ExpValue    = StringToInt(gameDataJson[0]["ExpValue"].ToString());
+        userData.CoinValue   = StringToInt(gameDataJson[0]["CoinValue"].ToString());
+        userData.SpawnPos    = StringToVector3(gameDataJson[0]["SpawnPos"].ToString());
+        userData.SpawnRot    = StringToVector3(gameDataJson[0]["SpawnRot"].ToString());
 
         //userData.info = gameDataJson[0]["info"].ToString();
         //foreach (string itemKey in gameDataJson[0]["inventory"].Keys)
@@ -239,15 +233,15 @@ public class UserManager : Manager
     {
         Param param = new Param();
 
-        param.Add("CharacterID", userData.CharacterID.ToString());
-        param.Add("StatID", userData.StatID.ToString());
-        param.Add("WeaponID", userData.WeaponID.ToString());
-        param.Add("CurrHP", userData.CurrHP.ToString());
-        param.Add("LevelValue", userData.LevelValue.ToString());
-        param.Add("ExpValue", userData.ExpValue.ToString());
-        param.Add("CoinValue", userData.CoinValue.ToString());
-        param.Add("SpawnPos", userData.SpawnPos.ToString());
-        param.Add("SpawnRot", userData.SpawnRot.ToString());
+        param.Add("CharacterID",    userData.CharacterID.ToString());
+        param.Add("StatID",         userData.StatID.ToString());
+        param.Add("WeaponID",       userData.WeaponID.ToString());
+        param.Add("CurrHP",         userData.CurrHP.ToString());
+        param.Add("LevelValue",     userData.LevelValue.ToString());
+        param.Add("ExpValue",       userData.ExpValue.ToString());
+        param.Add("CoinValue",      userData.CoinValue.ToString());
+        param.Add("SpawnPos",       userData.SpawnPos.ToString());
+        param.Add("SpawnRot",       userData.SpawnRot.ToString());
 
         return param;
     }
@@ -266,7 +260,7 @@ public class UserManager : Manager
         pStr = pStr.Replace("(", "");
         pStr = pStr.Replace(")", "");
 
-        Vector3 vec = Vector3.zero;
+        Vector3 vec      = Vector3.zero;
         float[] elements = pStr.Split(',').Select(x => float.Parse(x)).ToArray();
         if (elements != null && elements.Length == 3)
         {

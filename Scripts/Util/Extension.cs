@@ -30,35 +30,6 @@ public static class Extension
         return pGO.activeSelf;
     }
 
-    //public static T GetComponent<T>(this GameObject pGO) where T : Component
-    //{
-    //    if (pGO == null)
-    //    {
-    //        Debug.LogWarning($"Failed : ");
-    //        return null;
-    //    }
-
-    //    T baseComp = pGO.GetComponent<T>();
-    //    if (baseComp == null)
-    //    {
-    //        Debug.LogError($"Failed : ");
-    //        return null;
-    //    }
-
-    //    return baseComp;
-    //}
-
-    //public static void BindEvent(this GameObject go, Action<PointerEventData> action, Define.UIEvent type = Define.UIEvent.Click)
-    //{
-    //	UI_Base.BindEvent(go, action, type);
-    //}
-
-    ////Spawning
-    //public static void DespawnOrDestroy(this GameObject myobject)
-    //{
-    //    Managers.Spawn.Despawn(myobject);
-    //}
-
     #endregion GameObject
 
     #region Transform

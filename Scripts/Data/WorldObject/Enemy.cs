@@ -1,3 +1,4 @@
+using Interface;
 using Table;
 using UnityEngine;
 using static Define;
@@ -5,8 +6,9 @@ using static Define;
 
 public class Enemy : BaseActor
 {
-    private float temp_attackRange = 1.5f;
-    private Vector3 temp_destPos = Vector3.zero;
+    private float   temp_attackRange = 1.5f;
+    private Vector3 temp_destPos     = Vector3.zero;
+
 
     protected override void Update()
     {
@@ -48,7 +50,7 @@ public class Enemy : BaseActor
         {
             if (hitCollider.tag == "Player")
             {
-                ITarget_Temp player = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
+                ITarget player = WorldScene.Instance.GetTargetCharacter(hitCollider.gameObject);
                 if (player != null)
                 {
                     player.OnDamage(Stat.attack);
@@ -101,11 +103,6 @@ public class Enemy : BaseActor
     {
         float distance = 0f;
 
-        //if (UpperAnimType == Define.UpperAnim.Attack)
-        //{
-        //    return;
-        //}
-
         NevAgent.isStopped = true;
         NevAgent.velocity = Vector3.zero;
 
@@ -113,7 +110,6 @@ public class Enemy : BaseActor
         distance = (temp_destPos - Position).magnitude;
         if (distance <= temp_scanRange && CalculateNavMeshPath(temp_destPos))
         {
-            //target = Managers.Game.GamePlayer.gameObject;
             BaseAnimType = Define.BaseAnim.Run;
             return;
         }
@@ -138,7 +134,6 @@ public class Enemy : BaseActor
         {
             NevAgent.SetDestination(transform.position);
             BaseAnimType = Define.BaseAnim.Idle;
-            //SetUpperStateType(Define.UpperState.Attack);
             return;
         }
 
@@ -151,7 +146,7 @@ public class Enemy : BaseActor
 
         NevAgent.isStopped = false;
 
-        EnemyTable.Data enemeyData = GlobalScene.Instance.EnemyTable.GetTableData(actorID);
+        EnemyTable.Data     enemeyData    = GlobalScene.Instance.EnemyTable.GetTableData(actorID);
         CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(enemeyData.CharacterID);
 
         NevAgent.speed = characterData.RunSpeed_Temp;
@@ -162,17 +157,14 @@ public class Enemy : BaseActor
     void UpdateUpperReady()
     {
         float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
-        bool isAttack = distance <= temp_attackRange;
-        if (isAttack) 
-        {
-            UpperAnimType = Define.UpperAnim.Attack;
-        }
+        bool  isAttack = distance <= temp_attackRange;
+        if (isAttack) { UpperAnimType = Define.UpperAnim.Attack; }
     }
 
     void UpdateUpperAttack()
     {
         NevAgent.isStopped = true;
-        NevAgent.velocity = Vector3.zero;
+        NevAgent.velocity  = Vector3.zero;
 
         float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
         if (distance > temp_attackRange)
@@ -181,8 +173,8 @@ public class Enemy : BaseActor
             return;
         }
 
-        Vector3 dir = WorldScene.Instance.PlayerCtrl.Position - Position;
-        Quaternion quat = Quaternion.LookRotation(dir);
-        transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
+        Vector3     dir     = WorldScene.Instance.PlayerCtrl.Position - Position;
+        Quaternion  quat    = Quaternion.LookRotation(dir);
+        transform.rotation  = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
     }
 }

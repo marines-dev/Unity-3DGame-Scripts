@@ -6,19 +6,15 @@ using UnityEngine;
 public class CamController : MonoBehaviour
 {
     public bool SwitchQuarterViewMoed{ private get; set; }
+
     private Define.CameraMode CameraModeType = Define.CameraMode.Defualt;
     private readonly Vector3 deltaPos = Config.followCam_deltaPos;
 
     private Camera mainCamera_ref = null;
 
+
     public static CamController CreateCameraController()
     {
-        //if (CameraManager.CameraModeType != Define.CameraMode.QuarterView)
-        //{
-        //    Util.LogWarning("");
-        //    return null;
-        //}
-
         return Util.CreateGlobalObject<CamController>();
     }
 
@@ -48,8 +44,8 @@ public class CamController : MonoBehaviour
             return;
         }
 
-        mainCamera_ref = pMainCamera;
-        SwitchQuarterViewMoed = false;
+        mainCamera_ref          = pMainCamera;
+        SwitchQuarterViewMoed   = false;
 
         ResetCameraMode();
     }
@@ -62,9 +58,9 @@ public class CamController : MonoBehaviour
         {
             mainCamera_ref.backgroundColor = Config.cam_backgroundColor;
 
-            mainCamera_ref.transform.localPosition = Config.cam_initPos;
-            mainCamera_ref.transform.localRotation = Quaternion.Euler(Config.cam_initRot);
-            mainCamera_ref.transform.localScale = Config.cam_initScale;
+            mainCamera_ref.transform.localPosition  = Config.cam_initPos;
+            mainCamera_ref.transform.localRotation  = Quaternion.Euler(Config.cam_initRot);
+            mainCamera_ref.transform.localScale     = Config.cam_initScale;
         }
     }
 

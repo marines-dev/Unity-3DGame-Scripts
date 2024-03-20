@@ -12,35 +12,23 @@ public class AnimationClipOverrides : List<KeyValuePair<AnimationClip, Animation
         set
         {
             int index = this.FindIndex(x => x.Key.name.Equals(pAnimationClipName));
-            if (index != -1)
-                this[index] = new KeyValuePair<AnimationClip, AnimationClip>(this[index].Key, value);
+            if (index != -1) { this[index] = new KeyValuePair<AnimationClip, AnimationClip>(this[index].Key, value); }
         }
     }
 }
 
 public class Animator_Util : MonoBehaviour
 {
-    Animator animator_ = null;
-    Animator animator
-    {
-        get
-        {
-            if (animator_ == null)
-            {
-                animator_ = gameObject.GetOrAddComponent<Animator>();
-            }
-            return animator_;
-        }
-    }
+    Animator anim = null;
+    Animator Anim => anim ?? (anim = gameObject.GetOrAddComponent<Animator>());
     AnimatorOverrideController  animatorOverrideController  = null;
     AnimationClipOverrides      clipOverrides               = null;
 
 
-
     void Start()
     {
-        animator_ = gameObject.GetOrAddComponent<Animator>();
-        animator.applyRootMotion = true;
+        anim = gameObject.GetOrAddComponent<Animator>();
+        Anim.applyRootMotion = true;
     }
     
     public void SetAnimatorController(string pAnimatorController, string pAnimatorAvatar)
@@ -48,7 +36,7 @@ public class Animator_Util : MonoBehaviour
         string path = string.Empty;
 
         // RuntimeAnimatorController
-        if (animator.runtimeAnimatorController == null)
+        if (Anim.runtimeAnimatorController == null)
         {
             path = $"Animators/{pAnimatorController}";
             RuntimeAnimatorController runtimeAnimatorController = GlobalScene.Instance.LoadResource<RuntimeAnimatorController>(path);
@@ -57,11 +45,12 @@ public class Animator_Util : MonoBehaviour
                 Util.LogWarning();
                 return;
             }
-            animator.runtimeAnimatorController = runtimeAnimatorController;
+
+            Anim.runtimeAnimatorController = runtimeAnimatorController;
         }
 
         // Avatar
-        if (animator.avatar == null)
+        if (Anim.avatar == null)
         {
             path = $"Animators/{pAnimatorAvatar}";
             Avatar avatar = GlobalScene.Instance.LoadResource<Avatar>(path);
@@ -70,12 +59,13 @@ public class Animator_Util : MonoBehaviour
                 Util.LogWarning();
                 return;
             }
-            animator.avatar = avatar;
+
+            Anim.avatar = avatar;
         }
 
         // AnimationClip
-        animatorOverrideController          = new AnimatorOverrideController(animator.runtimeAnimatorController);
-        animator.runtimeAnimatorController  = animatorOverrideController;
+        animatorOverrideController          = new AnimatorOverrideController(Anim.runtimeAnimatorController);
+        Anim.runtimeAnimatorController      = animatorOverrideController;
 
         clipOverrides = new AnimationClipOverrides(animatorOverrideController.overridesCount);
         animatorOverrideController.GetOverrides(clipOverrides);
@@ -87,33 +77,35 @@ public class Animator_Util : MonoBehaviour
         //animatorOverrideController.ApplyOverrides(clipOverrides);
 
         // Layer
-        int upperLayerIndex = animator.GetLayerIndex("Upper Layer");
+        int     upperLayerIndex = Anim.GetLayerIndex("Upper Layer");
         float   layerWeight     = 1f;
-        animator.SetLayerWeight(upperLayerIndex, layerWeight);
+
+        Anim.SetLayerWeight(upperLayerIndex, layerWeight);
     }
 
     public void SetCrossFade(string pLayerName, string pAnimStateName, float pNormalizedTransitionDuration, float pSpeed)
     {
-        animator.speed = pSpeed;
-        int upperLayerIndex = animator.GetLayerIndex(pLayerName);
-        animator.CrossFade(pAnimStateName, pNormalizedTransitionDuration, upperLayerIndex);
+        Anim.speed          = pSpeed;
+        int upperLayerIndex = Anim.GetLayerIndex(pLayerName);
+
+        Anim.CrossFade(pAnimStateName, pNormalizedTransitionDuration, upperLayerIndex);
     }
 
     public void SetRebind()
     {
-        animator.Rebind();
+        Anim.Rebind();
     }
 
     public bool IsCurrentAnimatorStateName(string pLayerName, string pAnimName)
     {
-        int upperLayerIndex = animator.GetLayerIndex(pLayerName);
-        return animator.GetCurrentAnimatorStateInfo(upperLayerIndex).IsName(pAnimName);
+        int upperLayerIndex = Anim.GetLayerIndex(pLayerName);
+        return Anim.GetCurrentAnimatorStateInfo(upperLayerIndex).IsName(pAnimName);
     }
 
     public float GetAnimatorStateNormalizedTime(string pLayerName)
     {
-        int upperLayerIndex = animator.GetLayerIndex(pLayerName);
-        return animator.GetCurrentAnimatorStateInfo(upperLayerIndex).normalizedTime;
+        int upperLayerIndex = Anim.GetLayerIndex(pLayerName);
+        return Anim.GetCurrentAnimatorStateInfo(upperLayerIndex).normalizedTime;
     }
 
     [Obsolete("юс╫ц")]

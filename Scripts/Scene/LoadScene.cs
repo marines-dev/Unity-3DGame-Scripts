@@ -5,10 +5,6 @@ using UnityEngine;
 public class LoadScene : BaseScene<LoadScene>
 {
     /// <summary>
-    /// Table
-    /// </summary>
-
-    /// <summary>
     /// MainUI
     /// </summary>
     private LoadingUI loadUI = null;
@@ -49,7 +45,7 @@ public class LoadScene : BaseScene<LoadScene>
 
         loadUI?.Close();
         /// Complete
-        Debug.Log($"Success : {Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
+        Util.LogSuccess($"{Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
 
     void LoadingProcess()
@@ -73,7 +69,7 @@ public class LoadScene : BaseScene<LoadScene>
     {
         yield return null;
 
-        preSceneName = Manager.SceneMng.PreSceneName;
+        preSceneName  = Manager.SceneMng.PreSceneName;
         nextSceneName = Manager.SceneMng.NextSceneName;
         yield return null;
 

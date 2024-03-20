@@ -4,10 +4,6 @@ using UnityEngine;
 public class SampleScene : BaseScene<SampleScene>
 {
     /// <summary>
-    /// Table
-    /// </summary>
-
-    /// <summary>
     /// MainUI
     /// </summary>
 

@@ -8,19 +8,22 @@ public class SampleUI : BaseUI<SampleUI.UI>
         /// SampleUI
         /// </sammary>
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
 
-        // Button
+        /// Button
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
     }
 
 
+    //private void Update()
+    //{
+    //}
 
     // Event를 연결합니다.
     protected override void BindEvents()
@@ -29,29 +32,13 @@ public class SampleUI : BaseUI<SampleUI.UI>
     }
 
     // UIPanel을 생성할 때 초기화하는 함수입니다.
-    protected override void OnAwake()
-    {
-    }
+    protected override void OnAwake() { }
 
     // Open할 때 실행할 프로세스입니다.
-    protected override void OnOpen()
-    {
-        //yield return null;
-
-        //
-    }
+    protected override void OnOpen() { }
 
     // Close할 때 실행할 프로세스입니다.
-    protected override void OnClose()
-    {
-        //yield return null;
-
-        //
-    }
-
-    //void Update()
-    //{
-    //}
+    protected override void OnClose() { }
 
     #region Button
 
@@ -80,7 +67,6 @@ public class SampleUI : BaseUI<SampleUI.UI>
 
     //void Update_SampleUI_Panel_()
     //{
-
     //}
 
     #endregion SampleUI_Panel_

@@ -20,9 +20,9 @@ public class WorldScene : BaseScene<WorldScene>
 
     #region World
 
-    private Player player = null;
-    private NullObject nullPlayer = new NullObject();
-    public IPlayerCtrl PlayerCtrl
+    private Player      player      = null;
+    private NullObject  nullPlayer  = new NullObject();
+    public IPlayerCtrl  PlayerCtrl
     {
         get
         {
@@ -36,8 +36,8 @@ public class WorldScene : BaseScene<WorldScene>
         }
     }
 
-    private Dictionary<GameObject, int> fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
-    private Dictionary<int, WorldSpawner> worldSpawner_dic = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
+    private Dictionary<GameObject, int>     fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
+    private Dictionary<int, WorldSpawner>   worldSpawner_dic  = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
 
     #endregion World
 
@@ -63,8 +63,10 @@ public class WorldScene : BaseScene<WorldScene>
         {
             /// Player
             Manager.UserMng.LoadUserData();
+
             Vector3 spawnPos = new Vector3(7.5f, 0f, 1f);
             Vector3 spawnRot = Quaternion.identity.eulerAngles; 
+
             GameObject player_go = WorldSpawner.CreateGameObject(Define.Spawning.Player, 1, spawnPos, spawnRot);//임시
             player = player_go.GetOrAddComponent<Player>();
 
@@ -199,7 +201,7 @@ public class WorldScene : BaseScene<WorldScene>
         SwitchSpawnersPooling(false);
     }
 
-    public ITarget_Temp GetTargetCharacter(GameObject pTarget)
+    public ITarget GetTargetCharacter(GameObject pTarget)
     {
         if (pTarget == null)
         {

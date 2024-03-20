@@ -12,38 +12,38 @@ public class TitleUI : BaseUI<TitleUI.UI>
         /// </sammary>
         TitleUI,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
         TitleUI_Object_MainBG, TitleUI_Object_StartBG, TitleUI_Object_LoadDataBG,
         TitleUI_Object_InitDataProcess, TitleUI_Object_LoginProcess, TitleUI_Object_LoadDataProcess,
         TitleUI_Object_Logout, TitleUI_Object_Login,
 
-        // Button
+        /// Button
         TitleUI_Button_Guest, TitleUI_Button_Google, TitleUI_Button_GameStart,
 
-        // Slider
+        /// Slider
         TitleUI_Slider_LoadData,
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
         /// <sammary>
         /// TitleUI_Panel_PatchPopup
         /// </sammary>
         TitleUI_Panel_PatchPopup,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
 
-        // Button
+        /// Button
         PatchPopup_Button_Confirm, PatchPopup_Button_Cancel,
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
 
         /// <sammary>
@@ -51,76 +51,76 @@ public class TitleUI : BaseUI<TitleUI.UI>
         /// </sammary>
         TitleUI_Panel_SignUpPopup,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
         SignUpPopup_Object_Guest, SignUpPopup_Object_Google,
 
-        // Button
+        /// Button
         SignUpPopup_Button_GuestConfirm, SignUpPopup_Button_GuestCancel, SignUpPopup_Button_GoogleConfirm, SignUpPopup_Button_GoogleCancel,
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
         /// <sammary>
         /// TitleUI_Panel_NicknamePopup
         /// </sammary>
         TitleUI_Panel_NicknamePopup,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
 
-        // Button
+        /// Button
         NicknamePopup_Button_Confirm,
 
-        // InputField
+        /// InputField
         NicknamePopup_InputField_Nickname,
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
         /// <sammary>
         /// TitleUI_Panel_GuestLogoutPopup
         /// </sammary>
         TitleUI_Panel_GuestLogoutPopup,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
 
-        // Button
+        /// Button
         GuestLogoutPopup_Button_Confirm, GuestLogoutPopup_Button_Cancel,
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
 
         /// <sammary>
         /// TitleUI_Panel_DebugTestPopup
         /// </sammary>
         TitleUI_Panel_DebugTestPopup,
 
-        // UIPosition
+        /// UIPosition
 
-        // Object
+        /// Object
         DebugTestPopup_Object_SelectAble, DebugTestPopup_Object_SelectDesable,
         DebugTestPopup_Object_DestPopup, DebugTestPopup_Object_TestLogout,
 
-        // Button
+        /// Button
         DebugTestPopup_Button_Select, DebugTestPopup_Button_TestLogout,
 
-        // Image
+        /// Image
 
-        // Text
+        /// Text
         DebugTestPopup_Text_Desc,
     }
 
-    public AccountType selectAccountType { get; private set; } = AccountType.None;
-    public string inputNickname { get; private set; } = string.Empty;
-    public bool IsTitleUI_AnimationCompleted
+    public AccountType  selectAccountType   { get; private set; } = AccountType.None;
+    public string       inputNickname       { get; private set; } = string.Empty;
+    public bool         IsTitleUI_AnimationCompleted
     {
         get
         {
@@ -227,7 +227,6 @@ public class TitleUI : BaseUI<TitleUI.UI>
     void OnClick_SignUpPopup_Button_GuestCancel()
     {
         //selectAccountType = LoginManager.AccountType.None;
-
         CloseTitleUI_Panel_SignUpPopup();
     }
 
@@ -239,7 +238,6 @@ public class TitleUI : BaseUI<TitleUI.UI>
     void OnClick_SignUpPopup_Button_GoogleCancel()
     {
         //selectAccountType = LoginManager.AccountType.None;
-
         CloseTitleUI_Panel_SignUpPopup();
     }
 
@@ -337,25 +335,15 @@ public class TitleUI : BaseUI<TitleUI.UI>
         onLogInState = pOnLogInState;
     }
 
-    //public void PlayInitDataText_Anim()
-    //{
-    //    Animator anim = GetUIComponent<Animator>(UI.TitleUI_AnimText_InitDataTitle);
-    //    if(anim != null)
-    //    {
-    //        //anim.Rebind();
-    //        //anim.Play("Play");
-    //    }
-    //}
-
     void UpdateTitleUI(TitleScene.TitleProcessType pTitleProcessType)
     {
-        SetActiveUI(UI.TitleUI_Object_MainBG, pTitleProcessType == TitleScene.TitleProcessType.Init);
-        SetActiveUI(UI.TitleUI_Object_LoadDataBG, pTitleProcessType == TitleScene.TitleProcessType.LoadUserData);
+        SetActiveUI(UI.TitleUI_Object_MainBG,       pTitleProcessType == TitleScene.TitleProcessType.Init);
+        SetActiveUI(UI.TitleUI_Object_LoadDataBG,   pTitleProcessType == TitleScene.TitleProcessType.LoadUserData);
 
         ///
-        SetActiveUI(UI.TitleUI_Object_InitDataProcess, pTitleProcessType == TitleScene.TitleProcessType.Init);
-        SetActiveUI(UI.TitleUI_Object_LoginProcess, pTitleProcessType == TitleScene.TitleProcessType.LogIn);
-        SetActiveUI(UI.TitleUI_Object_LoadDataProcess, pTitleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
+        SetActiveUI(UI.TitleUI_Object_InitDataProcess,  pTitleProcessType == TitleScene.TitleProcessType.Init);
+        SetActiveUI(UI.TitleUI_Object_LoginProcess,     pTitleProcessType == TitleScene.TitleProcessType.LogIn);
+        SetActiveUI(UI.TitleUI_Object_LoadDataProcess,  pTitleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
 
         if (pTitleProcessType == TitleScene.TitleProcessType.LoadUserData)
         {
@@ -368,8 +356,8 @@ public class TitleUI : BaseUI<TitleUI.UI>
             SetActiveUI(UI.TitleUI_Object_StartBG, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
 
             ///
-            SetActiveUI(UI.TitleUI_Object_Login, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
-            SetActiveUI(UI.TitleUI_Object_Logout, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogOut);
+            SetActiveUI(UI.TitleUI_Object_Login,    TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
+            SetActiveUI(UI.TitleUI_Object_Logout,   TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogOut);
         }
     }
 
@@ -419,7 +407,7 @@ public class TitleUI : BaseUI<TitleUI.UI>
             return;
 
         inputField.text = string.Empty;
-        inputNickname = inputField.text;
+        inputNickname   = inputField.text;
     }
 
     #endregion TitleUI_Panel_NicknamePopup

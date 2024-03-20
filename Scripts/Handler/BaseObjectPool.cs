@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class BaseObjectPool : MonoBehaviour
 {
     protected string prefabPath = string.Empty;
-    protected bool poolExpand = true;
+    protected bool   poolExpand = true;
 
     Dictionary<GameObject, Define.ExistenceState> objectPool_dic = new Dictionary<GameObject, Define.ExistenceState>();
 
@@ -27,15 +27,8 @@ public abstract class BaseObjectPool : MonoBehaviour
     {
         GameObject go = GlobalScene.Instance.InstantiateResource(prefabPath, transform);
 
-        if (!objectPool_dic.ContainsKey(go))
-        {
-            objectPool_dic.Add(go, Define.ExistenceState.Despawn);
-
-        }
-        else
-        {
-            objectPool_dic[go] = Define.ExistenceState.Despawn;
-        }
+        if (!objectPool_dic.ContainsKey(go)) { objectPool_dic.Add(go, Define.ExistenceState.Despawn); }
+        else { objectPool_dic[go] = Define.ExistenceState.Despawn; }
 
         return go;
     }
@@ -45,10 +38,7 @@ public abstract class BaseObjectPool : MonoBehaviour
         GameObject go = null;
         foreach (KeyValuePair<GameObject, Define.ExistenceState> pair in objectPool_dic)
         {
-            if (pair.Value == Define.ExistenceState.Despawn)
-            {
-                go = pair.Key;
-            }
+            if (pair.Value == Define.ExistenceState.Despawn) { go = pair.Key; }
         }
 
         if (go != null)

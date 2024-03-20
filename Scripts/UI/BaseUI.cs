@@ -12,8 +12,8 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
     //public GameObject GameObject { get { return gameObject; } }
     public bool IsOpen { get { return gameObject.activeSelf; } }
 
-    List<Transform> trans_List = new List<Transform>();
-    Transform[] uiTrans_arr = null;
+    List<Transform> trans_List  = new List<Transform>();
+    Transform[]     uiTrans_arr = null;
     
 
     private void Awake()
@@ -39,12 +39,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
             gameObject.SetActive(true);
         }
 
-        //UIManager_Test.instance.OpenUI<ScreenCoverUI>();
-        //UIManager_Test.instance.GetUI<ScreenCoverUI>().SetScreeConverUI(ScreenCoverUI.ScreenCoverType.LoadingData);
-
         OnOpen();
-
-        //UIManager_Test.instance.CloseUI<ScreenCoverUI>();
     }
 
     public void Close()
@@ -54,12 +49,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
             gameObject.SetActive(false);
         }
 
-        //UIManager_Test.instance.OpenUI<ScreenCoverUI>();
-        //UIManager_Test.instance.GetUI<ScreenCoverUI>().SetScreeConverUI(ScreenCoverUI.ScreenCoverType.LoadingData);
-
         OnClose();
-
-        //UIManager_Test.instance.CloseUI<ScreenCoverUI>();
     }
 
     public void DestroySelf()
@@ -72,10 +62,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         int uiIndex = Convert.ToInt32(_enum);
         Transform trans = uiTrans_arr[uiIndex];
 
-        if (trans == null)
-        {
-            Util.LogWarning($"{trans}는 null입니다.");
-        }
+        if (trans == null) { Util.LogWarning($"{trans}는 null입니다."); }
 
         return trans;
     }
@@ -85,10 +72,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         int uiIndex = Convert.ToInt32(_enum);
         Transform trans = uiTrans_arr[uiIndex];
 
-        if (trans == null)
-        {
-            Util.LogWarning($"{trans}는 null입니다.");
-        }
+        if (trans == null) { Util.LogWarning($"{trans}는 null입니다."); }
 
         return trans.gameObject;
     }
@@ -98,16 +82,10 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         int uiIndex = Convert.ToInt32(_enum);
         Transform trans = uiTrans_arr[uiIndex];
 
-        if (trans == null)
-        {
-            Util.LogWarning($"{trans}는 null입니다.");
-        }
+        if (trans == null) { Util.LogWarning($"{trans}는 null입니다."); }
 
         T component = trans.GetComponent<T>();
-        if(component == null)
-        {
-            Util.LogWarning($"{component.ToString()}의 {typeof(T).Name} 컴포넌트는 존재하지 않습니다.");
-        }
+        if(component == null) { Util.LogWarning($"{component.ToString()}의 {typeof(T).Name} 컴포넌트는 존재하지 않습니다."); }
 
         return component;
     }
@@ -126,25 +104,18 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
             return;
         }
 
-        GameObject obj = GetUIObject(_enum);
-        Image image = obj.GetComponent<Image>();
-        if (image == null)
-        {
-            image = obj.AddComponent<Image>();
-        }
+        GameObject  obj     = GetUIObject(_enum);
+        Image       image   = obj.GetOrAddComponent<Image>();
+        image.sprite        = arr_sprite[_spriteIndex];
 
-        image.sprite = arr_sprite[_spriteIndex];
         Util.LogWarning($"IndexTest필요");
     }
 
     protected void SetTextUI(Enum _enum, string _text)
     {
-        GameObject obj = GetUIObject(_enum);
-        TMP_Text text = obj.GetComponent<TMP_Text>();
-        if (text == null)
-        {
-            text = obj.AddComponent<TMP_Text>();
-        }
+        GameObject  obj  = GetUIObject(_enum);
+        TMP_Text    text = obj.GetComponent<TMP_Text>();
+        if (text == null) { text = obj.AddComponent<TMP_Text>(); }
 
         text.text = _text;
     }
@@ -158,13 +129,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         // Button
         if (typeof(T) == typeof(Button))
         {
-            Button button = obj.GetComponent<Button>();
-
-            if (button == null)
-            {
-                button = obj.AddComponent<Button>();
-            }
-
+            Button button = obj.GetOrAddComponent<Button>();
             button.onClick.AddListener(_action);
         }
     }
@@ -181,13 +146,13 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
             ReculsiveUI(transform);
         }
 
-        Array array_control = System.Enum.GetValues(typeof(TUI));
-        int uiCount = array_control.Length;
-        uiTrans_arr = new Transform[uiCount];
+        Array   array_control = Enum.GetValues(typeof(TUI));
+        int     uiCount       = array_control.Length;
+        uiTrans_arr           = new Transform[uiCount];
 
         foreach (int control in array_control)
         {
-            string uiName = System.Enum.GetName(typeof(TUI), control);
+            string uiName        = Enum.GetName(typeof(TUI), control);
             Transform childTrans = trans_List.Find(x => x.gameObject.name == uiName);
             int uiIndex = (int)control;
 
@@ -198,14 +163,8 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
     private void ReculsiveUI(Transform _trans)
     {
         int findIndex = trans_List.FindIndex(x => x == _trans);
-        if (findIndex == -1)
-        {
-            trans_List.Add(_trans);
-        }
-        else
-        {
-            trans_List[findIndex] = _trans;
-        }
+        if (findIndex == -1) { trans_List.Add(_trans); }
+        else { trans_List[findIndex] = _trans; }
 
         if (_trans.childCount != 0)
         {
@@ -216,16 +175,6 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
             }
         }
     }
-
-    //private void InitUIList(GameObject pObj)
-    //{
-    //    if (list_uiTrans != null && list_uiTrans.Count != 0)
-    //    {
-    //        list_uiTrans.Clear();
-    //    }
-
-    //    ReculsiveUI(pObj.transform);
-    //}
 
     #endregion Load
 }

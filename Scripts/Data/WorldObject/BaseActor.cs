@@ -1,26 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using Interface;
 using Table;
 using UnityEngine;
 using UnityEngine.AI;
 using static Define;
 
-public interface ITarget_Temp
-{
-    public ExistenceState ExistenceStateType { get; }
-    public SurvivalState SurvivalStateType { get; }
 
-    public Vector3 Position { get; }
-    public Vector3 Rotation { get; }
-
-    public void OnEnableTargetOutline();
-    public void OnDisableTargetOutline();
-
-    public void OnDamage(int pValue);
-}
-
-public abstract class BaseActor : MonoBehaviour, ITarget_Temp
+public abstract class BaseActor : MonoBehaviour, ITarget
 {
     private Actor actorType = Actor.None;
     protected int actorID = 0;
@@ -65,13 +51,13 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         public int currentHp;
         public int attack;
         public int defense;
-        //public float runSpeed;
     }
+
     private ActorStat stat;
-    public ActorStat Stat { get { return stat; } }
+    public  ActorStat Stat { get { return stat; } }
 
     private BaseAnim baseAnimType = BaseAnim.Idle;
-    public BaseAnim BaseAnimType
+    public  BaseAnim BaseAnimType
     {
         get { return baseAnimType; }
         set
@@ -106,7 +92,7 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
     }
 
     private UpperAnim upperAnimType = UpperAnim.None;
-    public UpperAnim UpperAnimType
+    public  UpperAnim UpperAnimType
     {
         get { return upperAnimType; }
         set
@@ -138,30 +124,28 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         }
     }
 
-    readonly public string temp_baseLayerName = "Base Layer";
-    readonly public string temp_upperLayerName = "Upper Layer";
+    readonly public string temp_baseLayerName   = "Base Layer";
+    readonly public string temp_upperLayerName  = "Upper Layer";
 
-    protected float temp_scanRange = 6f; //임시
-    protected float temp_hitTime = 0.4f; //플레이어
-    private float temp_startTime = 1f;
-    private float temp_andTime = 0f;
-    private float temp_fadeOutTime = 0f;
-    private bool temp_isDying = false;
-    protected bool temp_isAttacking = false;
-    protected bool temp_isHit = false;
+    protected   float temp_scanRange    = 6f; //임시
+    protected   float temp_hitTime      = 0.4f; //플레이어
+    private     float temp_startTime    = 1f;
+    private     float temp_andTime      = 0f;
+    private     float temp_fadeOutTime  = 0f;
+    private     bool  temp_isDying      = false;
+    protected   bool  temp_isAttacking  = false;
+    protected   bool  temp_isHit        = false;
 
     protected string Temp_Tag { set { gameObject.tag = value; } }
 
-    private Collider collider = null;
-    private Shader_Util shader = null;
-    public Animator_Util Anim { get; private set; } = null;
-    public NavMeshAgent NevAgent { get; private set; } = null;
+    private Collider collider       = null;
+    private Shader_Util shader      = null;
+    public  Animator_Util Anim      { get; private set; } = null;
+    public  NavMeshAgent NevAgent   { get; private set; } = null;
 
-    HPBarUI hpBarUI = null;
-    private IWeapon weap = null;
-    protected IWeapon Weap => weap ?? (weap = new NullObject());
-    
-    //private Action<GameObject> despawnAction = null;
+    private     HPBarUI hpBarUI = null;
+    private     IWeapon weap    = null;
+    protected   IWeapon Weap    => weap ?? (weap = new NullObject());
 
 
     private void Awake()
@@ -172,15 +156,12 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
             if (collider == null)
             {
                 Renderer renderer = GetComponentInChildren<Renderer>();
-                if (renderer != null)
-                {
-                    collider = renderer.gameObject.GetOrAddComponent<MeshCollider>();
-                }
+                if (renderer != null) { collider = renderer.gameObject.GetOrAddComponent<MeshCollider>(); }
             }
         }
 
-        Anim = gameObject.GetOrAddComponent<Animator_Util>();
-        shader = gameObject.GetOrAddComponent<Shader_Util>();
+        Anim    = gameObject.GetOrAddComponent<Animator_Util>();
+        shader  = gameObject.GetOrAddComponent<Shader_Util>();
 
         NevAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
         NevAgent.radius = 0.3f;
@@ -188,45 +169,36 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
 
     protected virtual void Update()
     {
-        if (BaseAnimType == BaseAnim.Die)
-        {
-            UpdateDying();
-        }
-        else if (UpperAnimType == UpperAnim.Attack)
-        {
-            UpdateAttacking();
-        }
+        if (BaseAnimType == BaseAnim.Die) { UpdateDying(); }
+        else if (UpperAnimType == UpperAnim.Attack) { UpdateAttacking(); }
     }
 
     void FixedUpdate()
     {
-        if (hpBarUI != null)
-        {
-            hpBarUI.SetHPBar(transform, Stat.currentHp, Stat.maxHp);
-        }
+        if (hpBarUI != null) { hpBarUI.SetHPBar(transform, Stat.currentHp, Stat.maxHp); }
     }
 
     public virtual void Spawn(Actor pActorType, int pActorID)
     {
-        CharacterTable.Data characterData = null;
-        StatTable.Data statData = null;
-        WeaponTable.Data weaponData = null;
+        CharacterTable.Data characterData   = null;
+        StatTable.Data      statData        = null;
+        WeaponTable.Data    weaponData      = null;
 
         switch (pActorType)
         {
             case Actor.Player:
                 {
-                    characterData = GlobalScene.Instance.CharacterTable.GetTableData(1); //임시
-                    statData = GlobalScene.Instance.StatTable.GetTableData(1); //임시 
-                    weaponData = GlobalScene.Instance.WeaponTable.GetTableData(2); //임시
+                    characterData   = GlobalScene.Instance.CharacterTable.GetTableData(1); //임시
+                    statData        = GlobalScene.Instance.StatTable.GetTableData(1); //임시 
+                    weaponData      = GlobalScene.Instance.WeaponTable.GetTableData(2); //임시
                 }
                 break;
             case Actor.Enemy:
                 {
                     EnemyTable.Data enemeyData = GlobalScene.Instance.EnemyTable.GetTableData(pActorID);
-                    characterData = GlobalScene.Instance.CharacterTable.GetTableData(enemeyData.CharacterID);
-                    statData = GlobalScene.Instance.StatTable.GetTableData(enemeyData.StatID); //임시
-                    weaponData = GlobalScene.Instance.WeaponTable.GetTableData(enemeyData.WeaponID); //임시
+                    characterData   = GlobalScene.Instance.CharacterTable.GetTableData(enemeyData.CharacterID);
+                    statData        = GlobalScene.Instance.StatTable.GetTableData(enemeyData.StatID); //임시
+                    weaponData      = GlobalScene.Instance.WeaponTable.GetTableData(enemeyData.WeaponID); //임시
                 }
                 break;
         }
@@ -239,11 +211,11 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         }
 
         ///
-        actorType = pActorType;
-        actorID = pActorID;
+        actorType   = pActorType;
+        actorID     = pActorID;
 
-        ExistenceStateType = ExistenceState.Spawn;
-        SurvivalStateType = SurvivalState.Alive;
+        ExistenceStateType  = ExistenceState.Spawn;
+        SurvivalStateType   = SurvivalState.Alive;
 
         ///
         shader.SetMateriasColorAlpha(1f, false);
@@ -258,13 +230,12 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
             stat.currentHp = statData.MaxHp;
             stat.attack = statData.Attack;
             stat.defense = statData.Defense;
-            //stat.runSpeed = statData.moveSpeed;
-            //this.statData.maxExp = statData.maxExp;
         }
 
         /// HPBarUI
         if (hpBarUI == null)
             CreateHPBarUI();
+
         hpBarUI?.Open();
 
         /// Weapon
@@ -282,30 +253,21 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         UpperAnimType = UpperAnim.Ready;
 
         temp_isAttacking = false;
-        temp_isHit = false;
-        temp_isDying = false;
-
-        //despawnAction = pDespawnAction;
+        temp_isHit       = false;
+        temp_isDying     = false;
     }
 
     public virtual void Despawn()
     {
-        //if (despawnAction != null)
-        //    despawnAction.Invoke(gameObject);
-
         ExistenceStateType = ExistenceState.Despawn;
-
         WorldScene.Instance.SetDespawnSpawning(gameObject, actorType);
     }
 
     protected void SetHP(int pHpValue)
     {
-        if (pHpValue < 0)
-            stat.currentHp = 0;
-        else if (pHpValue > stat.maxHp)
-            stat.currentHp = stat.maxHp;
-        else
-            stat.currentHp = pHpValue;
+        if (pHpValue < 0) { stat.currentHp = 0; }
+        else if (pHpValue > stat.maxHp) { stat.currentHp = stat.maxHp; }
+        else { stat.currentHp = pHpValue; }
     }
 
     protected virtual void SetDead()
@@ -317,21 +279,21 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
 
         weap.SetEquiped(false);
 
-        NevAgent.isStopped = true;
-        NevAgent.velocity = Vector3.zero;
+        NevAgent.isStopped  = true;
+        NevAgent.velocity   = Vector3.zero;
         Anim.SetRebind();
 
         PlayBaseAnimation(BaseAnimType, 0.03f, 1f);
-        temp_startTime = 1f;
-        temp_andTime = 0f;
+        temp_startTime   = 1f;
+        temp_andTime     = 0f;
         temp_fadeOutTime = 0f;
-        temp_isDying = true;
+        temp_isDying     = true;
     }
 
     protected virtual void SetIdle()
     {
         NevAgent.isStopped = true;
-        NevAgent.velocity = Vector3.zero;
+        NevAgent.velocity  = Vector3.zero;
 
         PlayBaseAnimation(BaseAnimType, 0.03f, 1f);
     }
@@ -355,7 +317,7 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
     protected virtual void SetAttack()
     {
         temp_isAttacking = true;
-        temp_isHit = false;
+        temp_isHit       = false;
 
         PlayUpperAnimation(UpperAnimType, 0.1f, 1f);
         Weap.SetAttackPos();
@@ -376,10 +338,10 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
 
             Despawn();
 
-            temp_startTime = 1f;
-            temp_andTime = 0f;
+            temp_startTime   = 1f;
+            temp_andTime     = 0f;
             temp_fadeOutTime = 0f;
-            temp_isDying = false;
+            temp_isDying     = false;
         }
     }
 
@@ -388,8 +350,8 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         if (temp_isAttacking == false)
             return;
 
-        int truncValue = (int)Anim.GetAnimatorStateNormalizedTime(temp_upperLayerName);
-        float animTime = Anim.GetAnimatorStateNormalizedTime(temp_upperLayerName) - truncValue;
+        int     truncValue = (int)Anim.GetAnimatorStateNormalizedTime(temp_upperLayerName);
+        float   animTime   = Anim.GetAnimatorStateNormalizedTime(temp_upperLayerName) - truncValue;
 
         if (temp_isHit && animTime < temp_hitTime)
         {
@@ -404,7 +366,7 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         if (animTime >= 1.0f)
         {
             temp_isAttacking = false;
-            temp_isHit = false;
+            temp_isHit       = false;
         }
     }
 
@@ -416,15 +378,12 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
     public void OnDamage(int pValue)
     {
         int attackValue = pValue + Weap.AttackValue;
-        int damage = Mathf.Max(0, attackValue - Stat.defense);
-        int hp = Stat.currentHp - damage;
+        int damage      = Mathf.Max(0, attackValue - Stat.defense);
+        int hp          = Stat.currentHp - damage;
         SetHP(hp);
 
         /// Die
-        if (Stat.currentHp <= 0)
-        {
-            BaseAnimType = BaseAnim.Die;
-        }
+        if (Stat.currentHp <= 0) { BaseAnimType = BaseAnim.Die; }
     }
 
     public void OnEnableTargetOutline()

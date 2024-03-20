@@ -29,33 +29,23 @@ class ScreenCoverUI : BaseUI<ScreenCoverUI.UI>
         LoadingData,
     }
 
+
+    //private void Update()
+    //{
+    //}
+
     protected override void BindEvents()
     {
         //BindEventControl<Button>(Control., OnClick_);
     }
 
-    protected override void OnAwake()
-    {
-    }
-
+    protected override void OnAwake() { }
     protected override void OnOpen()
     {
-        //yield return null;
-        
-        //
         UpdateScreenCoverUI(ScreenCoverType.TuchBlocking);
     }
 
-    protected override void OnClose()
-    {
-        //yield return null;
-
-        //
-    }
-
-    //private void Update()
-    //{
-    //}
+    protected override void OnClose() { }
 
     #region Button
 

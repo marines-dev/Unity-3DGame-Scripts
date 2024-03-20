@@ -11,14 +11,9 @@ public class ResourceManager : Manager//BaseManager<ResourceManager>
     {
         if (typeof(T) == typeof(GameObject))
         {
-            string name = path;
-            int index = name.LastIndexOf('/');
-            if (index >= 0)
-                name = name.Substring(index + 1);
-
-            //GameObject go = Managers.Pool.GetOriginal(name);
-            //if (go != null)
-                //return go as T;
+            string  name    = path;
+            int     index   = name.LastIndexOf('/');
+            if (index >= 0) { name = name.Substring(index + 1); }
         }
 
         return Resources.Load<T>(path);
@@ -33,9 +28,6 @@ public class ResourceManager : Manager//BaseManager<ResourceManager>
             return null;
         }
 
-        //if (original.GetComponent<Poolable>() != null)
-            //return Managers.Pool.Pop(original, res_storage_obj.transform).gameObject;
-
         GameObject go = UnityEngine.Object.Instantiate(original, parent);
         go.name = original.name;
         //Util.LogSuccess($"Instantiate prefab : {path}");
@@ -49,7 +41,6 @@ public class ResourceManager : Manager//BaseManager<ResourceManager>
         if(string.IsNullOrEmpty(pGo_name) == false)
             go.name = pGo_name;
 
-        //임시
         go.transform.SetParent(pTran);
         go.transform.localPosition = Vector3.zero;
         go.transform.localRotation = Quaternion.identity;
@@ -65,7 +56,6 @@ public class ResourceManager : Manager//BaseManager<ResourceManager>
         if (string.IsNullOrEmpty(pGo_name) == false)
             go.name = pGo_name;
 
-        //임시
         go.transform.SetParent(pTran);
         go.transform.localPosition = Vector3.zero;
         go.transform.localRotation = Quaternion.identity;
@@ -77,10 +67,7 @@ public class ResourceManager : Manager//BaseManager<ResourceManager>
     public void DestroyGameObject(GameObject go)
     {
         if (go == null)
-        {
-            Debug.Log("");
             return;
-        }
 
         GameObject.Destroy(go);
         go = null;

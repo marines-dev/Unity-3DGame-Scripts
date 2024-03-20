@@ -30,12 +30,13 @@ public class Weapon : MonoBehaviour, IWeapon
     }
 
     private int weaponID = 0;
+
     private ParticleSystem shotSFX = null;
 
 
     public static IWeapon CreateWeapon(Transform pOwner, int pWeaponID)
     {
-        NullObject nullWeapon = new NullObject();
+        NullObject       nullWeapon = new NullObject();
         WeaponTable.Data weaponData = GlobalScene.Instance.WeaponTable.GetTableData(pWeaponID);
         if (pOwner == null || weaponData == null)
         {
@@ -49,8 +50,8 @@ public class Weapon : MonoBehaviour, IWeapon
             return nullWeapon;
         }
 
-        string path = $"Prefabs/Weapon/{weaponData.PrefabName}";
-        GameObject go = GlobalScene.Instance.InstantiateResource(path);
+        string     path = $"Prefabs/Weapon/{weaponData.PrefabName}";
+        GameObject go   = GlobalScene.Instance.InstantiateResource(path);
         if (go == null)
         {
             Util.LogWarning();

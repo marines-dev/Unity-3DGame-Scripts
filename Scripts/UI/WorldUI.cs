@@ -29,13 +29,12 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
     private float r = 0f;
     //private float moveSpeed               = 4f;
     private bool isAttackButtonPressed   = false;
-    private Vector2 beginPos = Vector3.zero;
-    private Vector2 dragPos = Vector3.zero;
-    private Vector2 centerPos  = Vector3.zero;
+    private Vector2 beginPos    = Vector3.zero;
+    private Vector2 dragPos     = Vector3.zero;
+    private Vector2 centerPos   = Vector3.zero;
 
-    private RectTransform backgroundRectTrans   = null;
-    private RectTransform pointerRectTrans      = null;
-    //private Action<bool> attackButtonAction     = null;
+    private RectTransform backgroundRectTrans = null;
+    private RectTransform pointerRectTrans    = null;
 
 
     private void FixedUpdate()
@@ -45,8 +44,8 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
             if (Vector2.Distance(dragPos, beginPos) > 10) // Move
             {
                 //
-                Vector2 dir = (dragPos - beginPos).normalized;
-                float angle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
+                Vector2 dir     = (dragPos - beginPos).normalized;
+                float   angle   = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 angle = angle < 0 ? 360 + angle : angle;
                 Vector3 eulerAngles = new Vector3(0, Camera.main.transform.eulerAngles.y + angle, 0);
 
@@ -60,38 +59,6 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
             }
         }
     }
-
-    //void FixedUpdate()
-    //{
-    //    if (Vector2.Distance(dragPos, beginPos) > 10) // joystick move
-    //    {
-    //        Vector2 v2 = (dragPos - beginPos).normalized;
-    //        float angle = Mathf.Atan2(v2.x, v2.y) * Mathf.Rad2Deg;
-    //        angle = angle < 0 ? 360 + angle : angle;
-    //        //Vector3 eulerAngles = new Vector3(0, cameraTransform.eulerAngles.y + angle, 0);
-    //        //playerCC.transform.eulerAngles = eulerAngles;
-    //        //playerCC.Move(player.forward * Time.deltaTime * moveSpeed);
-
-    //        //if (anim)//your ainmation set
-    //        //{
-    //        //    anim.CrossFade("forward");
-    //        //}
-    //    }
-    //    else // joystick stop
-    //    {
-    //        //if (anim)//your ainmation set
-    //        //{
-    //        //    anim.CrossFade("standing");
-    //        //}
-    //    }
-    //    ////Simulated drop
-    //    //if (!playerCC.isGrounded)
-    //    //{
-    //    //    playerCC.Move(new Vector3(0, -10f * Time.deltaTime, 0));
-    //    //}
-
-    //    //cameraController.CameraSet();
-    //}
 
     protected override void BindEvents()
     {
@@ -117,8 +84,8 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
     {
         //
         RectTransform joystickRectTrans = GetUIComponent<RectTransform>(UI.WorldUI_Image_JoystickArea);
-        Vector2 sizeDelta           = new Vector2(Screen.height * 0.5f, Screen.height * 0.5f);
-        joystickRectTrans.sizeDelta = sizeDelta;
+        Vector2 sizeDelta               = new Vector2(Screen.height * 0.5f, Screen.height * 0.5f);
+        joystickRectTrans.sizeDelta     = sizeDelta;
         //transform.gameObject.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 
         backgroundRectTrans = GetUIComponent<RectTransform>(UI.WorldUI_Image_Background);
@@ -144,7 +111,6 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
 
         backgroundRectTrans = null;
         pointerRectTrans    = null;
-        //attackButtonAction  = null;
     }
 
     #region Button

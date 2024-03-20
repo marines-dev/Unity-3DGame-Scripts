@@ -1,10 +1,9 @@
 using UnityEngine;
+using static Define;
 
 namespace Interface
 {
-    public interface IBaseScene
-    {
-    }
+    public interface IBaseScene { }
 
     public interface IBaseManager
     {
@@ -18,14 +17,31 @@ namespace Interface
         public void DestroySelf();
     }
 
-    public interface ITable
-    {
-
-    }
+    public interface IBaseTable { }
 
     public interface ITableLoader
     {
         public void Initialized(TextAsset pTextAsset);
+    }
+
+    //public interface ILoader<TKey, TValue>
+    //{
+    //    Dictionary<TKey, TValue> MakeDict();
+    //}
+}
+
+public interface ITarget
+    {
+        public ExistenceState ExistenceStateType { get; }
+        public SurvivalState SurvivalStateType { get; }
+
+        public Vector3 Position { get; }
+        public Vector3 Rotation { get; }
+
+        public void OnEnableTargetOutline();
+        public void OnDisableTargetOutline();
+
+        public void OnDamage(int pValue);
     }
 
     public interface IPlayerCtrl
@@ -47,4 +63,3 @@ namespace Interface
     //    //public void Stop();
     //    //public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction);
     //}
-}

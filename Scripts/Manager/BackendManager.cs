@@ -7,14 +7,11 @@ public class BackendManager : Manager
 {
     string gameDataRowInDate = string.Empty;
 
-    //
     BackendReturnObject bro = null;
 
+
     protected override void OnInitialized() { }
-    public override void OnRelease()
-    {
-        gameDataRowInDate = string.Empty;
-    }
+    public override void OnRelease() { gameDataRowInDate = string.Empty; }
 
     #region Init
 

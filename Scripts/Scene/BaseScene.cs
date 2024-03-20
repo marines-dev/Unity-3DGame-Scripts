@@ -137,10 +137,10 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
 
     public static void RegisteredGlobalObjects()
     {
-        mainCamera = FindOrCreateGlobalObject<Camera>(mainCamera);
-        mainCanvas = FindOrCreateGlobalObject<Canvas>(mainCanvas);
+        mainCamera      = FindOrCreateGlobalObject<Camera>(mainCamera);
+        mainCanvas      = FindOrCreateGlobalObject<Canvas>(mainCanvas);
         mainEventSystem = FindOrCreateGlobalObject<EventSystem>(mainEventSystem);
-        mainLight = FindOrCreateGlobalObject<Light>(mainLight);
+        mainLight       = FindOrCreateGlobalObject<Light>(mainLight);
         
         if (camCtrl == null)
         {
@@ -173,7 +173,6 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
 
         /// 중복 검사
         TGlobalObj[] go_arr = GameObject.FindObjectsOfType<TGlobalObj>();
-        Debug.Log($"{typeof(TGlobalObj).Name} 개수 : {go_arr.Length}");
         foreach (TGlobalObj go in go_arr)
         {
             if (go != null && pGlobalObj != go)

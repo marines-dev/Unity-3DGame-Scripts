@@ -5,8 +5,8 @@ using static Define;
 
 public class GameObjectPool : MonoBehaviour
 {
-    string prefabPath = string.Empty;
-    bool poolExpand = true;
+    string  prefabPath = string.Empty;
+    bool    poolExpand = true;
 
     Dictionary<GameObject, ExistenceState> objectPool_dic = new Dictionary<GameObject, ExistenceState>();
 
@@ -30,15 +30,8 @@ public class GameObjectPool : MonoBehaviour
     GameObject CreateObject()
     {
         GameObject go = GlobalScene.Instance.InstantiateResource(prefabPath, transform);
-
-        if (!objectPool_dic.ContainsKey(go))
-        {
-            objectPool_dic.Add(go, ExistenceState.Despawn);
-        }
-        else
-        {
-            objectPool_dic[go] = ExistenceState.Despawn;
-        }
+        if (!objectPool_dic.ContainsKey(go)) { objectPool_dic.Add(go, ExistenceState.Despawn); }
+        else { objectPool_dic[go] = ExistenceState.Despawn; }
 
         return go;
     }

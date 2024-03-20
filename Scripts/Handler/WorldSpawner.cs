@@ -8,31 +8,24 @@ using static Define;
 public class WorldSpawner : MonoBehaviour
 {
     public bool SwitchPooling { private get; set; }
-    /// <summary>
-    /// TableData
-    /// </summary>
-    //SpawnerTable.Data spawnerData = null;
-    //private int spawningID = 0;
+
     private int spawnerID = 0;
 
     /// <summary>
     /// StateData
     /// </summary>
-    private int spawnCount = 0;
+    private int spawnCount   = 0;
     private int reserveCount = 0;
-    private float delayTime = 0f; // 임시
-    private bool isSpawn = false;
+    private float delayTime  = 0f; // 임시
+    private bool isSpawn     = false;
 
     GameObjectPool gameObjectPool = null;
-
-    //private Action<GameObject, int> spawnAction = null; /// <GameObject, SpawnerID>
-    //private Action<GameObject> despawnAction = null;
 
 
     public static GameObject CreateGameObject(Spawning pSpawningType, int pSpawningID, Vector3 pPos, Vector3 pRot, float pSpawnerRadius = 0f)
     {
-        string path = FindSpawningPath(pSpawningType, pSpawningID);
-        GameObject go = GlobalScene.Instance.InstantiateResource(path);
+        string path     = FindSpawningPath(pSpawningType, pSpawningID);
+        GameObject go   = GlobalScene.Instance.InstantiateResource(path);
         SetGameObjectRandomPos(go.transform, pPos, pRot);
 
         return go;
@@ -90,15 +83,12 @@ public class WorldSpawner : MonoBehaviour
         gameObjectPool.SetObjectPool(path, spawnerData.PoolAmount, spawnerData.PoolExpand);
 
         ///
-        spawnCount = 0;
-        reserveCount = 0;
-        delayTime = 0f;
-        isSpawn = false;
+        spawnCount      = 0;
+        reserveCount    = 0;
+        delayTime       = 0f;
+        isSpawn         = false;
 
         SwitchPooling = false;
-
-        //spawnAction = pSpawnAction;
-        //despawnAction = pDespawnAction;
     }
 
     void Spawn()
@@ -134,6 +124,7 @@ public class WorldSpawner : MonoBehaviour
 
         Vector3 randDir = UnityEngine.Random.insideUnitSphere * UnityEngine.Random.Range(0, pSpawnerRadius);
         randDir.y = 0;
+        
         Vector3 randPos = pSpawnerPos + randDir;
         Vector3 randRot = pSpawnerRot;
 

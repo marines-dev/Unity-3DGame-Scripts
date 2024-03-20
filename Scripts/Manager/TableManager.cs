@@ -66,22 +66,6 @@ public class TableManager : Manager//BaseManager<TableManager>
         }
     }
 
-    //public TTable CreateOrGetBaseTable<TTable>() where TTable : class, IBaseTable, new()
-    //{
-    //    TTable baseTable = GetBaseTable(typeof(TTable)) as TTable;
-    //    if (baseTable != null)
-    //    {
-    //        return baseTable;
-    //    }
-
-    //    // T 테이블 클래스에서 테이블 데이터를 자동 생성 합니다.
-    //    string tableName = typeof(TTable).Name;
-    //    TTable table = new TTable();
-
-    //    baseTable_dic.Add(tableName, table);
-    //    return table;
-    //}
-
     //public Table.BaseTable CreateOrGetBaseTable(Type pType)
     //{
     //    if (pType == null || pType.BaseType != typeof(Table.BaseTable))

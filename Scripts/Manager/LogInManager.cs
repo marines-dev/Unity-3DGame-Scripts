@@ -21,30 +21,25 @@ public class LogInManager : Manager
 {
     public LogInProcessType currLogInProcessType { get; private set; }  = LogInProcessType.None;
     public AccountType      currAccountType { get; private set; }       = AccountType.None;
+   
     public bool isDone { get; private set; } = false;
+
 
     protected override void OnInitialized() { }
     public override void OnRelease() { }
 
-
     public void InitLogInState()
     {
         currLogInProcessType = LogInProcessType.InitLogIn;
-        currAccountType = AccountType.None;
+        currAccountType      = AccountType.None;
 
         isDone = BackendMng.TokenLogin();
         if (isDone)
         {
             string nickname = BackendMng.GetNickname();
             isDone = CheckNickname(nickname);
-            if (isDone)
-            {
-                currLogInProcessType = LogInProcessType.AccountAuth;
-            }
-            else
-            {
-                currLogInProcessType = LogInProcessType.UpdateNickname;
-            }
+            if (isDone) { currLogInProcessType = LogInProcessType.AccountAuth; }
+            else { currLogInProcessType = LogInProcessType.UpdateNickname; }
         }
         else
         {
@@ -57,7 +52,6 @@ public class LogInManager : Manager
     bool CheckNickname(string _nickname)
     {
         bool nicknameAble = string.IsNullOrEmpty(_nickname) == false; //닉네임이 있을 경우 true
-
         return nicknameAble;
     }
 
@@ -79,21 +73,17 @@ public class LogInManager : Manager
                 {
                     if (Application.platform != RuntimePlatform.Android)
                     {
-                        Debug.LogWarning("사용할 수 없는 기기입니다.");
+                        Util.LogWarning("사용할 수 없는 기기입니다.");
                         return isDone;
                     }
 
                     isDone = BackendMng.CheckFederationAccount();
-
-                    if (isDone)
-                    {
-                        isDone = BackendMng.AuthorizeFederation();
-                    }
+                    if (isDone) { isDone = BackendMng.AuthorizeFederation(); }
                 }
                 break;
 
             default:
-                Debug.LogError("예외 처리 필요");
+                Util.LogError("예외 처리 필요");
                 break;
         }
 
@@ -103,14 +93,13 @@ public class LogInManager : Manager
     public bool SetUpdateNickname(string _updateNickname)
     {
         isDone = BackendMng.CreateNickname(_updateNickname);
-
         return isDone;
     }
 
     public void SetUserLogIn()
     {
         currLogInProcessType = LogInProcessType.UserLogIn;
-        currAccountType = GetAccountType();
+        currAccountType      = GetAccountType();
 
         isDone = true;
     }
@@ -122,11 +111,7 @@ public class LogInManager : Manager
             case AccountType.Guest:
                 {
                     isDone = BackendMng.SignOut();
-
-                    if(isDone)
-                    {
-                        BackendMng.DeleteGuestInfo();
-                    }
+                    if (isDone) { BackendMng.DeleteGuestInfo(); }
                 }
                 break;
 
@@ -137,7 +122,7 @@ public class LogInManager : Manager
                 break;
 
             default:
-                Debug.LogError("예외 처리 필요");
+                Util.LogError("예외 처리 필요");
                 break;
         }
     }
@@ -164,8 +149,7 @@ public class LogInManager : Manager
 
             default:
                 {
-                    Debug.LogError("알 수 없는 계정 타입 : " + subscriptionType);
-
+                    Util.LogError("알 수 없는 계정 타입 : " + subscriptionType);
                     return AccountType.None;
                 }
         }

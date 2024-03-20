@@ -16,6 +16,7 @@ public class TitleScene : BaseScene<TitleScene>
     TitleProcessType currTitleProcessType = TitleProcessType.Init;
 
     TitleUI titleUI = null;
+
     IEnumerator titleProcessCoroutine = null;
     IEnumerator titleProcessRoutine   = null;
     [Obsolete("테스트")] IEnumerator testDebugProcessCoroutine = null;
@@ -84,19 +85,19 @@ public class TitleScene : BaseScene<TitleScene>
         yield return null;
 
         currTitleProcessType = TitleProcessType.Init;
-        titleProcessRoutine = InitDataProcessCoroutine();
+        titleProcessRoutine  = InitDataProcessCoroutine();
         yield return titleProcessRoutine;
 
         currTitleProcessType = TitleProcessType.LogIn;
-        titleProcessRoutine = LogInProcessCoroutine();
+        titleProcessRoutine  = LogInProcessCoroutine();
         yield return titleProcessRoutine;
 
         currTitleProcessType = TitleProcessType.LoadUserData;
-        titleProcessRoutine = LoadUserDataProcessCoroutine();
+        titleProcessRoutine  = LoadUserDataProcessCoroutine();
         yield return titleProcessRoutine;
 
         currTitleProcessType = TitleProcessType.LoadGameScene;
-        titleProcessRoutine = LoadGameSceneProcessCoroutine();
+        titleProcessRoutine  = LoadGameSceneProcessCoroutine();
         yield return titleProcessRoutine;
 
         currTitleProcessType = TitleProcessType.Complete;
@@ -105,9 +106,6 @@ public class TitleScene : BaseScene<TitleScene>
     IEnumerator InitDataProcessCoroutine()
     {
         yield return null;
-
-        //titleUI.PlayInitDataText_Anim();
-        //yield return null;
 
         // Server
         Manager.BackendMng.InitBackendSDK();
@@ -146,10 +144,7 @@ public class TitleScene : BaseScene<TitleScene>
                                     return;
                                 }
                                 
-                                if(titleUI.selectAccountType == AccountType.Google)
-                                {
-                                    
-                                }
+                                if(titleUI.selectAccountType == AccountType.Google) { }
                             }
                             break;
 
@@ -175,7 +170,7 @@ public class TitleScene : BaseScene<TitleScene>
 
             case TitleProcessType.LoadUserData:
                 {
-                    Debug.LogWarning("Debug 테스트용");
+                    Util.LogWarning("Debug 테스트용");
                     Manager.LogInMng.SetUserLogOut();
 
                     TitleProcess();
@@ -219,7 +214,6 @@ public class TitleScene : BaseScene<TitleScene>
         while(true)
         {
             UpdateTitleProcessDebug();
-
             yield return null;
         }
     }
@@ -228,9 +222,9 @@ public class TitleScene : BaseScene<TitleScene>
     {
         try
         {
-            string inData = Manager.BackendMng.GetInData();
+            string inData   = Manager.BackendMng.GetInData();
             string nickname = Manager.BackendMng.GetNickname();
-            string format = string.Format(
+            string format   = string.Format(
                 "[TitleProcess] " + currTitleProcessType.ToString() + '\n' +
                 "[LoginProcess] " + Manager.LogInMng.currLogInProcessType.ToString() + '\n' +
                 "[AccountType] " + Manager.LogInMng.currAccountType.ToString() + '\n' +
