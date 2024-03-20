@@ -46,27 +46,22 @@ public class GlobalScene : BaseScene<GlobalScene>
 
     #endregion Resource
 
-    //#region UserData
-
-    //public int GetUserExpValue()
-    //{
-    //    return Manager.UserMng.userData.ExpValue;
-    //}
-
-    //public int GetUserLevelValue()
-    //{
-    //    return Manager.UserMng.userData.LevelValue;
-    //}
-
-    //public int GetUserHpValue()
-    //{
-    //    return Manager.UserMng.userData.CurrHP;
-    //}
+    #region UserData
 
     public void UpdateUserData_CurrHPValue(int pHP)
     {
         Manager.UserMng.UpdateUserData_CurrHPValue(pHP);
     }
 
-    //#endregion UserData
+    public void UpdateUserData_ExpValue(int pExpValue)
+    {
+        Manager.UserMng.UpdateUserData_ExpValue(pExpValue);
+    }
+
+    public void UpdateUserData_LevelUp()
+    {
+        Manager.UserMng.UpdateUserData_LevelUp();
+    }
+
+    #endregion UserData
 }

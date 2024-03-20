@@ -119,7 +119,6 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
 
             upperAnimType = value;
 
-            // Upper
             switch (upperAnimType)
             {
                 case UpperAnim.Ready:
@@ -148,8 +147,8 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
     private float temp_andTime = 0f;
     private float temp_fadeOutTime = 0f;
     private bool temp_isDying = false;
-    private bool temp_isAttacking = false;
-    private bool temp_isHit = false;
+    protected bool temp_isAttacking = false;
+    protected bool temp_isHit = false;
 
     protected string Temp_Tag { set { gameObject.tag = value; } }
 
@@ -162,7 +161,6 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
     private IWeapon weap = null;
     protected IWeapon Weap => weap ?? (weap = new NullObject());
     
-
     //private Action<GameObject> despawnAction = null;
 
 
@@ -317,6 +315,8 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         if (hpBarUI != null)
             hpBarUI.Close(); //юс╫ц
 
+        weap.SetEquiped(false);
+
         NevAgent.isStopped = true;
         NevAgent.velocity = Vector3.zero;
         Anim.SetRebind();
@@ -361,6 +361,28 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         Weap.SetAttackPos();
     }
 
+    private void UpdateDying()
+    {
+        if (temp_isDying == false)
+            return;
+
+        temp_fadeOutTime = Mathf.Lerp(temp_startTime, temp_andTime, Anim.GetAnimatorStateNormalizedTime(temp_baseLayerName));
+        SetMateriasColorAlpha(temp_fadeOutTime);
+
+        if (Anim.GetAnimatorStateNormalizedTime(temp_baseLayerName) >= 1.0f)
+        {
+            SetMateriasColorAlpha(0f);
+            Anim.SetRebind();
+
+            Despawn();
+
+            temp_startTime = 1f;
+            temp_andTime = 0f;
+            temp_fadeOutTime = 0f;
+            temp_isDying = false;
+        }
+    }
+
     private void UpdateAttacking()
     {
         if (temp_isAttacking == false)
@@ -383,28 +405,6 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         {
             temp_isAttacking = false;
             temp_isHit = false;
-        }
-    }
-
-    private void UpdateDying()
-    {
-        if (temp_isDying == false)
-            return;
-
-        temp_fadeOutTime = Mathf.Lerp(temp_startTime, temp_andTime, Anim.GetAnimatorStateNormalizedTime(temp_baseLayerName));
-        SetMateriasColorAlpha(temp_fadeOutTime);
-
-        if (Anim.GetAnimatorStateNormalizedTime(temp_baseLayerName) >= 1.0f)
-        {
-            SetMateriasColorAlpha(0f);
-            Anim.SetRebind();
-
-            Despawn();
-
-            temp_startTime = 1f;
-            temp_andTime = 0f;
-            temp_fadeOutTime = 0f;
-            temp_isDying = false;
         }
     }
 
@@ -448,7 +448,7 @@ public abstract class BaseActor : MonoBehaviour, ITarget_Temp
         Anim.SetCrossFade(temp_baseLayerName, animName, pTransDuration, pSpeed);
     }
 
-    private void PlayUpperAnimation(UpperAnim pUpperAnimType, float pTransDuration, float pSpeed)
+    protected void PlayUpperAnimation(UpperAnim pUpperAnimType, float pTransDuration, float pSpeed)
     {
         string animName = pUpperAnimType.ToString();
         Anim.SetCrossFade(temp_upperLayerName, animName, pTransDuration, pSpeed);

@@ -7,10 +7,12 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
         /// <sammary>
         /// LoadingUI
         /// </sammary>
+        LoadingUI,
 
         // UIPosition
 
         // Object
+        //LoadingUI_Object_BGAnimation,
 
         // Button
 
@@ -18,6 +20,21 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
 
         // Text
 
+    }
+
+    public bool IsLoadingUI_AnimationCompleted
+    {
+        get
+        {
+            Animator anim = GetUIComponent<Animator>(UI.LoadingUI);
+            if (anim != null)
+            {
+                bool isCompleted = anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9f;
+                if(isCompleted) { anim.speed = 0f; }
+                return isCompleted;
+            }
+            return true;
+        }
     }
 
 
@@ -46,6 +63,17 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
 
     //void Update()
     //{
+    //}
+
+    //public bool IsLoadingUI_AnimationCompleted()
+    //{
+    //    Animator anim = GetUIComponent<Animator>(UI.LoadingUI);
+    //    if (anim != null)
+    //    {
+    //        return anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f;
+    //    }
+
+    //    return true;
     //}
 
     #region Button

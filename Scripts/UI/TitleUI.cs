@@ -10,10 +10,12 @@ public class TitleUI : BaseUI<TitleUI.UI>
         /// <sammary>
         /// TitleUI
         /// </sammary>
+        TitleUI,
 
         // UIPosition
 
         // Object
+        TitleUI_Object_MainBG, TitleUI_Object_StartBG, TitleUI_Object_LoadDataBG,
         TitleUI_Object_InitDataProcess, TitleUI_Object_LoginProcess, TitleUI_Object_LoadDataProcess,
         TitleUI_Object_Logout, TitleUI_Object_Login,
 
@@ -118,6 +120,21 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
     public AccountType selectAccountType { get; private set; } = AccountType.None;
     public string inputNickname { get; private set; } = string.Empty;
+    public bool IsTitleUI_AnimationCompleted
+    {
+        get
+        {
+            Animator anim = GetUIComponent<Animator>(UI.TitleUI);
+            if (anim != null)
+            {
+                bool isCompleted = anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9f;
+                //if (isCompleted) { anim.speed = 0f; }
+                return isCompleted;
+            }
+            return true;
+        }
+    }
+
     bool debugSelectAble = true;
 
     public Action onLogInState { get; private set; } = null;
@@ -159,12 +176,10 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
         UpdateTitleUI(TitleScene.TitleProcessType.Init);
         OpenTitleUI_Panel_DebugTestPopup();
+        OnClick_DebugTestPopup_Button_Select(); //임시
     }
 
-    protected override void OnClose()
-    {
-        //yield return null;
-    }
+    protected override void OnClose() { }
 
     #region Button
 
@@ -175,7 +190,7 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_TitleUI_Button_Google()
     {
-        Debug.LogWarning("개발 진행 중 입니다.");
+        Util.LogWarning("개발 진행 중 입니다.");
 
         //selectAccountType = LoginManager.AccountType.Guest;
 
@@ -191,14 +206,12 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_PatchPopup_Button_Confirm()
     {
-        Debug.LogWarning("개발 진행 중 입니다.");
-
+        Util.LogWarning("개발 진행 중 입니다.");
     }
 
     void OnClick_PatchPopup_Button_Cancel()
     {
-        Debug.LogWarning("개발 진행 중 입니다.");
-
+        Util.LogWarning("개발 진행 중 입니다.");
     }
 
     void OnClick_SignUpPopup_Button_GuestConfirm()
@@ -232,7 +245,7 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
     void OnClick_NicknamePopup_Button_Confirm()
     {
-        Debug.LogWarning("UI 구조 수정 필요");
+        Util.LogWarning("UI 구조 수정 필요");
         TMP_InputField inputField = GetUIObject(UI.NicknamePopup_InputField_Nickname).GetComponent<TMP_InputField>();
         if (inputField == null)
             return;
@@ -276,13 +289,13 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
             case AccountType.Google:
                 {
-                    Debug.LogWarning("개발 진행 중 입니다.");
+                    Util.LogWarning("개발 진행 중 입니다.");
                     //LoginManager.Instance.SetLogOut(LoginManager.AccountType.Google);
                 }
                 break;
 
             default:
-                Debug.LogError("예외 처리 필요");
+                Util.LogError("예외 처리 필요");
                 break;
         }
     }
@@ -291,11 +304,11 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
     #region TitleUI
 
-    public void SetTitleUI(TitleScene.TitleProcessType _titleProcessType)
+    public void SetTitleUI(TitleScene.TitleProcessType pTitleProcessType)
     {
-        UpdateTitleUI(_titleProcessType);
+        UpdateTitleUI(pTitleProcessType);
 
-        if (_titleProcessType == TitleScene.TitleProcessType.LogIn)
+        if (pTitleProcessType == TitleScene.TitleProcessType.LogIn)
         {
             switch (TitleScene.Instance.GetCurrLogInProcessType())
             {
@@ -319,19 +332,42 @@ public class TitleUI : BaseUI<TitleUI.UI>
         }
     }
 
-    public void Set_OnLogInState(Action _onLogInState)
+    public void Set_OnLogInState(Action pOnLogInState)
     {
-        onLogInState = _onLogInState;
+        onLogInState = pOnLogInState;
     }
 
-    void UpdateTitleUI(TitleScene.TitleProcessType _titleProcessType)
-    {
-        SetActiveUI(UI.TitleUI_Object_InitDataProcess, _titleProcessType == TitleScene.TitleProcessType.Init);
-        SetActiveUI(UI.TitleUI_Object_LoginProcess, _titleProcessType == TitleScene.TitleProcessType.LogIn);
-        SetActiveUI(UI.TitleUI_Object_LoadDataProcess, _titleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
+    //public void PlayInitDataText_Anim()
+    //{
+    //    Animator anim = GetUIComponent<Animator>(UI.TitleUI_AnimText_InitDataTitle);
+    //    if(anim != null)
+    //    {
+    //        //anim.Rebind();
+    //        //anim.Play("Play");
+    //    }
+    //}
 
-        if(_titleProcessType == TitleScene.TitleProcessType.LogIn)
+    void UpdateTitleUI(TitleScene.TitleProcessType pTitleProcessType)
+    {
+        SetActiveUI(UI.TitleUI_Object_MainBG, pTitleProcessType == TitleScene.TitleProcessType.Init);
+        SetActiveUI(UI.TitleUI_Object_LoadDataBG, pTitleProcessType == TitleScene.TitleProcessType.LoadUserData);
+
+        ///
+        SetActiveUI(UI.TitleUI_Object_InitDataProcess, pTitleProcessType == TitleScene.TitleProcessType.Init);
+        SetActiveUI(UI.TitleUI_Object_LoginProcess, pTitleProcessType == TitleScene.TitleProcessType.LogIn);
+        SetActiveUI(UI.TitleUI_Object_LoadDataProcess, pTitleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
+
+        if (pTitleProcessType == TitleScene.TitleProcessType.LoadUserData)
         {
+            Animator anim = GetUIComponent<Animator>(UI.TitleUI);
+            anim?.Rebind(); 
+        }
+
+        if(pTitleProcessType == TitleScene.TitleProcessType.LogIn)
+        {
+            SetActiveUI(UI.TitleUI_Object_StartBG, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
+
+            ///
             SetActiveUI(UI.TitleUI_Object_Login, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
             SetActiveUI(UI.TitleUI_Object_Logout, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogOut);
         }
@@ -341,12 +377,12 @@ public class TitleUI : BaseUI<TitleUI.UI>
 
     #region TitleUI_Panel_SignUpPopup
 
-    void OpenTitleUI_Panel_SignUpPopup(AccountType _accountType)
+    void OpenTitleUI_Panel_SignUpPopup(AccountType pAccountType)
     {
         SetActiveUI(UI.TitleUI_Panel_SignUpPopup, true);
 
         selectAccountType = AccountType.None;
-        UpdateTitleUI_Panel_SignUpPopup(_accountType);
+        UpdateTitleUI_Panel_SignUpPopup(pAccountType);
     }
 
     void CloseTitleUI_Panel_SignUpPopup()
@@ -354,10 +390,10 @@ public class TitleUI : BaseUI<TitleUI.UI>
         SetActiveUI(UI.TitleUI_Panel_SignUpPopup, false);
     }
 
-    void UpdateTitleUI_Panel_SignUpPopup(AccountType _accountType)
+    void UpdateTitleUI_Panel_SignUpPopup(AccountType pAccountType)
     {
-        SetActiveUI(UI.SignUpPopup_Object_Guest,     _accountType == AccountType.Guest);
-        SetActiveUI(UI.SignUpPopup_Object_Google,    _accountType == AccountType.Google);
+        SetActiveUI(UI.SignUpPopup_Object_Guest,     pAccountType == AccountType.Guest);
+        SetActiveUI(UI.SignUpPopup_Object_Google,    pAccountType == AccountType.Google);
     }
 
     #endregion TitleUI_Panel_SignUpPopup
@@ -423,12 +459,12 @@ public class TitleUI : BaseUI<TitleUI.UI>
         SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, false);
     }
 
-    void UpdateTitleUI_Panel_DebugTestPopup(bool _debugSelectAble)
+    void UpdateTitleUI_Panel_DebugTestPopup(bool pDebugSelectAble)
     {
         // Select
-        SetActiveUI(UI.DebugTestPopup_Object_SelectAble,     _debugSelectAble == false);
-        SetActiveUI(UI.DebugTestPopup_Object_SelectDesable,  _debugSelectAble);
-        SetActiveUI(UI.DebugTestPopup_Object_DestPopup,      _debugSelectAble);
+        SetActiveUI(UI.DebugTestPopup_Object_SelectAble,     pDebugSelectAble == false);
+        SetActiveUI(UI.DebugTestPopup_Object_SelectDesable,  pDebugSelectAble);
+        SetActiveUI(UI.DebugTestPopup_Object_DestPopup,      pDebugSelectAble);
         SetDebugLog();
     }
 

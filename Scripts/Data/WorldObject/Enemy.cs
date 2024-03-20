@@ -5,8 +5,8 @@ using static Define;
 
 public class Enemy : BaseActor
 {
-    float temp_attackRange = 1.5f;
-    Vector3 temp_destPos = Vector3.zero;
+    private float temp_attackRange = 1.5f;
+    private Vector3 temp_destPos = Vector3.zero;
 
     protected override void Update()
     {
@@ -30,9 +30,9 @@ public class Enemy : BaseActor
 
     protected override void SetDead()
     {
-        //// 플레이어 Exp 증가
-        //if (Manager.World.IsGamePlay)
-        //    Manager.World.playerCtrl.IncreaseExp(stat.maxExp);
+        // 플레이어 Exp 증가
+        EnemyTable.Data enemeyData = GlobalScene.Instance.EnemyTable.GetTableData(actorID);
+        WorldScene.Instance.PlayerCtrl.OnIncreaseExp(enemeyData.RewardExp);
 
         OnDisableTargetOutline();
 
@@ -56,24 +56,11 @@ public class Enemy : BaseActor
                 break;
             }
         }
-
-        //if (target != null && target.StateType != Define.State.Die)
-        //{
-        //    float distance = (this.target.transform.position - transform.position).magnitude;
-        //    if (distance <= attackRange)
-        //        SetStateType(Define.State.Attack);
-        //    else
-        //        SetStateType(Define.State.Run);
-        //}
-        //else
-        //{
-        //    SetStateType(Define.State.Idle);
-        //}
     }
 
     void UpdateBaseState(Define.BaseAnim pBaseState)
     {
-        if (BaseAnimType == Define.BaseAnim.Die)
+        if (BaseAnimType == Define.BaseAnim.Die || UpperAnimType == Define.UpperAnim.Attack)
             return;
 
         switch (pBaseState)
@@ -114,10 +101,13 @@ public class Enemy : BaseActor
     {
         float distance = 0f;
 
-        if (UpperAnimType == Define.UpperAnim.Attack)
-        {
-            return;
-        }
+        //if (UpperAnimType == Define.UpperAnim.Attack)
+        //{
+        //    return;
+        //}
+
+        NevAgent.isStopped = true;
+        NevAgent.velocity = Vector3.zero;
 
         temp_destPos = WorldScene.Instance.PlayerCtrl.Position;
         distance = (temp_destPos - Position).magnitude;
@@ -144,7 +134,7 @@ public class Enemy : BaseActor
         float distance = 0f;
         //행동 변경 검사 : 공격 범위 이내이면 -> Attack
         distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
-        if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
+        if (distance <= temp_attackRange)
         {
             NevAgent.SetDestination(transform.position);
             BaseAnimType = Define.BaseAnim.Idle;
@@ -159,6 +149,8 @@ public class Enemy : BaseActor
             return;
         }
 
+        NevAgent.isStopped = false;
+
         EnemyTable.Data enemeyData = GlobalScene.Instance.EnemyTable.GetTableData(actorID);
         CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(enemeyData.CharacterID);
 
@@ -170,31 +162,27 @@ public class Enemy : BaseActor
     void UpdateUpperReady()
     {
         float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
-        if (distance <= temp_attackRange) // 플레이어와의 거리가 공격 범위보다 가까우면 공격
+        bool isAttack = distance <= temp_attackRange;
+        if (isAttack) 
         {
             UpperAnimType = Define.UpperAnim.Attack;
-            //return;
         }
     }
 
     void UpdateUpperAttack()
     {
-        //if (WorldScene.Instance.IsGamePlay)
-        //{
-            float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
-            if (distance > temp_attackRange)
-            {
-                UpperAnimType = Define.UpperAnim.Ready;
-                return;
-            }
+        NevAgent.isStopped = true;
+        NevAgent.velocity = Vector3.zero;
 
-            Vector3 dir = WorldScene.Instance.PlayerCtrl.Position - Position;
-            Quaternion quat = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
-        //}
-        //else
-        //{
-         //   UpperAnimType = Define.UpperAnim.Ready;
-        //}
+        float distance = (WorldScene.Instance.PlayerCtrl.Position - Position).magnitude;
+        if (distance > temp_attackRange)
+        {
+            UpperAnimType = Define.UpperAnim.Ready;
+            return;
+        }
+
+        Vector3 dir = WorldScene.Instance.PlayerCtrl.Position - Position;
+        Quaternion quat = Quaternion.LookRotation(dir);
+        transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20 * Time.deltaTime);
     }
 }

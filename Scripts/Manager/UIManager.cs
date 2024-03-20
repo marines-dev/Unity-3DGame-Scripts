@@ -80,6 +80,7 @@ public class UIManager : Manager
             string uiName = typeof(TBaseUI).Name;
             string path = $"Prefabs/UI/{uiName}";
             baseUI = ResourceMng.Instantiate(path, pCanvas.transform).GetOrAddComponent<TBaseUI>();
+            baseUI.gameObject.name = name;
         }
 
         ///

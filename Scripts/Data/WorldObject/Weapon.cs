@@ -110,7 +110,8 @@ public class Weapon : MonoBehaviour, IWeapon
 
                     ///
                     shotSFX = go.GetOrAddComponent<ParticleSystem>();
-                    shotSFX.gameObject.SetActive(false);
+                    shotSFX.Stop();
+                    //shotSFX.gameObject.SetActive(false);
                 }
             }
         }
@@ -171,8 +172,9 @@ public class Weapon : MonoBehaviour, IWeapon
             shotSFX.transform.parent = transform;
             shotSFX.transform.localPosition = weaponData.SFXPosition;
             shotSFX.transform.localRotation = Quaternion.Euler(weaponData.SFXRotation);
-            shotSFX.gameObject.SetActive(false);
-            shotSFX.gameObject.SetActive(true);
+            //shotSFX.gameObject.SetActive(false);
+            //shotSFX.gameObject.SetActive(true);
+            shotSFX.Play();
         }
     }
 }

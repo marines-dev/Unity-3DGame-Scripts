@@ -36,8 +36,8 @@ public class WorldScene : BaseScene<WorldScene>
         }
     }
 
-    Dictionary<GameObject, int> fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
-    Dictionary<int, WorldSpawner> worldSpawner_dic = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
+    private Dictionary<GameObject, int> fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
+    private Dictionary<int, WorldSpawner> worldSpawner_dic = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
 
     #endregion World
 

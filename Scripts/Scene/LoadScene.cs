@@ -47,7 +47,7 @@ public class LoadScene : BaseScene<LoadScene>
     {
         ClearLoadingProcess();
 
-        loadUI.Close();
+        loadUI?.Close();
         /// Complete
         Debug.Log($"Success : {Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
@@ -81,14 +81,12 @@ public class LoadScene : BaseScene<LoadScene>
         Manager.ReleaseManagers();
         yield return null;
 
-        /// 메모리 정리(임시)
         Resources.UnloadUnusedAssets();
         GC.Collect();
-        yield return null;
+        yield return new WaitUntil(() => loadUI.IsLoadingUI_AnimationCompleted);
 
         yield return LoadSceneAsync(nextSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
         SetActiveScene(nextSceneName);
-        yield return null;
 
         string loadSceneName = typeof(LoadScene).Name;
         yield return UnloadSceneAsync(loadSceneName);

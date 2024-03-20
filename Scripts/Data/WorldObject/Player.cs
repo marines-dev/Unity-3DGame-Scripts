@@ -1,27 +1,16 @@
 using System;
+using Interface;
 using UnityEngine;
 using static Define;
 
-public interface IPlayerCtrl
-{
-    public Vector3 Position { get; }
-    public Vector3 Rotation { get; }
-
-    public void OnMove(Vector3 pEulerAngles);
-    public void OnStop();
-    public void OnAttack();
-    public void OnReady();
-    //public void IncreaseExp(int pAddExpValue);
-}
-
 public class Player : BaseActor, IPlayerCtrl
 {
-    int temp_userLevelValue = 0;
-    int temp_userExpValue = 0;
+    //int temp_userLevelValue = 0;
+    //int temp_userExpValue = 0;
 
-    ITarget_Temp target = null;
+    private ITarget_Temp target = null;
 
-    Action deadAction = null;
+    private Action deadAction = null;
 
 
     protected override void Update()
@@ -32,12 +21,7 @@ public class Player : BaseActor, IPlayerCtrl
         {
             //
             Vector3 target_dir = target.Position - Position;
-            if (target_dir.magnitude > temp_scanRange)
-            {
-                target.OnDisableTargetOutline();
-                target = null;
-            }
-            else if (target.SurvivalStateType == SurvivalState.Dead)
+            if ((target_dir.magnitude > temp_scanRange) || target.SurvivalStateType == SurvivalState.Dead)
             {
                 target.OnDisableTargetOutline();
                 target = null;
@@ -87,10 +71,7 @@ public class Player : BaseActor, IPlayerCtrl
         {
             Temp_Tag = "Player";
 
-            temp_userExpValue = GlobalScene.Instance.UserData.ExpValue;
-            temp_userLevelValue = GlobalScene.Instance.UserData.LevelValue;
             int currentHp = GlobalScene.Instance.UserData.CurrHP;
-
             SetHP(currentHp);
         }
 
@@ -114,6 +95,15 @@ public class Player : BaseActor, IPlayerCtrl
         {
             deadAction.Invoke();
         }
+    }
+
+    protected override void SetAttack()
+    {
+        temp_isAttacking = true;
+        temp_isHit = false;
+
+        PlayUpperAnimation(UpperAnimType, 0.01f, 1f);
+        Weap.SetAttackPos();
     }
 
     public void OnMove(Vector3 pEulerAngles)
@@ -159,75 +149,52 @@ public class Player : BaseActor, IPlayerCtrl
         }
     }
 
-    //public void IncreaseExp(int pAddExpValue)
-    //{
-    //    if (pAddExpValue <= 0)
-    //    {
-    //        Debug.LogWarning("Failed : ");
-    //        return;
-    //    }
+    public void OnIncreaseExp(int pAddExpValue)
+    {
+        if (pAddExpValue <= 0)
+        {
+            Util.LogWarning();
+            return;
+        }
 
-    //    int expValue = userExpValue + pAddExpValue;
-    //    if (expValue < stat.maxExp)
-    //    {
-    //        userExpValue = Manager.User.SetUserExp(expValue);
-    //        Debug.Log($"userExpValue 증가 : {userExpValue}");
-    //    }
-    //    else
-    //    {
-    //        SetLevelUp(); //임시
-    //    }
-    //    //int level = 1;
-    //    //while (true)
-    //    //{
-    //    //    //Data.StatData statData;
-    //    //    //if (Managers.Data.StatDict.TryGetValue(level + 1, out statData) == false)
-    //    //    //    break;
+        int userExpValue = GlobalScene.Instance.UserData.ExpValue;
+        int expValue = userExpValue + pAddExpValue;
+        if (expValue < Config.User_MaxExp_init)
+        {
+            GlobalScene.Instance.UpdateUserData_ExpValue(expValue);
+            userExpValue = GlobalScene.Instance.UserData.ExpValue;
+            Util.LogSuccess($"userExpValue 증가 : {userExpValue}");
+        }
+        else
+        {
+            SetLevelUp(); //임시
+        }
+    }
 
-    //    //    int temp_totalExp = 100;
-    //    //    if (statData.exp < temp_totalExp)
-    //    //        break;
-    //    //    level++;
-    //    //}
+    private void SetLevelUp()
+    {
+        int userExpValue = GlobalScene.Instance.UserData.ExpValue;
+        int maxExp = Config.User_MaxExp_init;
+        if (userExpValue < maxExp)
+        {
+            Debug.LogWarning($"Failed : 플레이어의 Exp({userExpValue})가 MaxExp({maxExp})보다 작아 LevelUp할 수 없습니다.");
+            return;
+        }
 
-    //    //if (level != statData.level)
-    //    //{
-    //    //    Debug.Log("Level Up!");
-    //    //}
-    //}
+        GlobalScene.Instance.UpdateUserData_LevelUp();
+        Util.LogSuccess($"Level Up!(level : {GlobalScene.Instance.UserData.LevelValue}, exp : {GlobalScene.Instance.UserData.ExpValue})");
+    }
 
-    //void SetLevelUp()
-    //{
-    //    if (userExpValue < stat.maxExp)
-    //    {
-    //        Debug.LogWarning($"Failed : 플레이어의 Exp({userExpValue})가 MaxExp({stat.maxExp})보다 작아 LevelUp할 수 없습니다.");
-    //        return;
-    //    }
-
-    //    Manager.User.SetUserLevelUp();
-    //    userExpValue = Manager.User.ExpValue;
-    //    userLevelValue = Manager.User.LevelValue;
-
-    //    Debug.Log($"Success : Level Up! : {userLevelValue}(exp : {userExpValue})");
-
-    //    //Dictionary<int, Data.StatData> dict = Managers.Data.StatDict;
-    //    //Data.StatData statData = dict[level];
-
-    //    //Stat.Hp = statData.maxHp;
-    //    //Stat.MaxHp = statData.maxHp;
-    //    //Stat.Attack = statData.attack;
-    //}
-
-    ////Draw the Box Overlap as a gizmo to show where it currently is testing. Click the Gizmos button to see this
-    //[Obsolete("테스트")]
-    //void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.blue;
-    //    //Check that it is being run in Play Mode, so it doesn't try to draw this in Editor mode
-    //    //if (m_Started)
-    //    //Draw a cube where the OverlapBox is (positioned where your GameObject is as well as a size)
-    //    Gizmos.DrawWireSphere(transform.position, 3f);
-    //    Gizmos.DrawWireCube(transform.position + (transform.forward / 2f) + transform.up, transform.localScale);
-    //    //Debug.DrawRay(transform.position + transform.up, transform.forward * 3f, Color.red);
-    //}
+    //Draw the Box Overlap as a gizmo to show where it currently is testing. Click the Gizmos button to see this
+    [Obsolete("테스트")]
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        //Check that it is being run in Play Mode, so it doesn't try to draw this in Editor mode
+        //if (m_Started)
+        //Draw a cube where the OverlapBox is (positioned where your GameObject is as well as a size)
+        Gizmos.DrawWireSphere(transform.position, temp_scanRange);
+        Gizmos.DrawWireCube(transform.position + (transform.forward / 2f) + transform.up, transform.localScale);
+        //Debug.DrawRay(transform.position + transform.up, transform.forward * 3f, Color.red);
+    }
 }

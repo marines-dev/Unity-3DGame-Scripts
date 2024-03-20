@@ -60,7 +60,7 @@ public class TitleScene : BaseScene<TitleScene>
 
     [Obsolete("임시")] public AccountType GetCurrAccountType() { return Manager.LogInMng.currAccountType; }
     [Obsolete("임시")] public LogInProcessType GetCurrLogInProcessType() { return Manager.LogInMng.currLogInProcessType; }
-
+    
     void TitleProcess()
     {
         if (titleProcessCoroutine != null)
@@ -104,15 +104,23 @@ public class TitleScene : BaseScene<TitleScene>
 
     IEnumerator InitDataProcessCoroutine()
     {
+        yield return null;
+
+        //titleUI.PlayInitDataText_Anim();
+        //yield return null;
+
         // Server
         Manager.BackendMng.InitBackendSDK();
         Manager.GPGSMng.InitGPGSAuth();
         Manager.LogInMng.InitLogInState();
-        yield return null;
+
+        yield return new WaitUntil(() => titleUI.IsTitleUI_AnimationCompleted);
     }
 
     IEnumerator LogInProcessCoroutine()
     {
+        yield return null;
+
         titleUI.SetTitleUI(currTitleProcessType);
         titleUI.Set_OnLogInState(OnLogInState);
         yield return new WaitUntil(() => Manager.LogInMng.currLogInProcessType == LogInProcessType.UserLogIn);
@@ -180,7 +188,7 @@ public class TitleScene : BaseScene<TitleScene>
     IEnumerator LoadUserDataProcessCoroutine()
     {
         titleUI.SetTitleUI(currTitleProcessType);
-        yield return new WaitForSeconds(2f); // 테스트 코드
+        yield return new WaitUntil(() => titleUI.IsTitleUI_AnimationCompleted);
 
         Manager.UserMng.LoadUserData();
     }

@@ -1,3 +1,4 @@
+using Interface;
 using UnityEngine;
 
 public class NullObject : IPlayerCtrl, IWeapon
@@ -11,6 +12,7 @@ public class NullObject : IPlayerCtrl, IWeapon
     public void OnStop() { }
     public void OnAttack() { }
     public void OnReady() { }
+    public void OnIncreaseExp(int pAddExpValue) { }
 
     #endregion IPlayerCtrl
 

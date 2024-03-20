@@ -18,6 +18,8 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
     private void Awake()
     {
+        gameObject.name = GetType().Name; //юс╫ц
+
         BindUI();
         BindEvents();
 

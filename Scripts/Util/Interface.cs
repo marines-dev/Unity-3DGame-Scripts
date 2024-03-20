@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Interface
@@ -29,6 +26,18 @@ namespace Interface
     public interface ITableLoader
     {
         public void Initialized(TextAsset pTextAsset);
+    }
+
+    public interface IPlayerCtrl
+    {
+        public Vector3 Position { get; }
+        public Vector3 Rotation { get; }
+
+        public void OnMove(Vector3 pEulerAngles);
+        public void OnStop();
+        public void OnAttack();
+        public void OnReady();
+        public void OnIncreaseExp(int pAddExpValue);
     }
 
     //public interface ISpawner
