@@ -1,6 +1,5 @@
 using System;
 using Interface;
-using Table;
 using UnityEngine;
 using UnityEngine.AI;
 using static Define;

@@ -1,14 +1,10 @@
 using UnityEngine;
 
-/// <summary>
-/// Default
-/// </summary>
+
 public class CamController : MonoBehaviour
 {
     public bool SwitchQuarterViewMoed{ private get; set; }
-
-    private Define.CameraMode CameraModeType = Define.CameraMode.Defualt;
-    private readonly Vector3 deltaPos = Config.followCam_deltaPos;
+    private readonly Vector3 deltaPos = Define.followCam_deltaPos;
 
     private Camera mainCamera_ref = null;
 
@@ -52,19 +48,14 @@ public class CamController : MonoBehaviour
 
     private void ResetCameraMode()
     {
-        CameraModeType = Define.CameraMode.Defualt;
-
         if (mainCamera_ref != null)
         {
-            mainCamera_ref.backgroundColor = Config.cam_backgroundColor;
+            mainCamera_ref.backgroundColor = Define.cam_backgroundColor;
 
-            mainCamera_ref.transform.localPosition  = Config.cam_initPos;
-            mainCamera_ref.transform.localRotation  = Quaternion.Euler(Config.cam_initRot);
-            mainCamera_ref.transform.localScale     = Config.cam_initScale;
+            mainCamera_ref.transform.localPosition  = Define.cam_initPos;
+            mainCamera_ref.transform.localRotation  = Quaternion.Euler(Define.cam_initRot);
+            mainCamera_ref.transform.localScale     = Define.cam_initScale;
         }
     }
-
-    //protected override void OnPlay() { }
-    //protected override void OnStop() { }
 }
 

@@ -1,5 +1,4 @@
 using Interface;
-using Table;
 using UnityEngine;
 using static Define;
 

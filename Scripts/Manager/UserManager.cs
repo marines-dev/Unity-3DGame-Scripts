@@ -47,8 +47,8 @@ public class UserManager : Manager
             return userData.CurrHP;
         }
 
-        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
-        Table.StatTable.Data      statData      = TableMng.CreateOrGetBaseTable<Table.StatTable>().GetTableData(userData.StatID);
+        CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<CharacterTable>().GetTableData(userData.CharacterID);
+        StatTable.Data      statData      = TableMng.CreateOrGetBaseTable<StatTable>().GetTableData(userData.StatID);
         if (pCurrHP > statData.MaxHp)
         {
             Util.LogWarning($"HP({pCurrHP}) 값 초과로 MaxHP({statData.MaxHp})으로 저장합니다.");
@@ -83,8 +83,8 @@ public class UserManager : Manager
             return userData.ExpValue;
         }
 
-        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
-        int maxExp = Config.User_MaxExp_init;
+        CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<CharacterTable>().GetTableData(userData.CharacterID);
+        int maxExp = Define.User_MaxExp_init;
         if (pExpValue > maxExp)
         {
             Util.LogSuccess($"ExpValue({pExpValue}) 값 초과로 MaxExp({maxExp})으로 저장합니다.\n유저의 레벨을 증가해 주세요!");
@@ -111,7 +111,7 @@ public class UserManager : Manager
     [Obsolete("임시")]
     public int UpdateUserData_LevelUp()
     {
-        Table.CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<Table.CharacterTable>().GetTableData(userData.CharacterID);
+        CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<CharacterTable>().GetTableData(userData.CharacterID);
         int maxExp = 500;
         if (userData.ExpValue < maxExp)
         {
@@ -165,7 +165,7 @@ public class UserManager : Manager
 
     public void LoadUserData() // Backend 데이터를 불러옵니다.
     {
-        LitJson.JsonData gameDataJson = BackendMng.LoadBackendData(Config.User_TableName);
+        LitJson.JsonData gameDataJson = BackendMng.LoadBackendData(Define.User_TableName);
         if (gameDataJson == null)
         {
             Util.LogWarning($"유저 데이터가 존재하지 않습니다. 새로운 유저 데이터를 생성합니다.");
@@ -173,22 +173,22 @@ public class UserManager : Manager
             /// CreateUserData
             {
                 // ServerData.UserData
-                userData.CharacterID = Config.UserDataValue.CharacterID;
-                userData.StatID      = Config.UserDataValue.StatID;
-                userData.WeaponID    = Config.UserDataValue.WeaponID;
-                userData.CurrHP      = Config.UserDataValue.CurrHP;
-                userData.LevelValue  = Config.UserDataValue.LevelValue;
-                userData.ExpValue    = Config.UserDataValue.ExpValue;
-                userData.CoinValue   = Config.UserDataValue.CoinValue;
-                userData.SpawnPos    = Config.UserDataValue.SpawnPos;
-                userData.SpawnRot    = Config.UserDataValue.SpawnRot;
+                userData.CharacterID = Define.UserDataValue.CharacterID;
+                userData.StatID      = Define.UserDataValue.StatID;
+                userData.WeaponID    = Define.UserDataValue.WeaponID;
+                userData.CurrHP      = Define.UserDataValue.CurrHP;
+                userData.LevelValue  = Define.UserDataValue.LevelValue;
+                userData.ExpValue    = Define.UserDataValue.ExpValue;
+                userData.CoinValue   = Define.UserDataValue.CoinValue;
+                userData.SpawnPos    = Define.UserDataValue.SpawnPos;
+                userData.SpawnRot    = Define.UserDataValue.SpawnRot;
 
                 /// SaveUserData
                 Param param = AddServerData();
-                BackendMng.SaveBackendData(Config.User_TableName, ref param);
+                BackendMng.SaveBackendData(Define.User_TableName, ref param);
 
                 /// Reload
-                gameDataJson = BackendMng.LoadBackendData(Config.User_TableName);
+                gameDataJson = BackendMng.LoadBackendData(Define.User_TableName);
                 if (gameDataJson == null)
                 {
                     Util.LogError();
@@ -226,7 +226,7 @@ public class UserManager : Manager
         Param param = AddServerData();
 
         /// UpdateBackend
-        BackendMng.UpdateBackendData(Config.User_TableName, ref param);
+        BackendMng.UpdateBackendData(Define.User_TableName, ref param);
     }
 
     private Param AddServerData()

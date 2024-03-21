@@ -136,7 +136,7 @@ public class Player : BaseActor, IPlayerCtrl
 
         int userExpValue = GlobalScene.Instance.UserData.ExpValue;
         int expValue     = userExpValue + pAddExpValue;
-        if (expValue < Config.User_MaxExp_init)
+        if (expValue < Define.User_MaxExp_init)
         {
             GlobalScene.Instance.UpdateUserData_ExpValue(expValue);
             userExpValue = GlobalScene.Instance.UserData.ExpValue;
@@ -152,7 +152,7 @@ public class Player : BaseActor, IPlayerCtrl
     private void SetLevelUp()
     {
         int userExpValue = GlobalScene.Instance.UserData.ExpValue;
-        int maxExp       = Config.User_MaxExp_init;
+        int maxExp       = Define.User_MaxExp_init;
         if (userExpValue < maxExp)
         {
             Util.LogWarning($"플레이어의 Exp({userExpValue})가 MaxExp({maxExp})보다 작아 LevelUp할 수 없습니다.");

@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Interface;
 using UnityEngine;
 
 
-public class TableManager : Manager//BaseManager<TableManager>
+public class TableManager : Manager
 {
     /// <summary>
     /// Table
     /// </summary>
-    private Dictionary<string, ITableLoader> baseTable_dic = new Dictionary<string, ITableLoader>();
+    private Dictionary<string, IBaseTable> baseTable_dic = new Dictionary<string, IBaseTable>();
 
     /// <summary>
     /// Json
@@ -27,7 +26,7 @@ public class TableManager : Manager//BaseManager<TableManager>
     {
         // RemoveBaseTableAll
         {
-            ITableLoader[] baseTable_arr = baseTable_dic.Values.ToArray();
+            IBaseTable[] baseTable_arr = baseTable_dic.Values.ToArray();
             for (int i = 0; i < baseTable_arr.Length; ++i)
             {
                 if (baseTable_arr[i] != null)
@@ -39,7 +38,7 @@ public class TableManager : Manager//BaseManager<TableManager>
         }
     }
 
-    public TTable CreateOrGetBaseTable<TTable>() where TTable : class, ITableLoader, new()
+    public TTable CreateOrGetBaseTable<TTable>() where TTable : class, IBaseTable, new()
     {
         TTable baseTable = null;
         string name = typeof(TTable).Name;

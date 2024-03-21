@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public abstract class BaseObjectPool : MonoBehaviour
 {
@@ -62,15 +62,10 @@ public abstract class BaseObjectPool : MonoBehaviour
 
     public virtual void DespawnObject(GameObject pObj)
     {
-        if (pObj == null)
+        if (pObj == null || !objectPool_dic.ContainsKey(pObj))
         {
             Util.LogWarning();
             return;
-        }
-
-        if (!objectPool_dic.ContainsKey(pObj) || objectPool_dic[pObj] == Define.ExistenceState.Despawn)
-        {
-            Util.LogWarning();
         }
 
         objectPool_dic[pObj] = Define.ExistenceState.Despawn;

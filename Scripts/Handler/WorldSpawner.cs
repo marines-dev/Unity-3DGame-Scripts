@@ -1,6 +1,4 @@
 using System;
-using Interface;
-using Table;
 using UnityEngine;
 using static Define;
 
@@ -133,16 +131,16 @@ public class WorldSpawner : MonoBehaviour
     }
 
     [Obsolete("юс╫ц")]
-    private static string FindSpawningPath(Define.Spawning pSpawningType, int pSpawningID)
+    private static string FindSpawningPath(Spawning pSpawningType, int pSpawningID)
     {
         switch (pSpawningType)
         {
-            case Define.Spawning.Player:
+            case Spawning.Player:
                 {
                     CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(pSpawningID);
                     return $"Prefabs/WorldObject/Character/{characterData.PrefabName}";
                 }
-            case Define.Spawning.Enemy:
+            case Spawning.Enemy:
                 {
                     EnemyTable.Data enemyData = GlobalScene.Instance.EnemyTable.GetTableData(pSpawningID);
                     CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(enemyData.CharacterID);

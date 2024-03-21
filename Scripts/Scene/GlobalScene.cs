@@ -1,6 +1,5 @@
 using System;
 using ServerData;
-using Table;
 using UnityEngine;
 
 [Obsolete("юс╫ц")]

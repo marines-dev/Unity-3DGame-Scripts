@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Interface;
-using Table;
 using UnityEngine;
 using static Define;
 

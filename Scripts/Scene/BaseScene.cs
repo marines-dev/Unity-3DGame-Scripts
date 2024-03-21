@@ -120,21 +120,6 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
     protected abstract void OnStart();
     protected abstract void OnDestroy_();
 
-    /// <summary>
-    /// 파괴되지 않는 Managers의 오브젝트를 생성하고 반환합니다.
-    private Manager CreateManager()
-    {
-        /// Delete
-        if (manager != null)
-        {
-            manager = null;
-        }
-
-        /// New
-        manager = new Manager();
-        return manager;
-    }
-
     public static void RegisteredGlobalObjects()
     {
         mainCamera      = FindOrCreateGlobalObject<Camera>(mainCamera);
@@ -149,9 +134,6 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
             camCtrl.SetCamController(mainCamera);
         }
 
-        /// Registered as a Manager.
-        //CameraManager.SetCameraManager(MainCamera);
-        //UIManager.SetUIManager(MainCanvas, MainEventSystem);
     }
 
     private static TGlobalObj FindOrCreateGlobalObject<TGlobalObj>(TGlobalObj pGlobalObj) where TGlobalObj : Component

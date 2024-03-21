@@ -1,5 +1,4 @@
 using System;
-using Table;
 using UnityEngine;
 
 public interface IWeapon

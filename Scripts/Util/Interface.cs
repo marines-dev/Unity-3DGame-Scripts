@@ -17,20 +17,12 @@ namespace Interface
         public void DestroySelf();
     }
 
-    public interface IBaseTable { }
-
-    public interface ITableLoader
+    public interface IBaseTable 
     {
         public void Initialized(TextAsset pTextAsset);
     }
 
-    //public interface ILoader<TKey, TValue>
-    //{
-    //    Dictionary<TKey, TValue> MakeDict();
-    //}
-}
-
-public interface ITarget
+    public interface ITarget
     {
         public ExistenceState ExistenceStateType { get; }
         public SurvivalState SurvivalStateType { get; }
@@ -56,6 +48,11 @@ public interface ITarget
         public void OnIncreaseExp(int pAddExpValue);
     }
 
+    //public interface ILoader<TKey, TValue>
+    //{
+    //    Dictionary<TKey, TValue> MakeDict();
+    //}
+
     //public interface ISpawner
     //{
     //    public bool SwitchPooling { set; }
@@ -63,3 +60,4 @@ public interface ITarget
     //    //public void Stop();
     //    //public void SetWorldSpawner(int pSpawnerID, Action<GameObject, Define.Actor, int> pSpawnAction, Action<GameObject> pDespawnAction);
     //}
+}
