@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene : BaseScene<TScene>
+public abstract class BaseScene<TScene, TMainUI> : MonoBehaviour, IBaseScene where TScene : BaseScene<TScene, TMainUI> where TMainUI : Component, IMainUI
 {
     private static TScene instance;
     public static TScene Instance
@@ -19,20 +20,20 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
         }
     }
 
-    //private static TMainUI mainUI;
-    //public TMainUI MainUI
-    //{
-    //    get
-    //    {
-    //        if (mainUI == null)
-    //        {
-    //            Util.LogError();
-    //            return null;
-    //        }
-    //        return mainUI;
-    //    }
-    //}
-
+    private static TMainUI mainUI;
+    protected TMainUI MainUI
+    {
+        get
+        {
+            if (mainUI == null)
+            {
+                Util.LogError();
+                return default;
+            }
+            return mainUI;
+        }
+    }
+     
     #region GlobalObject
 
     private static Camera mainCamera = null;
@@ -55,6 +56,8 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
     private static Manager manager;
     protected Manager Manager => manager ?? (manager = new Manager());
 
+    private Dictionary<string, IBaseTable> baseTable_dic = new Dictionary<string, IBaseTable>();
+    //Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
 
     protected virtual void Awake()
     {
@@ -74,26 +77,27 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
         {
             if (instance != null)
             {
-                Manager.ResourceMng.DestroyGameObject(gameObject);
+                Util.LogWarning($"<{instance.name}>의 Instance가 중복되어 삭제했습니다.");
+                ResourceLoader.DestroyGameObject(gameObject);
                 instance = null;
-                Util.LogSuccess($"<{this}>이 중복되어 삭제하였습니다.");
             }
 
             instance = this as TScene;
-            Util.LogSuccess($"<{this}>을(를) 생성하고, Instance가 등록되었습니다.");
+            Util.LogSuccess($"새로운 <{this}>의 Instance가 등록되었습니다.");
         }
 
-        /////
-        //if (mainUI != null)
-        //{
-        //    Manager.ResourceMng.DestroyGameObject(mainUI.gameObject);
-        //    mainUI = null;
+        /// MainUI
+        {
+            if (mainUI != null)
+            {
+                Util.LogWarning($"<{mainUI.name}>의 MainUI가 중복되어 삭제합니다.");
+                ResourceLoader.DestroyGameObject(gameObject);
+                mainUI = default;
+            }
 
-        //    Util.LogSuccess($"<{mainUI.GetType().Name}>이 중복되어 삭제하였습니다.");
-        //}
-
-        //mainUI = Manager.UIMng.CreateOrGetBaseUI<TMainUI>(MainCanvas);
-        //mainUI.Close();
+            mainUI = UILoader.CreateBaseUI<TMainUI>(MainCanvas);
+            mainUI.Close();
+        }
 
         ///
         OnAwake();
@@ -101,24 +105,34 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
 
     protected virtual void Start()
     {
-        //mainUI.Open();
+        mainUI.Open();
 
         OnStart();
     }
 
     private void OnDestroy()
     {
-        OnDestroy_();
+        onDestroy();
 
-        instance = null;
-        //mainUI = null;
+        if(instance != null)
+        {
+            ResourceLoader.DestroyGameObject(instance.gameObject);
+            instance = null;
+        }
+
+
+        if(mainUI != null)
+        {
+            ResourceLoader.DestroyGameObject(mainUI.gameObject);
+            mainUI = null;
+        }
 
         Util.LogSuccess($"<{this}>이 파괴되고, Instance가 해제되었습니다.");
     }
 
     protected abstract void OnAwake();
     protected abstract void OnStart();
-    protected abstract void OnDestroy_();
+    protected abstract void onDestroy();
 
     public static void RegisteredGlobalObjects()
     {
@@ -165,4 +179,71 @@ public abstract class BaseScene<TScene> : MonoBehaviour, IBaseScene where TScene
 
         return pGlobalObj;
     }
+
+    protected TTable CreateOrGetBaseTable<TTable>() where TTable : class, IBaseTable, new()
+    {
+        TTable baseTable = null;
+        string name = typeof(TTable).Name;
+        /// Get
+        {
+            if (baseTable_dic.ContainsKey(name))
+            {
+                baseTable = baseTable_dic[name] as TTable;
+                return baseTable;
+            }
+        }
+
+        /// Create
+        {
+            baseTable = TableLoader.CreateBaseTable<TTable>();
+            baseTable_dic.Add(name, baseTable);
+            return baseTable;
+        }
+    }
+
+    //protected TBaseUI CreateOrGetBaseUI<TBaseUI>() where TBaseUI : Component, IBaseUI
+    //{
+    //    /// Get
+    //    {
+    //        TBaseUI baseUI = null;
+    //        baseUI = MainCanvas.transform.GetComponentInChildren<TBaseUI>();
+    //        if (baseUI != null) { return baseUI; }
+    //    }
+
+    //    /// Create
+    //    return UILoader.CreateBaseUI<TBaseUI>(MainCanvas);
+    //}
+
+    //public void OpenBaseUIAll()
+    //{
+    //    foreach (IBaseUI baseUI in baseUI_dic.Values)
+    //    {
+    //        if (baseUI != null) { baseUI.Open(); }
+    //    }
+    //}
+
+    //public void CloseBaseUIAll()
+    //{
+    //    foreach (IBaseUI baseUI in baseUI_dic.Values)
+    //    {
+    //        if (baseUI != null) { baseUI.Close(); }
+    //    }
+    //}
+
+    //private void DestroyBaseUIAll()
+    //{
+    //    if(baseUI_dic == null)
+    //    {
+    //        Util.LogWarning("");
+    //        return;
+    //    }    
+
+    //    IBaseUI[] baseTable_arr = baseUI_dic.Values.ToArray();
+    //    foreach (IBaseUI baseUI in baseTable_arr)
+    //    {
+    //        baseUI.DestroySelf();
+    //    }
+
+    //    baseUI_dic.Clear();
+    //}
 }

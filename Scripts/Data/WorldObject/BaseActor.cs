@@ -418,7 +418,7 @@ public abstract class BaseActor : MonoBehaviour, ITarget
         {
             if (hpBarUI != null)
             {
-                GlobalScene.Instance.DestroyGameObject(hpBarUI.gameObject);
+                ResourceLoader.DestroyGameObject(hpBarUI.gameObject);
                 hpBarUI = null;
             }
         }

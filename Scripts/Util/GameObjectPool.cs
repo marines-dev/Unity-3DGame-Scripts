@@ -29,7 +29,7 @@ public class GameObjectPool : MonoBehaviour
 
     GameObject CreateObject()
     {
-        GameObject go = GlobalScene.Instance.InstantiateResource(prefabPath, transform);
+        GameObject go = ResourceLoader.Instantiate(prefabPath, transform);
         if (!objectPool_dic.ContainsKey(go)) { objectPool_dic.Add(go, ExistenceState.Despawn); }
         else { objectPool_dic[go] = ExistenceState.Despawn; }
 

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class SampleScene : BaseScene<SampleScene>
+public class SampleScene : BaseScene<SampleScene, SampleMainUI>
 {
     /// <summary>
     /// MainUI
@@ -15,5 +15,5 @@ public class SampleScene : BaseScene<SampleScene>
 
     protected override void OnAwake() { }
     protected override void OnStart() { }
-    protected override void OnDestroy_() { }
+    protected override void onDestroy() { }
 }

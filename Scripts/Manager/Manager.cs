@@ -9,17 +9,8 @@ public class Manager
     private static SceneManager sceneMng = null;
     public SceneManager SceneMng => sceneMng ?? (sceneMng = CreateManager<SceneManager>());
 
-    private static ResourceManager resourceMng = null;
-    public ResourceManager ResourceMng => resourceMng ?? (resourceMng = CreateManager<ResourceManager>());
-
-    private static TableManager tableMng = null;
-    public TableManager TableMng => tableMng ?? (tableMng = CreateManager<TableManager>());
-
     private static SystemManager systemMng = null;
     public SystemManager SystemMng => systemMng ?? (systemMng = CreateManager<SystemManager>());
-
-    private static UIManager uiMng = null;
-    public UIManager UIMng => uiMng ?? (uiMng = CreateManager<UIManager>());
 
     private static GPGSManager gpgsMng = null;
     public GPGSManager GPGSMng => gpgsMng ?? (gpgsMng = CreateManager<GPGSManager>());
@@ -32,6 +23,15 @@ public class Manager
 
     private static UserManager userMng = null;
     public UserManager UserMng => userMng ?? (userMng = CreateManager<UserManager>());
+
+    //private static ResourceManager_Legacy resourceMng = null;
+    //public ResourceManager_Legacy ResourceMng => resourceMng ?? (resourceMng = CreateManager<ResourceManager_Legacy>());
+
+    //private static TableManager_Legacy tableMng = null;
+    //public TableManager_Legacy TableMng => tableMng ?? (tableMng = CreateManager<TableManager_Legacy>());
+
+    //private static UIManager_Legacy uiMng = null;
+    //public UIManager_Legacy UIMng => uiMng ?? (uiMng = CreateManager<UIManager_Legacy>());
 
     private static HashSet<Manager> manager_hashSet = new HashSet<Manager>();
 
@@ -48,14 +48,14 @@ public class Manager
         }
 
         sceneMng    = CreateManager<SceneManager>();
-        resourceMng = CreateManager<ResourceManager>();
-        tableMng    = CreateManager<TableManager>();
         systemMng   = CreateManager<SystemManager>();
-        uiMng       = CreateManager<UIManager>();
         gpgsMng     = CreateManager<GPGSManager>();
         backendMng  = CreateManager<BackendManager>();
         logInMng    = CreateManager<LogInManager>();
         userMng     = CreateManager<UserManager>();
+        //resourceMng = CreateManager<ResourceManager_Legacy>();
+        //tableMng    = CreateManager<TableManager_Legacy>();
+        //uiMng       = CreateManager<UIManager_Legacy>();
     }
 
     public static void ReleaseManagers()

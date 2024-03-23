@@ -5,12 +5,12 @@ using UnityEngine;
 using static Define;
 
 
-public class WorldScene : BaseScene<WorldScene>
+public class WorldScene : BaseScene<WorldScene, WorldUI>
 {
     /// <summary>
     /// MainUI
     /// </summary>
-    private WorldUI worldUI = null;
+    //private WorldUI worldUI = null;
 
     /// <summary>
     /// Input
@@ -45,17 +45,10 @@ public class WorldScene : BaseScene<WorldScene>
     {
         /// CreateTable
         {
-            Manager.TableMng.CreateOrGetBaseTable<SpawnerTable>();
-            Manager.TableMng.CreateOrGetBaseTable<EnemyTable>();
-            Manager.TableMng.CreateOrGetBaseTable<CharacterTable>();
-            Manager.TableMng.CreateOrGetBaseTable<StatTable>();
-        }
-
-        /// CreateUI
-        {
-            // Joystick
-            worldUI = Manager.UIMng.CreateOrGetBaseUI<WorldUI>(MainCanvas);
-            worldUI.Close();
+            CreateOrGetBaseTable<SpawnerTable>();
+            CreateOrGetBaseTable<EnemyTable>();
+            CreateOrGetBaseTable<CharacterTable>();
+            CreateOrGetBaseTable<StatTable>();
         }
 
         /// Spawner
@@ -80,7 +73,7 @@ public class WorldScene : BaseScene<WorldScene>
                 {
                     Util.LogWarning();
                     worldSpawner = worldSpawner_dic[spawnerData.ID];
-                    GlobalScene.Instance.DestroyGameObject(worldSpawner.gameObject);
+                    ResourceLoader.DestroyGameObject(worldSpawner.gameObject);
                 }
 
                 worldSpawner_dic.Add(spawnerData.ID, worldSpawner);
@@ -100,11 +93,11 @@ public class WorldScene : BaseScene<WorldScene>
             SwitchSpawnersPooling(true);
         }
 
-        worldUI.Open();
+        //MainUI.Open();
         CamCtrl.SwitchQuarterViewMoed = true;
     }
 
-    protected override void OnDestroy_()
+    protected override void onDestroy()
     {
         //if(instance != null && instance.gameObject != null)
         //{
@@ -112,6 +105,15 @@ public class WorldScene : BaseScene<WorldScene>
         //}
 
         //instance = null;
+    }
+
+    public void MoveTitle()
+    {
+        //MainUI.Close();
+        CamCtrl.SwitchQuarterViewMoed = false;
+        SwitchSpawnersPooling(false);
+
+        Manager.SceneMng.LoadBaseScene<TitleScene>();
     }
 
     #region Spawner
@@ -174,7 +176,7 @@ public class WorldScene : BaseScene<WorldScene>
                     }
 
                     Util.LogWarning();
-                    GlobalScene.Instance.DestroyGameObject(pGO);
+                    ResourceLoader.DestroyGameObject(pGO);
                 }
                 break;
         }
@@ -195,7 +197,7 @@ public class WorldScene : BaseScene<WorldScene>
 
     private void OnPlayerDeadEvent()
     {
-        worldUI.Close();
+        //MainUI.Close();
         CamCtrl.SwitchQuarterViewMoed = false;
         SwitchSpawnersPooling(false);
     }
@@ -221,7 +223,7 @@ public class WorldScene : BaseScene<WorldScene>
     [Obsolete("임시")]
     public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
     {
-        return Manager.UIMng.CreateBaseSpaceUI<TSpaceUI>(pParent);
+        return UILoader.CreateBaseSpaceUI<TSpaceUI>(pParent);
     }
 
 

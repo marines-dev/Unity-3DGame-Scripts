@@ -14,8 +14,10 @@ namespace Interface
     {
         public void Open();
         public void Close();
-        public void DestroySelf();
+        //public void DestroySelf();
     }
+
+    public interface IMainUI : IBaseUI { }
 
     public interface IBaseTable 
     {

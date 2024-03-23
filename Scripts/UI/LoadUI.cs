@@ -1,13 +1,14 @@
+using Interface;
 using UnityEngine;
 
-public class LoadingUI : BaseUI<LoadingUI.UI>
+public class LoadUI : BaseUI<LoadUI.UI>, IMainUI
 {
     public enum UI
     {
         /// <sammary>
-        /// LoadingUI
+        /// LoadUI
         /// </sammary>
-        LoadingUI,
+        LoadUI,
 
         /// UIPosition
 
@@ -25,7 +26,7 @@ public class LoadingUI : BaseUI<LoadingUI.UI>
     {
         get
         {
-            Animator anim = GetUIComponent<Animator>(UI.LoadingUI);
+            Animator anim = GetUIComponent<Animator>(UI.LoadUI);
             if (anim != null)
             {
                 bool isCompleted = anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9f;

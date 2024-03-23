@@ -2,13 +2,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class LoadScene : BaseScene<LoadScene>
+public class LoadScene : BaseScene<LoadScene, LoadUI>
 {
-    /// <summary>
-    /// MainUI
-    /// </summary>
-    private LoadingUI loadUI = null;
-
     /// <summary>
     /// Input
     /// </summary>
@@ -22,10 +17,7 @@ public class LoadScene : BaseScene<LoadScene>
 
     protected override void OnAwake()
     {
-        /// LoadUI
-        Manager.UIMng.CloseBaseUIAll();
-        loadUI = Manager.UIMng.CreateOrGetBaseUI<LoadingUI>(MainCanvas);
-        loadUI.Close();
+        //CloseBaseUIAll();
     }
 
     protected override void OnStart() 
@@ -33,17 +25,14 @@ public class LoadScene : BaseScene<LoadScene>
         string loadSceneName = typeof(LoadScene).Name;
         SetActiveScene(loadSceneName);
 
-        loadUI.Open();
-
         ///
         LoadingProcess();
     }
 
-    protected override void OnDestroy_() 
+    protected override void onDestroy() 
     {
         ClearLoadingProcess();
 
-        loadUI?.Close();
         /// Complete
         Util.LogSuccess($"{Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
@@ -79,7 +68,7 @@ public class LoadScene : BaseScene<LoadScene>
 
         Resources.UnloadUnusedAssets();
         GC.Collect();
-        yield return new WaitUntil(() => loadUI.IsLoadingUI_AnimationCompleted);
+        yield return new WaitUntil(() => MainUI.IsLoadingUI_AnimationCompleted);
 
         yield return LoadSceneAsync(nextSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
         SetActiveScene(nextSceneName);

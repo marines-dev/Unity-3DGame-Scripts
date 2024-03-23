@@ -2,8 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Interface;
 
-public class TitleUI : BaseUI<TitleUI.UI>
+public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 {
     public enum UI
     {
@@ -128,7 +129,6 @@ public class TitleUI : BaseUI<TitleUI.UI>
             if (anim != null)
             {
                 bool isCompleted = anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9f;
-                //if (isCompleted) { anim.speed = 0f; }
                 return isCompleted;
             }
             return true;
@@ -158,9 +158,7 @@ public class TitleUI : BaseUI<TitleUI.UI>
         BindEventUI<Button>(UI.DebugTestPopup_Button_TestLogout, OnClick_DebugTestPopup_Button_TestLogout);
     }
 
-    protected override void OnAwake()
-    {
-    }
+    protected override void OnAwake() {}
 
     protected override void OnOpen()
     {
@@ -330,14 +328,14 @@ public class TitleUI : BaseUI<TitleUI.UI>
         }
     }
 
-    public void Set_OnLogInState(Action pOnLogInState)
+    public void SetLogInStateAction(Action pOnLogInState)
     {
         onLogInState = pOnLogInState;
     }
 
     void UpdateTitleUI(TitleScene.TitleProcessType pTitleProcessType)
     {
-        SetActiveUI(UI.TitleUI_Object_MainBG,       pTitleProcessType == TitleScene.TitleProcessType.Init);
+        SetActiveUI(UI.TitleUI_Object_MainBG,       pTitleProcessType == TitleScene.TitleProcessType.Init || pTitleProcessType == TitleScene.TitleProcessType.LogIn); //임시
         SetActiveUI(UI.TitleUI_Object_LoadDataBG,   pTitleProcessType == TitleScene.TitleProcessType.LoadUserData);
 
         ///

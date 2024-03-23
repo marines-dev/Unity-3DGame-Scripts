@@ -47,8 +47,8 @@ public class UserManager : Manager
             return userData.CurrHP;
         }
 
-        CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<CharacterTable>().GetTableData(userData.CharacterID);
-        StatTable.Data      statData      = TableMng.CreateOrGetBaseTable<StatTable>().GetTableData(userData.StatID);
+        CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(userData.CharacterID);
+        StatTable.Data      statData      = GlobalScene.Instance.StatTable.GetTableData(userData.StatID);
         if (pCurrHP > statData.MaxHp)
         {
             Util.LogWarning($"HP({pCurrHP}) 값 초과로 MaxHP({statData.MaxHp})으로 저장합니다.");
@@ -83,7 +83,7 @@ public class UserManager : Manager
             return userData.ExpValue;
         }
 
-        CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<CharacterTable>().GetTableData(userData.CharacterID);
+        CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(userData.CharacterID);
         int maxExp = Define.User_MaxExp_init;
         if (pExpValue > maxExp)
         {
@@ -111,7 +111,7 @@ public class UserManager : Manager
     [Obsolete("임시")]
     public int UpdateUserData_LevelUp()
     {
-        CharacterTable.Data characterData = TableMng.CreateOrGetBaseTable<CharacterTable>().GetTableData(userData.CharacterID);
+        CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(userData.CharacterID);
         int maxExp = 500;
         if (userData.ExpValue < maxExp)
         {

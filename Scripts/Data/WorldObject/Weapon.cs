@@ -50,7 +50,7 @@ public class Weapon : MonoBehaviour, IWeapon
         }
 
         string     path = $"Prefabs/Weapon/{weaponData.PrefabName}";
-        GameObject go   = GlobalScene.Instance.InstantiateResource(path);
+        GameObject go   = ResourceLoader.Instantiate(path);
         if (go == null)
         {
             Util.LogWarning();
@@ -101,7 +101,7 @@ public class Weapon : MonoBehaviour, IWeapon
                 if (shotSFX == null)
                 {
                     string path = $"Prefabs/SFX/{weaponData.SFXPrefabName}";
-                    GameObject go = GlobalScene.Instance.InstantiateResource(path, transform);
+                    GameObject go = ResourceLoader.Instantiate(path, transform);
                     if (go == null)
                     {
                         Util.LogWarning();

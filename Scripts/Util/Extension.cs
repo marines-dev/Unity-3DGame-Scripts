@@ -34,43 +34,6 @@ public static class Extension
 
     #region Transform
 
-    public static Transform GetChild(this Transform pTrans, string pName)
-    {
-        if (pTrans == null || string.IsNullOrEmpty(pName))
-        {
-            Util.LogWarning();
-            return null;
-        }
-
-        Transform transform = GetChild<Transform>(pTrans, pName);
-        if (transform == null)
-            return null;
-
-        return transform;
-    }
-
-    public static T GetChild<T>(this Transform pTrans, string pName) where T : UnityEngine.Object
-    {
-        if (pTrans == null || string.IsNullOrEmpty(pName))
-        {
-            Util.LogWarning();
-            return null;
-        }
-
-        for (int i = 0; i < pTrans.transform.childCount; i++)
-        {
-            Transform transform = pTrans.transform.GetChild(i);
-            if (transform.name == pName)
-            {
-                T component = transform.GetComponent<T>();
-                if (component != null)
-                    return component;
-            }
-        }
-
-        return null;
-    }
-
     //public static Transform GetDescendant(this Transform pTrans, string pName)
     //{
     //    if (pTrans == null || string.IsNullOrEmpty(pName))

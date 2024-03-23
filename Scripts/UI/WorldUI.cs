@@ -1,9 +1,9 @@
-using System;
+using Interface;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class WorldUI : BaseUI<WorldUI.UI>, IMainUI, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     public enum UI
     {
@@ -18,7 +18,7 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
         WorldUI_Object_GunAttackDeselect, WorldUI_Object_GunAttackSelect,
 
         // Button
-        WorldUI_Button_Attack,
+        WorldUI_Button_Attack, WorldUI_Button_MoveTitle,
 
         // Image
         WorldUI_Image_MoveLookArea, WorldUI_Image_JoystickArea,
@@ -62,7 +62,7 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
 
     protected override void BindEvents()
     {
-        //BindEventControl<Button>(Control.JoystickUI_Button_Attack, OnClick_JoystickUI_Button_Attack);
+        BindEventUI<Button>(UI.WorldUI_Button_MoveTitle, OnClick_WorldUI_Button_MoveTitle);
 
         EventTrigger eventTrigger = GetUIComponent<Button>(UI.WorldUI_Button_Attack).gameObject.GetOrAddComponent<EventTrigger>();
         var pointerDown = new EventTrigger.Entry();
@@ -115,10 +115,10 @@ public class WorldUI : BaseUI<WorldUI.UI>, IDragHandler, IBeginDragHandler, IEnd
 
     #region Button
 
-    //void OnClick_JoystickUI_Button_Attack()
-    //{
-    //    Managers.Game.gamePlayer.AnimState = Define.State.Skill;
-    //}
+    void OnClick_WorldUI_Button_MoveTitle()
+    {
+        WorldScene.Instance.MoveTitle();
+    }
 
     #endregion Button
 

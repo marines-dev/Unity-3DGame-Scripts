@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine;
 
-public class TitleScene : BaseScene<TitleScene>
+[Obsolete]
+public class TitleScene : BaseScene<TitleScene, TitleUI>
 {
     public enum TitleProcessType
     {
@@ -15,30 +16,24 @@ public class TitleScene : BaseScene<TitleScene>
     }
     TitleProcessType currTitleProcessType = TitleProcessType.Init;
 
-    TitleUI titleUI = null;
+    //TitleUI titleUI = null;
 
     IEnumerator titleProcessCoroutine = null;
     IEnumerator titleProcessRoutine   = null;
     [Obsolete("테스트")] IEnumerator testDebugProcessCoroutine = null;
 
 
-    protected override void OnAwake()
-    {
-        titleUI = Manager.UIMng.CreateOrGetBaseUI<TitleUI>(MainCanvas);
-        titleUI.Close();
-    }
+    protected override void OnAwake() { }
 
     protected override void OnStart()
     {
-        // TitleUI
-        titleUI.Open();
-        titleUI.SetTitleUI(currTitleProcessType);
+        MainUI.SetTitleUI(currTitleProcessType);
 
         TitleProcess();
         TestDebugProcess();
     }
 
-    protected override void OnDestroy_()
+    protected override void onDestroy()
     {
         if (titleProcessCoroutine != null)
         {
@@ -111,16 +106,15 @@ public class TitleScene : BaseScene<TitleScene>
         Manager.BackendMng.InitBackendSDK();
         Manager.GPGSMng.InitGPGSAuth();
         Manager.LogInMng.InitLogInState();
-
-        yield return new WaitUntil(() => titleUI.IsTitleUI_AnimationCompleted);
+        yield return new WaitUntil(() => MainUI.IsTitleUI_AnimationCompleted);
     }
 
     IEnumerator LogInProcessCoroutine()
     {
         yield return null;
 
-        titleUI.SetTitleUI(currTitleProcessType);
-        titleUI.Set_OnLogInState(OnLogInState);
+        MainUI.SetTitleUI(currTitleProcessType);
+        MainUI.SetLogInStateAction(OnLogInState);
         yield return new WaitUntil(() => Manager.LogInMng.currLogInProcessType == LogInProcessType.UserLogIn);
     }
 
@@ -134,17 +128,17 @@ public class TitleScene : BaseScene<TitleScene>
                     {
                         case LogInProcessType.UserLogOut:
                             {
-                                if (titleUI.selectAccountType == AccountType.None)
+                                if (MainUI.selectAccountType == AccountType.None)
                                     return;
 
-                                bool isSignUp = Manager.LogInMng.SetSignUp(titleUI.selectAccountType);
+                                bool isSignUp = Manager.LogInMng.SetSignUp(MainUI.selectAccountType);
                                 if(isSignUp)
                                 {
                                     TitleProcess();
                                     return;
                                 }
                                 
-                                if(titleUI.selectAccountType == AccountType.Google) { }
+                                if(MainUI.selectAccountType == AccountType.Google) { }
                             }
                             break;
 
@@ -156,9 +150,9 @@ public class TitleScene : BaseScene<TitleScene>
 
                         case LogInProcessType.UpdateNickname:
                             {
-                                if (string.IsNullOrEmpty(titleUI.inputNickname) == false)
+                                if (string.IsNullOrEmpty(MainUI.inputNickname) == false)
                                 {
-                                    Manager.LogInMng.SetUpdateNickname(titleUI.inputNickname);
+                                    Manager.LogInMng.SetUpdateNickname(MainUI.inputNickname);
                                 }
 
                                 TitleProcess();
@@ -182,18 +176,17 @@ public class TitleScene : BaseScene<TitleScene>
     [Obsolete("테스트 중")]
     IEnumerator LoadUserDataProcessCoroutine()
     {
-        titleUI.SetTitleUI(currTitleProcessType);
-        yield return new WaitUntil(() => titleUI.IsTitleUI_AnimationCompleted);
+        MainUI.SetTitleUI(currTitleProcessType);
+        yield return new WaitUntil(() => MainUI.IsTitleUI_AnimationCompleted);
 
         Manager.UserMng.LoadUserData();
     }
 
     IEnumerator LoadGameSceneProcessCoroutine()
     {
-        Manager.SceneMng.LoadBaseScene<WorldScene>();
         yield return null;
-
-        titleUI.Close();
+        Manager.SceneMng.LoadBaseScene<WorldScene>();
+        //MainUI.Close();
     }
 
     [Obsolete("테스트")]
@@ -231,7 +224,7 @@ public class TitleScene : BaseScene<TitleScene>
                 "[InData] " + inData + '\n' +
                 "[nickname] " + nickname + '\n');
 
-            titleUI.SetDebugLog(format);
+            MainUI.SetDebugLog(format);
         }
         catch(Exception ex)
         {

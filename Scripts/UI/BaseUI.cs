@@ -6,6 +6,64 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+public static class UILoader
+{
+    public static TBaseUI CreateBaseUI<TBaseUI>(Canvas pCanvas) where TBaseUI : Component, IBaseUI
+    {
+        if (pCanvas == null)
+        {
+            Util.LogError();
+            return null;
+        }
+
+        TBaseUI baseUI = null;
+        string uiName = typeof(TBaseUI).Name;
+        string path = $"Prefabs/UI/{uiName}";
+        baseUI =  ResourceLoader.Instantiate(path, pCanvas.transform).GetOrAddComponent<TBaseUI>();
+        baseUI.gameObject.name = uiName;
+
+        ///
+        baseUI.Close();
+        return baseUI;
+    }
+
+    public static TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
+    {
+        string name = typeof(TSpaceUI).Name;
+        GameObject go = ResourceLoader.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
+
+        Canvas canvas = go.GetOrAddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = Camera.main;
+
+        TSpaceUI baseUI = go.GetOrAddComponent<TSpaceUI>();
+        baseUI.Close();
+
+        return baseUI;
+    }
+
+    //public IBaseUI CreateOrGetBaseUI(Type pType)
+    //{
+    //    if (pType == null || pType.BaseType != typeof(IBaseUI))
+    //    {
+    //        Debug.LogError("");
+    //        return null;
+    //    }
+
+    //    IBaseUI baseUI = GetBaseUI(pType);
+    //    if (baseUI != null)
+    //    {
+    //        return baseUI;
+    //    }
+
+    //    baseUI = GlobalScene.ResourceMng.Instantiate($"Prefabs/UI/{pType}", canvas_ref.transform).GetOrAddComponent(pType) as IBaseUI;
+    //    baseUI.Close();
+
+    //    string uiName = pType.Name;
+    //    baseUI_dic.Add(uiName, baseUI);
+    //    return baseUI;
+    //}
+}
 
 public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 {
@@ -14,7 +72,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
 
     List<Transform> trans_List  = new List<Transform>();
     Transform[]     uiTrans_arr = null;
-    
+
 
     private void Awake()
     {
@@ -27,10 +85,26 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         OnAwake();
     }
 
+    /// <summary>
+    /// UI와 Event들을 연결하는 함수입니다.
+    /// </summary>
     protected abstract void BindEvents();
+
+    /// <summary>
+    /// UIPanel을 생성할 때 초기화하는 함수입니다.
+    /// </summary>
     protected abstract void OnAwake();
+
+    /// <summary>
+    /// Open할 때 실행할 함수입니다.
+    /// </summary>
     protected abstract void OnOpen();
+
+    /// <summary>
+    /// Close할 때 실행할 함수입니다.
+    /// </summary>
     protected abstract void OnClose();
+
 
     public void Open()
     {
@@ -50,11 +124,6 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         }
 
         OnClose();
-    }
-
-    public void DestroySelf()
-    {
-        GlobalScene.Instance.DestroyGameObject(gameObject);
     }
 
     protected Transform GetUITrans(Define _enum)
@@ -134,7 +203,7 @@ public abstract class BaseUI<TUI> : MonoBehaviour, IBaseUI where TUI : Enum
         }
     }
 
-    void BindUI()
+    private void BindUI()
     {
         /// GetBaseUITransform
         {

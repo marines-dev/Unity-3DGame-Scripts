@@ -23,7 +23,7 @@ public class WorldSpawner : MonoBehaviour
     public static GameObject CreateGameObject(Spawning pSpawningType, int pSpawningID, Vector3 pPos, Vector3 pRot, float pSpawnerRadius = 0f)
     {
         string path     = FindSpawningPath(pSpawningType, pSpawningID);
-        GameObject go   = GlobalScene.Instance.InstantiateResource(path);
+        GameObject go   = ResourceLoader.Instantiate(path);
         SetGameObjectRandomPos(go.transform, pPos, pRot);
 
         return go;
@@ -73,7 +73,7 @@ public class WorldSpawner : MonoBehaviour
         if (spawnerData == null)
         {
             Util.LogError();
-            GlobalScene.Instance.DestroyGameObject(gameObject);
+            ResourceLoader.DestroyGameObject(gameObject);
             return;
         }
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class InitScene : BaseScene<InitScene>
+public class InitScene : BaseScene<InitScene, InitUI>
 {
     public static bool IsInitSceneLoaded { get; private set; } = false;
 
@@ -19,7 +19,7 @@ public class InitScene : BaseScene<InitScene>
         Manager.SceneMng.LoadBaseScene<TitleScene>();
     }
 
-    protected override void OnDestroy_()
+    protected override void onDestroy()
     {
     }
 
@@ -29,7 +29,7 @@ public class InitScene : BaseScene<InitScene>
         GlobalScene instnace = FindObjectOfType<GlobalScene>();
         if (instnace != null)
         {
-            Manager.ResourceMng.DestroyGameObject(instnace.gameObject);
+            ResourceLoader.DestroyGameObject(instnace.gameObject);
         }
 
         /// Create

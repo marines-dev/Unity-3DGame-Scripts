@@ -1,12 +1,15 @@
+using Interface;
 using UnityEngine;
 
-public class SampleUI : BaseUI<SampleUI.UI>
+/// ※클래스 이름 변경 시 리소스 이름 변경 필수 입니다.
+public class SampleMainUI : BaseUI<SampleMainUI.UI>, IMainUI
 {
     public enum UI
     {
         /// <sammary>
         /// SampleUI
         /// </sammary>
+        SampleUI,
 
         /// UIPosition
 
@@ -25,49 +28,42 @@ public class SampleUI : BaseUI<SampleUI.UI>
     //{
     //}
 
-    // Event를 연결합니다.
     protected override void BindEvents()
     {
         //BindEventControl<Button>(Control., OnClick_);
     }
-
-    // UIPanel을 생성할 때 초기화하는 함수입니다.
     protected override void OnAwake() { }
-
-    // Open할 때 실행할 프로세스입니다.
     protected override void OnOpen() { }
-
-    // Close할 때 실행할 프로세스입니다.
     protected override void OnClose() { }
 
     #region Button
 
-    //void OnClick_()
+    //private void OnClick_()
     //{
     //    Debug.LogWarning("개발 진행 중 입니다.");
     //}
 
     #endregion Button
 
-    #region SampleUI
+    #region SampleMainUI
 
-    #endregion SampleUI
+    #endregion SampleMainUI
 
-    #region SampleUI_Panel_
+    #region SampleMainUI_Panel_
 
-    //void Open_SampleUI_Panel_()
+    //private void Open_SampleMainUI_Panel_()
     //{
-    //    SetActiveControl(Control.SampleUI_Panel_, true);
+    //    SetActiveUI(UI.SampleMainUI_Panel_, true);
     //}
 
-    //void Close_SampleUI_Panel_()
+    //private void Close_SampleMainUI_Panel_()
     //{
-    //    SetActiveControl(Control.SampleUI_Panel_, false);
+    //    SetActiveUI(UI.SSampleMainUI_Panel_, false);
     //}
 
-    //void Update_SampleUI_Panel_()
+    //private void Update_SampleMainUI_Panel_()
     //{
     //}
 
-    #endregion SampleUI_Panel_
+    #endregion SampleMainUI_Panel_
 }
