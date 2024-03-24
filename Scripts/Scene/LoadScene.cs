@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Interface;
 using UnityEngine;
 
 public class LoadScene : BaseScene<LoadScene, LoadUI>
@@ -9,11 +10,23 @@ public class LoadScene : BaseScene<LoadScene, LoadUI>
     /// </summary>
     //public BaseInput BaseInput { get; }
 
-    string preSceneName = string.Empty;
-    string nextSceneName = string.Empty;
+    private static string preSceneName  = string.Empty;
+    private static string nextSceneName = string.Empty;
 
     private IEnumerator loadingProcessCoroutine = null;
 
+
+    public static void SetLoadScene(string pPreSceneName, string pNextSceneName)
+    {
+        if(!SceneLoader.IsSceneLoading)
+        {
+            Util.LogError();
+            return;
+        }
+
+        preSceneName  = pPreSceneName;
+        nextSceneName = pNextSceneName;
+    }
 
     protected override void OnAwake()
     {
@@ -32,9 +45,11 @@ public class LoadScene : BaseScene<LoadScene, LoadUI>
     protected override void onDestroy() 
     {
         ClearLoadingProcess();
+        preSceneName  = string.Empty;
+        nextSceneName = string.Empty;
 
-        /// Complete
-        Util.LogSuccess($"{Manager.SceneMng.ActiveSceneName} 씬 로드를 완료했습니다.");
+        SceneLoader.CompleteSceneLoading();
+        Util.LogSuccess($"{SceneLoader.ActiveSceneName} 씬 로드를 완료했습니다.");
     }
 
     void LoadingProcess()
@@ -58,13 +73,9 @@ public class LoadScene : BaseScene<LoadScene, LoadUI>
     {
         yield return null;
 
-        preSceneName  = Manager.SceneMng.PreSceneName;
-        nextSceneName = Manager.SceneMng.NextSceneName;
-        yield return null;
-
         yield return UnloadSceneAsync(preSceneName);
-        Manager.ReleaseManagers();
-        yield return null;
+        //Manager_Legacy.ReleaseManagers();
+        //yield return null;
 
         Resources.UnloadUnusedAssets();
         GC.Collect();

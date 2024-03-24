@@ -4,6 +4,37 @@ using UnityEngine;
 
 public class Define
 {
+    #region Title
+
+    public enum TitleProcess
+    {
+        InitData,
+        //Patch,
+        LogIn,
+        LoadUserData,
+        LoadGameScene,
+        Complete,
+    }
+
+    public enum LogInProcess
+    {
+        None,
+        //InitLogInState,
+        //UpdateNickname,
+        Auth,
+        LogIn,
+        LogOut,
+    }
+
+    public enum Account
+    {
+        None,
+        Guest,
+        Google
+    }
+
+    #endregion Title
+
     public enum Spawning
     {
         None,

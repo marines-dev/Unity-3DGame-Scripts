@@ -65,11 +65,17 @@ public class Player : BaseActor, IPlayerCtrl
         {
             Temp_Tag = "Player";
 
-            int currentHp = GlobalScene.Instance.UserData.CurrHP;
+            int currentHp = User.UserData.CurrHP;
             SetHP(currentHp);
         }
 
         deadAction = pDeadAction;
+    }
+
+    [Obsolete]
+    public void SaveData_Temp()
+    {
+        User.UpdateUserData_CurrHPValue(Stat.currentHp);
     }
 
     protected new void Spawn(Actor pActorType, int pActorID = 0)
@@ -81,8 +87,8 @@ public class Player : BaseActor, IPlayerCtrl
     {
         base.SetDead();
 
-        GlobalScene.Instance.UpdateUserData_CurrHPValue(Stat.maxHp);
-        int currentHp = GlobalScene.Instance.UserData.CurrHP;
+        User.UpdateUserData_CurrHPValue(Stat.maxHp);
+        int currentHp = User.UserData.CurrHP;
         SetHP(currentHp);
 
         if (deadAction != null) { deadAction.Invoke(); }
@@ -100,11 +106,6 @@ public class Player : BaseActor, IPlayerCtrl
     public void OnMove(Vector3 pEulerAngles)
     {
         BaseAnimType = Define.BaseAnim.Run;
-
-        //float angle = Mathf.Atan2(pEulerAngles.x, pEulerAngles.y) * Mathf.Rad2Deg;
-        //angle = angle < 0 ? 360 + angle : angle;
-        //Vector3 eulerAngles = new Vector3(0f, Camera.main.transform.eulerAngles.y + angle, 0f);
-        //transform.eulerAngles = eulerAngles;
 
         transform.eulerAngles = pEulerAngles;
         Vector3 pos = transform.forward * Time.deltaTime * NevAgent.speed;
@@ -134,12 +135,12 @@ public class Player : BaseActor, IPlayerCtrl
             return;
         }
 
-        int userExpValue = GlobalScene.Instance.UserData.ExpValue;
+        int userExpValue = User.UserData.ExpValue;
         int expValue     = userExpValue + pAddExpValue;
         if (expValue < Define.User_MaxExp_init)
         {
-            GlobalScene.Instance.UpdateUserData_ExpValue(expValue);
-            userExpValue = GlobalScene.Instance.UserData.ExpValue;
+            User.UpdateUserData_ExpValue(expValue);
+            userExpValue = User.UserData.ExpValue;
 
             Util.LogSuccess($"userExpValue Áõ°¡ : {userExpValue}");
         }
@@ -151,7 +152,7 @@ public class Player : BaseActor, IPlayerCtrl
 
     private void SetLevelUp()
     {
-        int userExpValue = GlobalScene.Instance.UserData.ExpValue;
+        int userExpValue = User.UserData.ExpValue;
         int maxExp       = Define.User_MaxExp_init;
         if (userExpValue < maxExp)
         {
@@ -159,8 +160,8 @@ public class Player : BaseActor, IPlayerCtrl
             return;
         }
 
-        GlobalScene.Instance.UpdateUserData_LevelUp();
-        Util.LogSuccess($"Level Up!(level : {GlobalScene.Instance.UserData.LevelValue}, exp : {GlobalScene.Instance.UserData.ExpValue})");
+        User.UpdateUserData_LevelUp();
+        Util.LogSuccess($"Level Up!(level : {User.UserData.LevelValue}, exp : {User.UserData.ExpValue})");
     }
 
     //Draw the Box Overlap as a gizmo to show where it currently is testing. Click the Gizmos button to see this

@@ -4,6 +4,7 @@ using UnityEngine;
 using BackEnd;
 using ServerData;
 using System.Linq;
+using Server;
 
 
 namespace ServerData
@@ -24,22 +25,19 @@ namespace ServerData
     }
 }
 
-public class UserManager : Manager
+public static class User
 {
     // Backend
-    private string InData   { get { return BackendMng.GetInData(); } }
-    private string NickName { get { return BackendMng.GetNickname(); } }
+    //private static string InData   { get { return BackendManager.GetInData(); } }
+    //private static string NickName { get { return BackendManager.GetNickname(); } }
 
-    private UserData userData = new UserData();
-    public  UserData UserData {  get { return userData.Copy(); } }
-
-    protected override void OnInitialized() { }
-    public override void OnRelease() { }
+    private static  UserData userData = new UserData();
+    public static   UserData UserData {  get { return userData.Copy(); } }
 
     /// <summary>
     // 변경할 CurrHPValue 값을 검사하여 유저 CurrHPValue 스탯에 저장합니다. 반환된 값으로 다시 사용해주세요.
     /// </summary>
-    public int UpdateUserData_CurrHPValue(int pCurrHP)
+    public static int UpdateUserData_CurrHPValue(int pCurrHP)
     {
         if (pCurrHP == userData.CurrHP)
         {
@@ -75,7 +73,7 @@ public class UserManager : Manager
     /// <summary>
     // 변경할 Exp 값을 검사하여 유저 Exp 스탯에 저장합니다. 반환된 값으로 다시 사용해주세요.
     /// </summary>
-    public int UpdateUserData_ExpValue(int pExpValue)
+    public static int UpdateUserData_ExpValue(int pExpValue)
     {
         if (pExpValue <= userData.ExpValue)
         {
@@ -109,7 +107,7 @@ public class UserManager : Manager
     }
 
     [Obsolete("임시")]
-    public int UpdateUserData_LevelUp()
+    public static int UpdateUserData_LevelUp()
     {
         CharacterTable.Data characterData = GlobalScene.Instance.CharacterTable.GetTableData(userData.CharacterID);
         int maxExp = 500;
@@ -131,7 +129,7 @@ public class UserManager : Manager
         return userData.LevelValue;
     }
 
-    public void UpdateUserData_WeaponID(int pWeaponID)
+    public static void UpdateUserData_WeaponID(int pWeaponID)
     {
         if (pWeaponID < 1) // Table 범위 검사
         {
@@ -163,9 +161,9 @@ public class UserManager : Manager
 
     #region ServerLoad
 
-    public void LoadUserData() // Backend 데이터를 불러옵니다.
+    public static void LoadUserData() // Backend 데이터를 불러옵니다.
     {
-        LitJson.JsonData gameDataJson = BackendMng.LoadBackendData(Define.User_TableName);
+        LitJson.JsonData gameDataJson = BackendManager.LoadBackendData(Define.User_TableName);
         if (gameDataJson == null)
         {
             Util.LogWarning($"유저 데이터가 존재하지 않습니다. 새로운 유저 데이터를 생성합니다.");
@@ -185,10 +183,10 @@ public class UserManager : Manager
 
                 /// SaveUserData
                 Param param = AddServerData();
-                BackendMng.SaveBackendData(Define.User_TableName, ref param);
+                BackendManager.SaveBackendData(Define.User_TableName, ref param);
 
                 /// Reload
-                gameDataJson = BackendMng.LoadBackendData(Define.User_TableName);
+                gameDataJson = BackendManager.LoadBackendData(Define.User_TableName);
                 if (gameDataJson == null)
                 {
                     Util.LogError();
@@ -221,15 +219,15 @@ public class UserManager : Manager
         Util.LogSuccess($"유저 데이터 로드를 성공했습니다. \n{ToString()}");
     }
 
-    private void UpdateUserData() // Backend 데이터에 저장합니다.
+    private static void UpdateUserData() // Backend 데이터에 저장합니다.
     {
         Param param = AddServerData();
 
         /// UpdateBackend
-        BackendMng.UpdateBackendData(Define.User_TableName, ref param);
+        BackendManager.UpdateBackendData(Define.User_TableName, ref param);
     }
 
-    private Param AddServerData()
+    private static Param AddServerData()
     {
         Param param = new Param();
 
@@ -250,12 +248,12 @@ public class UserManager : Manager
 
     #region Parse
 
-    public int StringToInt(string pStr)
+    public static int StringToInt(string pStr)
     {
         return int.Parse(pStr);
     }
 
-    public Vector3 StringToVector3(string pStr)
+    public static Vector3 StringToVector3(string pStr)
     {
         pStr = pStr.Replace("(", "");
         pStr = pStr.Replace(")", "");
@@ -272,16 +270,16 @@ public class UserManager : Manager
 
     #endregion Parse
 
-    // Debug.Log(ToString())
-    public override string ToString()
+    /// Debug.Log(ToString())
+    public static string ToString()
     {
         StringBuilder result = new StringBuilder();
 
-        // User
-        result.AppendLine($"inData : {InData.ToString()}");
-        result.AppendLine($"nickName : {NickName.ToString()}");
+        /// User
+        //result.AppendLine($"inData : {InData.ToString()}");
+        //result.AppendLine($"nickName : {NickName.ToString()}");
 
-        // Player
+        /// Player
         result.AppendLine($"CharacterID : {userData.CharacterID.ToString()}");
         result.AppendLine($"StatID : {userData.StatID.ToString()}");
         result.AppendLine($"WeaponID : {userData.WeaponID.ToString()}");

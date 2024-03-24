@@ -4,6 +4,7 @@ using Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+
 public abstract class BaseScene<TScene, TMainUI> : MonoBehaviour, IBaseScene where TScene : BaseScene<TScene, TMainUI> where TMainUI : Component, IMainUI
 {
     private static TScene instance;
@@ -53,8 +54,8 @@ public abstract class BaseScene<TScene, TMainUI> : MonoBehaviour, IBaseScene whe
 
     #endregion GlobalObject
 
-    private static Manager manager;
-    protected Manager Manager => manager ?? (manager = new Manager());
+    //private static Manager_Legacy manager;
+    //protected Manager_Legacy Manager => manager ?? (manager = new Manager_Legacy());
 
     private Dictionary<string, IBaseTable> baseTable_dic = new Dictionary<string, IBaseTable>();
     //Dictionary<string, IBaseUI> baseUI_dic = new Dictionary<string, IBaseUI>();
@@ -63,9 +64,9 @@ public abstract class BaseScene<TScene, TMainUI> : MonoBehaviour, IBaseScene whe
     {
         if (!InitScene.IsInitSceneLoaded)
         {
-            if (! Manager.SceneMng.IsActiveScene<InitScene>())
+            if (!SceneLoader.IsActiveScene<InitScene>())
             {
-                Manager.SceneMng.LoadInitScene();
+                SceneLoader.LoadInitScene();
                 return;
             }
         }

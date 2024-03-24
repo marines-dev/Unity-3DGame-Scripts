@@ -3,6 +3,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Interface;
+using static Define;
+
+public enum TitleUIState
+{
+    InitData,
+    Login,
+    LoadData,
+}
+
+public enum LoginState
+{
+    None,
+    Login,
+    LogOut,
+}
+
 
 public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 {
@@ -21,7 +37,7 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
         TitleUI_Object_Logout, TitleUI_Object_Login,
 
         /// Button
-        TitleUI_Button_Guest, TitleUI_Button_Google, TitleUI_Button_GameStart,
+        TitleUI_Button_Guest, TitleUI_Button_Google, TitleUI_Button_GameStart, TitleUI_Button_TestLogout,
 
         /// Slider
         TitleUI_Slider_LoadData,
@@ -99,28 +115,28 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 
         /// Text
 
-        /// <sammary>
-        /// TitleUI_Panel_DebugTestPopup
-        /// </sammary>
-        TitleUI_Panel_DebugTestPopup,
+        ///// <sammary>
+        ///// TitleUI_Panel_DebugTestPopup
+        ///// </sammary>
+        //TitleUI_Panel_DebugTestPopup,
 
-        /// UIPosition
+        ///// UIPosition
 
-        /// Object
-        DebugTestPopup_Object_SelectAble, DebugTestPopup_Object_SelectDesable,
-        DebugTestPopup_Object_DestPopup, DebugTestPopup_Object_TestLogout,
+        ///// Object
+        //DebugTestPopup_Object_SelectAble, DebugTestPopup_Object_SelectDesable,
+        //DebugTestPopup_Object_DestPopup, DebugTestPopup_Object_TestLogout,
 
-        /// Button
-        DebugTestPopup_Button_Select, DebugTestPopup_Button_TestLogout,
+        ///// Button
+        //DebugTestPopup_Button_Select, DebugTestPopup_Button_TestLogout,
 
-        /// Image
+        ///// Image
 
-        /// Text
-        DebugTestPopup_Text_Desc,
+        ///// Text
+        //DebugTestPopup_Text_Desc,
     }
 
-    public AccountType  selectAccountType   { get; private set; } = AccountType.None;
-    public string       inputNickname       { get; private set; } = string.Empty;
+    //public AccountType  selectAccountType   { get; private set; } = AccountType.None;
+    //public string       inputNickname       { get; private set; } = string.Empty;
     public bool         IsTitleUI_AnimationCompleted
     {
         get
@@ -135,9 +151,7 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
         }
     }
 
-    bool debugSelectAble = true;
-
-    public Action onLogInState { get; private set; } = null;
+    //bool debugSelectAble = true;
 
 
     protected override void BindEvents()
@@ -145,6 +159,7 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
         BindEventUI<Button>(UI.TitleUI_Button_Guest,             OnClick_TitleUI_Button_Guest);
         BindEventUI<Button>(UI.TitleUI_Button_Google,            OnClick_TitleUI_Button_Google);
         BindEventUI<Button>(UI.TitleUI_Button_GameStart,         OnClick_TitleUI_Button_GameStart);
+        BindEventUI<Button>(UI.TitleUI_Button_TestLogout,        OnClick_TitleUI_Button_TestLogout);
         BindEventUI<Button>(UI.PatchPopup_Button_Confirm,        OnClick_PatchPopup_Button_Confirm);
         BindEventUI<Button>(UI.PatchPopup_Button_Cancel,         OnClick_PatchPopup_Button_Cancel);
         BindEventUI<Button>(UI.SignUpPopup_Button_GuestConfirm,  OnClick_SignUpPopup_Button_GuestConfirm);
@@ -154,27 +169,24 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
         BindEventUI<Button>(UI.NicknamePopup_Button_Confirm,     OnClick_NicknamePopup_Button_Confirm);
         BindEventUI<Button>(UI.GuestLogoutPopup_Button_Confirm,  OnClick_GuestLogoutPopup_Button_Confirm);
         BindEventUI<Button>(UI.GuestLogoutPopup_Button_Cancel,   OnClick_GuestLogoutPopup_Button_Cancel);
-        BindEventUI<Button>(UI.DebugTestPopup_Button_Select,     OnClick_DebugTestPopup_Button_Select);
-        BindEventUI<Button>(UI.DebugTestPopup_Button_TestLogout, OnClick_DebugTestPopup_Button_TestLogout);
+        //BindEventUI<Button>(UI.DebugTestPopup_Button_Select,     OnClick_DebugTestPopup_Button_Select);
     }
 
     protected override void OnAwake() {}
 
     protected override void OnOpen()
     {
-        selectAccountType   = AccountType.None;
-        debugSelectAble     = true;
-        onLogInState        = null;
+        //debugSelectAble     = true;
 
         // Close
         CloseTitleUI_Panel_SignUpPopup();
         CloseTitleUI_Panel_NicknamePopup();
         CloseTitleUI_Panel_GuestLogoutPopup();
-        CloseTitleUI_Panel_DebugTestPopup();
+        //CloseTitleUI_Panel_DebugTestPopup();
 
-        UpdateTitleUI(TitleScene.TitleProcessType.Init);
-        OpenTitleUI_Panel_DebugTestPopup();
-        OnClick_DebugTestPopup_Button_Select(); //임시
+        //UpdateTitleUI(TitleUIState.InitData);
+        //OpenTitleUI_Panel_DebugTestPopup();
+        //OnClick_DebugTestPopup_Button_Select(); //임시
     }
 
     protected override void OnClose() { }
@@ -183,23 +195,40 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 
     void OnClick_TitleUI_Button_Guest()
     {
-        OpenTitleUI_Panel_SignUpPopup(AccountType.Guest);
+        OpenTitleUI_Panel_SignUpPopup(Account.Guest);
     }
 
     void OnClick_TitleUI_Button_Google()
     {
-        Util.LogWarning("개발 진행 중 입니다.");
-
-        //selectAccountType = LoginManager.AccountType.Guest;
-
-        //if (onLogInState != null)
-        //    onLogInState();
+        TitleScene.Instance.SetSinUp(Account.Google);
     }
 
     void OnClick_TitleUI_Button_GameStart()
     {
-        if (onLogInState != null)
-            onLogInState();
+        TitleScene.Instance.SetGameStart();
+    }
+
+    void OnClick_TitleUI_Button_TestLogout()
+    {
+        switch (TitleScene.Instance.AccountType)
+        {
+            case Account.Guest:
+                {
+                    OpenTitleUI_Panel_GuestLogoutPopup();
+                }
+                break;
+
+            case Account.Google:
+                {
+                    Util.LogWarning("개발 진행 중 입니다.");
+                    //LoginManager.Instance.SetLogOut(LoginManager.AccountType.Google);
+                }
+                break;
+
+            default:
+                Util.LogError();
+                break;
+        }
     }
 
     void OnClick_PatchPopup_Button_Confirm()
@@ -214,17 +243,12 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 
     void OnClick_SignUpPopup_Button_GuestConfirm()
     {
-        selectAccountType = AccountType.Guest;
-
-        if (onLogInState != null)
-            onLogInState();
-
+        TitleScene.Instance.SetSinUp(Account.Guest);
         CloseTitleUI_Panel_SignUpPopup();
     }
 
     void OnClick_SignUpPopup_Button_GuestCancel()
     {
-        //selectAccountType = LoginManager.AccountType.None;
         CloseTitleUI_Panel_SignUpPopup();
     }
 
@@ -235,29 +259,28 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 
     void OnClick_SignUpPopup_Button_GoogleCancel()
     {
-        //selectAccountType = LoginManager.AccountType.None;
         CloseTitleUI_Panel_SignUpPopup();
     }
 
     void OnClick_NicknamePopup_Button_Confirm()
     {
-        Util.LogWarning("UI 구조 수정 필요");
         TMP_InputField inputField = GetUIObject(UI.NicknamePopup_InputField_Nickname).GetComponent<TMP_InputField>();
         if (inputField == null)
             return;
 
-        inputNickname = inputField.text;
-
-        if (onLogInState != null)
-            onLogInState();
+        string nickname = inputField.text;
+        if (!TitleScene.Instance.CreateNickName(nickname))
+        {
+            Util.LogWarning(); //임시
+            return;
+        }
 
         CloseTitleUI_Panel_NicknamePopup();
     }
 
     void OnClick_GuestLogoutPopup_Button_Confirm()
     {
-        onLogInState.Invoke();
-
+        TitleScene.Instance.SetLogOut();
         CloseTitleUI_Panel_GuestLogoutPopup();
     }
 
@@ -266,108 +289,80 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
         CloseTitleUI_Panel_GuestLogoutPopup();
     }
 
-    void OnClick_DebugTestPopup_Button_Select()
-    {
-        debugSelectAble = !debugSelectAble;
-
-        UpdateTitleUI_Panel_DebugTestPopup(debugSelectAble);
-    }
-
-    void OnClick_DebugTestPopup_Button_TestLogout()
-    {
-        switch (TitleScene.Instance.GetCurrAccountType())
-        {
-            case AccountType.Guest:
-                {
-                    OpenTitleUI_Panel_GuestLogoutPopup();
-                }
-                break;
-
-            case AccountType.Google:
-                {
-                    Util.LogWarning("개발 진행 중 입니다.");
-                    //LoginManager.Instance.SetLogOut(LoginManager.AccountType.Google);
-                }
-                break;
-
-            default:
-                Util.LogError("예외 처리 필요");
-                break;
-        }
-    }
+    //void OnClick_DebugTestPopup_Button_Select()
+    //{
+    //    debugSelectAble = !debugSelectAble;
+    //    UpdateTitleUI_Panel_DebugTestPopup(debugSelectAble);
+    //}
 
     #endregion Button
 
     #region TitleUI
 
-    public void SetTitleUI(TitleScene.TitleProcessType pTitleProcessType)
+    public void SetTitleUI_InitData()
     {
-        UpdateTitleUI(pTitleProcessType);
+        UpdateTitleUI(TitleUIState.InitData);
 
-        if (pTitleProcessType == TitleScene.TitleProcessType.LogIn)
-        {
-            switch (TitleScene.Instance.GetCurrLogInProcessType())
-            {
-                //case LoginManager.LoginProcessType.UserLogOut:
-                //    {
-
-                //    }
-                //    break;
-
-                //case LoginManager.LoginProcessType.UserLogIn:
-                //    {
-                //    }
-                //    break;
-
-                case LogInProcessType.UpdateNickname:
-                    {
-                        OpenTitleUI_Panel_NicknamePopup();
-                    }
-                    break;
-            }
-        }
-    }
-
-    public void SetLogInStateAction(Action pOnLogInState)
-    {
-        onLogInState = pOnLogInState;
-    }
-
-    void UpdateTitleUI(TitleScene.TitleProcessType pTitleProcessType)
-    {
-        SetActiveUI(UI.TitleUI_Object_MainBG,       pTitleProcessType == TitleScene.TitleProcessType.Init || pTitleProcessType == TitleScene.TitleProcessType.LogIn); //임시
-        SetActiveUI(UI.TitleUI_Object_LoadDataBG,   pTitleProcessType == TitleScene.TitleProcessType.LoadUserData);
-
-        ///
-        SetActiveUI(UI.TitleUI_Object_InitDataProcess,  pTitleProcessType == TitleScene.TitleProcessType.Init);
-        SetActiveUI(UI.TitleUI_Object_LoginProcess,     pTitleProcessType == TitleScene.TitleProcessType.LogIn);
-        SetActiveUI(UI.TitleUI_Object_LoadDataProcess,  pTitleProcessType == TitleScene.TitleProcessType.LoadUserData); //임시
-
-        if (pTitleProcessType == TitleScene.TitleProcessType.LoadUserData)
+        /// ReplayAnimation
         {
             Animator anim = GetUIComponent<Animator>(UI.TitleUI);
-            anim?.Rebind(); 
+            anim?.Rebind();
         }
+    }
 
-        if(pTitleProcessType == TitleScene.TitleProcessType.LogIn)
+    public void SetTitleUI_LogIn(LoginState pLoginState)
+    {
+        UpdateTitleUI(TitleUIState.Login, pLoginState);
+
+        /// ReplayAnimation
         {
-            SetActiveUI(UI.TitleUI_Object_StartBG, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
-
-            ///
-            SetActiveUI(UI.TitleUI_Object_Login,    TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.AccountAuth);
-            SetActiveUI(UI.TitleUI_Object_Logout,   TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogOut);
+            Animator anim = GetUIComponent<Animator>(UI.TitleUI);
+            anim?.Rebind();
         }
+    }
+
+    public void SetTitleUI_LoadUserData()
+    {
+        UpdateTitleUI(TitleUIState.LoadData);
+
+        /// ReplayAnimation
+        {
+            Animator anim = GetUIComponent<Animator>(UI.TitleUI);
+            anim?.Rebind();
+        }
+    }
+
+    public void OpenNicknamePopup()
+    {
+        OpenTitleUI_Panel_NicknamePopup();
+    }
+
+    private void UpdateTitleUI(TitleUIState pTitleUIState, LoginState pLoginState = LoginState.None)
+    {
+        bool isMainBG     = (pTitleUIState == TitleUIState.InitData) || (pLoginState == LoginState.LogOut);
+        bool isStartBG    = (pLoginState == LoginState.Login);
+        bool isLoadDataBG = pTitleUIState == TitleUIState.LoadData;
+        SetActiveUI(UI.TitleUI_Object_MainBG,       isMainBG); //임시
+        SetActiveUI(UI.TitleUI_Object_StartBG,      isStartBG); //임시
+        SetActiveUI(UI.TitleUI_Object_LoadDataBG,   isLoadDataBG);
+
+        ///
+        SetActiveUI(UI.TitleUI_Object_InitDataProcess,  pTitleUIState == TitleUIState.InitData);
+        SetActiveUI(UI.TitleUI_Object_LoginProcess,     pTitleUIState == TitleUIState.Login);
+        SetActiveUI(UI.TitleUI_Object_LoadDataProcess,  pTitleUIState == TitleUIState.LoadData); //임시
+
+        ///
+        SetActiveUI(UI.TitleUI_Object_Login,    pLoginState == LoginState.Login);
+        SetActiveUI(UI.TitleUI_Object_Logout,   pLoginState == LoginState.LogOut);
     }
 
     #endregion TitleUI
 
     #region TitleUI_Panel_SignUpPopup
 
-    void OpenTitleUI_Panel_SignUpPopup(AccountType pAccountType)
+    void OpenTitleUI_Panel_SignUpPopup(Account pAccountType)
     {
         SetActiveUI(UI.TitleUI_Panel_SignUpPopup, true);
-
-        selectAccountType = AccountType.None;
         UpdateTitleUI_Panel_SignUpPopup(pAccountType);
     }
 
@@ -376,10 +371,10 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
         SetActiveUI(UI.TitleUI_Panel_SignUpPopup, false);
     }
 
-    void UpdateTitleUI_Panel_SignUpPopup(AccountType pAccountType)
+    void UpdateTitleUI_Panel_SignUpPopup(Account pAccountType)
     {
-        SetActiveUI(UI.SignUpPopup_Object_Guest,     pAccountType == AccountType.Guest);
-        SetActiveUI(UI.SignUpPopup_Object_Google,    pAccountType == AccountType.Google);
+        SetActiveUI(UI.SignUpPopup_Object_Guest,     pAccountType == Account.Guest);
+        SetActiveUI(UI.SignUpPopup_Object_Google,    pAccountType == Account.Google);
     }
 
     #endregion TitleUI_Panel_SignUpPopup
@@ -405,7 +400,6 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
             return;
 
         inputField.text = string.Empty;
-        inputNickname   = inputField.text;
     }
 
     #endregion TitleUI_Panel_NicknamePopup
@@ -430,41 +424,41 @@ public class TitleUI : BaseUI<TitleUI.UI>, IMainUI
 
     #endregion TitleUI_Panel_GuestLogoutPopup
 
-    #region TitleUI_Panel_DebugTestPopup
+    //#region TitleUI_Panel_DebugTestPopup
 
-    void OpenTitleUI_Panel_DebugTestPopup()
-    {
-        SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, true);
+    //void OpenTitleUI_Panel_DebugTestPopup()
+    //{
+    //    SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, true);
 
-        debugSelectAble = true;
-        UpdateTitleUI_Panel_DebugTestPopup(debugSelectAble);
-    }
+    //    debugSelectAble = true;
+    //    UpdateTitleUI_Panel_DebugTestPopup(debugSelectAble);
+    //}
 
-    void CloseTitleUI_Panel_DebugTestPopup()
-    {
-        SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, false);
-    }
+    //void CloseTitleUI_Panel_DebugTestPopup()
+    //{
+    //    SetActiveUI(UI.TitleUI_Panel_DebugTestPopup, false);
+    //}
 
-    void UpdateTitleUI_Panel_DebugTestPopup(bool pDebugSelectAble)
-    {
-        // Select
-        SetActiveUI(UI.DebugTestPopup_Object_SelectAble,     pDebugSelectAble == false);
-        SetActiveUI(UI.DebugTestPopup_Object_SelectDesable,  pDebugSelectAble);
-        SetActiveUI(UI.DebugTestPopup_Object_DestPopup,      pDebugSelectAble);
-        SetDebugLog();
-    }
+    //void UpdateTitleUI_Panel_DebugTestPopup(bool pDebugSelectAble)
+    //{
+    //    // Select
+    //    SetActiveUI(UI.DebugTestPopup_Object_SelectAble, pDebugSelectAble == false);
+    //    SetActiveUI(UI.DebugTestPopup_Object_SelectDesable, pDebugSelectAble);
+    //    SetActiveUI(UI.DebugTestPopup_Object_DestPopup, pDebugSelectAble);
+    //    SetDebugLog();
+    //}
 
-    [Obsolete("테스트")]
-    public void SetDebugLog(string _logMessage = "")
-    {
-        if (debugSelectAble == false)
-            return;
+    //[Obsolete("테스트")]
+    //public void SetDebugLog(string _logMessage = "")
+    //{
+    //    if (debugSelectAble == false)
+    //        return;
 
-        SetTextUI(UI.DebugTestPopup_Text_Desc, _logMessage);
-        SetActiveUI(UI.DebugTestPopup_Object_TestLogout, TitleScene.Instance.GetCurrLogInProcessType() == LogInProcessType.UserLogIn);
+    //    SetTextUI(UI.DebugTestPopup_Text_Desc, _logMessage);
+    //    //SetActiveUI(UI.DebugTestPopup_Object_TestLogout, TitleScene.Instance.LogInProcessType == LogInProcess.LogIn);
 
-        Debug.Log($"[DebugLog]\n{_logMessage}");
-    }
+    //    Debug.Log($"[DebugLog]\n{_logMessage}");
+    //}
 
-    #endregion TitleUI_Panel_DebugTestPopup
+    //#endregion TitleUI_Panel_DebugTestPopup
 }

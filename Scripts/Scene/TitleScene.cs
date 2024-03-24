@@ -1,36 +1,53 @@
 ﻿using System;
 using System.Collections;
+using Server;
 using UnityEngine;
+using static Define;
+
 
 [Obsolete]
 public class TitleScene : BaseScene<TitleScene, TitleUI>
 {
-    public enum TitleProcessType
+    private LogInProcess LogInProcessType = LogInProcess.None;
+    public Account AccountType
     {
-        Init,
-        Patch,
-        LogIn,
-        LoadUserData,
-        LoadGameScene,
-        Complete,
+        get
+        {
+            string subscriptionName = BackendManager.GetSubscriptionName();
+            return GetAccountType(subscriptionName);
+        }
     }
-    TitleProcessType currTitleProcessType = TitleProcessType.Init;
 
-    //TitleUI titleUI = null;
+    private IEnumerator titleProcessCoroutine = null;
 
-    IEnumerator titleProcessCoroutine = null;
-    IEnumerator titleProcessRoutine   = null;
-    [Obsolete("테스트")] IEnumerator testDebugProcessCoroutine = null;
 
+    //private void Update()
+    //{
+    //    try
+    //    {
+    //        string log =
+    //     $"[LogInProcess] {LogInProcessType}\n" +
+    //     $"[Account]      {AccountType}\n" +
+    //     $"[UserInDate]   {BackendManager.GetInData()}\n" +
+    //     $"[Nickname]  {BackendManager.GetNickname()}";
+
+    //        MainUI.SetDebugLog(log);
+    //    }
+    //    catch (Exception e) 
+    //    {
+    //        MainUI.SetDebugLog("");
+    //    }
+    //}
 
     protected override void OnAwake() { }
 
     protected override void OnStart()
     {
-        MainUI.SetTitleUI(currTitleProcessType);
 
-        TitleProcess();
-        TestDebugProcess();
+        MainUI.SetTitleUI_InitData();
+        
+        ///
+        StartTitleProcess();
     }
 
     protected override void onDestroy()
@@ -40,24 +57,112 @@ public class TitleScene : BaseScene<TitleScene, TitleUI>
             StopCoroutine(titleProcessCoroutine);
             titleProcessCoroutine = null;
         }
-
-        if (titleProcessRoutine != null)
-        {
-            StopCoroutine(titleProcessRoutine);
-            titleProcessRoutine = null;
-        }
-
-        if (testDebugProcessCoroutine != null)
-        {
-            StopCoroutine(testDebugProcessCoroutine);
-            testDebugProcessCoroutine = null;
-        }
     }
 
-    [Obsolete("임시")] public AccountType GetCurrAccountType() { return Manager.LogInMng.currAccountType; }
-    [Obsolete("임시")] public LogInProcessType GetCurrLogInProcessType() { return Manager.LogInMng.currLogInProcessType; }
-    
-    void TitleProcess()
+    /// <summary>
+    /// 선택 계정으로 회원가입을 진행합니다.
+    /// </summary>
+    public void SetSinUp(Account pAccountType)
+    {
+        if (LogInProcessType != LogInProcess.LogOut)
+        {
+            Util.LogWarning();
+            return;
+        }
+
+        switch (pAccountType)
+        {
+            case Account.Guest:
+                {
+                    BackendManager.GuestLogIn();
+                }
+                break;
+
+            case Account.Google:
+                {
+                    Util.LogMessage("개발 중");
+                    return;
+
+                    //if (Application.platform != RuntimePlatform.Android)
+                    //{
+                    //    Util.LogWarning("사용할 수 없는 기기입니다.");
+                    //    return;
+                    //}
+
+                    //isDone = BackendManager.CheckFederationAccount();
+                    //if (isDone) { isDone = BackendManager.AuthorizeFederation(); }
+                }
+                break;
+
+            default:
+                Util.LogError();
+                break;
+        }
+
+        // Restart
+        StartTitleProcess();
+    }
+
+    /// <summary>
+    /// 계정을 인증하고 게임을 시작합니다.
+    /// </summary>
+    public void SetGameStart()
+    {
+        if (LogInProcessType != LogInProcess.LogIn)
+        {
+            Util.LogWarning();
+            return;
+        }
+
+        string subscriptionName = BackendManager.GetSubscriptionName();
+        bool isAuth = ! string.IsNullOrEmpty(subscriptionName); //임시
+        if (isAuth) { LogInProcessType = LogInProcess.Auth; }
+    }
+
+    /// <summary>
+    /// 닉네임을 검사하고 생성합니다.
+    /// </summary>
+    public bool CreateNickName(string pNickName)
+    {
+        bool isDone = BackendManager.CreateNickname(pNickName);
+
+        /// Restart
+        StartTitleProcess();
+        return isDone;
+    }
+
+    /// <summary>
+    /// 계정을 로그아웃합니다.
+    /// </summary>
+    public void SetLogOut()
+    {
+        if (LogInProcessType != LogInProcess.LogIn)
+        {
+            Util.LogWarning();
+            return;
+        }
+
+        switch (AccountType)
+        {
+            case Account.Guest:
+                {
+                    bool isDone = BackendManager.SignOut();
+                    if (isDone) { BackendManager.DeleteGuestInfo(); }
+                }
+                break;
+
+            case Account.Google:
+                {
+                    BackendManager.LogOut();
+                }
+                break;
+        }
+
+        /// Restart
+        StartTitleProcess();
+    }
+
+    private void StartTitleProcess()
     {
         if (titleProcessCoroutine != null)
         {
@@ -65,170 +170,110 @@ public class TitleScene : BaseScene<TitleScene, TitleUI>
             titleProcessCoroutine = null;
         }
 
-        if (titleProcessRoutine != null)
-        {
-            StopCoroutine(titleProcessRoutine);
-            titleProcessRoutine = null;
-        }
-
         titleProcessCoroutine = TitleProcessCoroutine();
         StartCoroutine(titleProcessCoroutine);
     }
 
+    [Obsolete]
     IEnumerator TitleProcessCoroutine()
     {
+        LogInProcessType = Define.LogInProcess.None;
         yield return null;
 
-        currTitleProcessType = TitleProcessType.Init;
-        titleProcessRoutine  = InitDataProcessCoroutine();
-        yield return titleProcessRoutine;
-
-        currTitleProcessType = TitleProcessType.LogIn;
-        titleProcessRoutine  = LogInProcessCoroutine();
-        yield return titleProcessRoutine;
-
-        currTitleProcessType = TitleProcessType.LoadUserData;
-        titleProcessRoutine  = LoadUserDataProcessCoroutine();
-        yield return titleProcessRoutine;
-
-        currTitleProcessType = TitleProcessType.LoadGameScene;
-        titleProcessRoutine  = LoadGameSceneProcessCoroutine();
-        yield return titleProcessRoutine;
-
-        currTitleProcessType = TitleProcessType.Complete;
-    }
-
-    IEnumerator InitDataProcessCoroutine()
-    {
-        yield return null;
-
-        // Server
-        Manager.BackendMng.InitBackendSDK();
-        Manager.GPGSMng.InitGPGSAuth();
-        Manager.LogInMng.InitLogInState();
-        yield return new WaitUntil(() => MainUI.IsTitleUI_AnimationCompleted);
-    }
-
-    IEnumerator LogInProcessCoroutine()
-    {
-        yield return null;
-
-        MainUI.SetTitleUI(currTitleProcessType);
-        MainUI.SetLogInStateAction(OnLogInState);
-        yield return new WaitUntil(() => Manager.LogInMng.currLogInProcessType == LogInProcessType.UserLogIn);
-    }
-
-    void OnLogInState()
-    {
-        switch (currTitleProcessType)
+        /// InitData
         {
-            case TitleProcessType.LogIn:
+            MainUI.SetTitleUI_InitData();
+            yield return null;
+
+            /// Server
+            BackendManager.InitBackendSDK();
+            //GPGSManager.InitGPGSAuth();
+            yield return new WaitUntil(() => MainUI.IsTitleUI_AnimationCompleted);
+        }
+
+        /// LogIn
+        {
+            bool isLogin = false;
+
+            /// CheckTokenLogin
+            {
+                isLogin = BackendManager.TokenLogin();
+                if (isLogin)
                 {
-                    switch (Manager.LogInMng.currLogInProcessType)
+                    LogInProcessType = LogInProcess.LogIn;
+                    MainUI.SetTitleUI_LogIn(LoginState.Login);
+                    yield return null;
+                }
+                else
+                {
+                    LogInProcessType = LogInProcess.LogOut;
+                    MainUI.SetTitleUI_LogIn(LoginState.LogOut);
+                    yield break;
+                }
+            }
+
+            /// CheckNinme
+            {
+                if(isLogin)
+                {
+                    string  nickname          = BackendManager.GetNickname();
+                    bool    isNicknameCreated = string.IsNullOrEmpty(nickname);
+                    if(isNicknameCreated)
                     {
-                        case LogInProcessType.UserLogOut:
-                            {
-                                if (MainUI.selectAccountType == AccountType.None)
-                                    return;
-
-                                bool isSignUp = Manager.LogInMng.SetSignUp(MainUI.selectAccountType);
-                                if(isSignUp)
-                                {
-                                    TitleProcess();
-                                    return;
-                                }
-                                
-                                if(MainUI.selectAccountType == AccountType.Google) { }
-                            }
-                            break;
-
-                        case LogInProcessType.AccountAuth:
-                            {
-                                Manager.LogInMng.SetUserLogIn();
-                            }
-                            break;
-
-                        case LogInProcessType.UpdateNickname:
-                            {
-                                if (string.IsNullOrEmpty(MainUI.inputNickname) == false)
-                                {
-                                    Manager.LogInMng.SetUpdateNickname(MainUI.inputNickname);
-                                }
-
-                                TitleProcess();
-                            }
-                            break;
+                        MainUI.OpenNicknamePopup();
+                        yield return null;
                     }
                 }
-                break;
+            }
 
-            case TitleProcessType.LoadUserData:
+            /// AccountAuth
+            {
+                yield return new WaitUntil(() => LogInProcessType == LogInProcess.Auth);
+            }
+        }
+
+        /// LoadUserData
+        {
+            MainUI.SetTitleUI_LoadUserData();
+            User.LoadUserData();
+            yield return new WaitUntil(() => MainUI.IsTitleUI_AnimationCompleted);
+        }
+
+        /// LoadGameScene
+        {
+            SceneLoader.LoadBaseScene<WorldScene>();
+        }
+    }
+
+    #region LogIn
+
+    private Account GetAccountType(string pAccountName)
+    {
+        string subscriptionType = BackendManager.GetSubscriptionName();
+        switch (subscriptionType)
+        {
+            case "customSignUp":
                 {
-                    Util.LogWarning("Debug 테스트용");
-                    Manager.LogInMng.SetUserLogOut();
-
-                    TitleProcess();
+                    return Account.Guest;
                 }
-                break;
+
+            case "google":
+                {
+                    return Account.Google;
+                }
+
+            case "":
+                {
+                    return Account.None;
+                }
+
+            default:
+                {
+                    Util.LogError("알 수 없는 계정 타입 : " + subscriptionType);
+                    return Account.None;
+                }
         }
     }
 
-    [Obsolete("테스트 중")]
-    IEnumerator LoadUserDataProcessCoroutine()
-    {
-        MainUI.SetTitleUI(currTitleProcessType);
-        yield return new WaitUntil(() => MainUI.IsTitleUI_AnimationCompleted);
-
-        Manager.UserMng.LoadUserData();
-    }
-
-    IEnumerator LoadGameSceneProcessCoroutine()
-    {
-        yield return null;
-        Manager.SceneMng.LoadBaseScene<WorldScene>();
-        //MainUI.Close();
-    }
-
-    [Obsolete("테스트")]
-    void TestDebugProcess()
-    {
-        if(testDebugProcessCoroutine != null)
-        {
-            StopCoroutine(testDebugProcessCoroutine);
-            testDebugProcessCoroutine = null;
-        }
-
-        testDebugProcessCoroutine = TestDebugProcessCorouine();
-        StartCoroutine(testDebugProcessCoroutine);
-    }
-
-    IEnumerator TestDebugProcessCorouine()
-    {
-        while(true)
-        {
-            UpdateTitleProcessDebug();
-            yield return null;
-        }
-    }
-
-    void UpdateTitleProcessDebug()
-    {
-        try
-        {
-            string inData   = Manager.BackendMng.GetInData();
-            string nickname = Manager.BackendMng.GetNickname();
-            string format   = string.Format(
-                "[TitleProcess] " + currTitleProcessType.ToString() + '\n' +
-                "[LoginProcess] " + Manager.LogInMng.currLogInProcessType.ToString() + '\n' +
-                "[AccountType] " + Manager.LogInMng.currAccountType.ToString() + '\n' +
-                "[InData] " + inData + '\n' +
-                "[nickname] " + nickname + '\n');
-
-            MainUI.SetDebugLog(format);
-        }
-        catch(Exception ex)
-        {
-            Debug.LogError(ex);
-        }
-    }
+    #endregion LogIn
 }

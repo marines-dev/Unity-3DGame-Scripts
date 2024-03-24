@@ -8,7 +8,6 @@ public class InitScene : BaseScene<InitScene, InitUI>
     protected override void OnAwake()
     {
         /// LoadManager
-        Manager.CreateManagers();
         CreateGlobalScene();
 
         IsInitSceneLoaded = true;
@@ -16,7 +15,7 @@ public class InitScene : BaseScene<InitScene, InitUI>
 
     protected override void OnStart()
     {
-        Manager.SceneMng.LoadBaseScene<TitleScene>();
+        SceneLoader.LoadBaseScene<TitleScene>();
     }
 
     protected override void onDestroy()

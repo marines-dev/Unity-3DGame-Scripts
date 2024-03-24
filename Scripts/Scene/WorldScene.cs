@@ -8,20 +8,13 @@ using static Define;
 public class WorldScene : BaseScene<WorldScene, WorldUI>
 {
     /// <summary>
-    /// MainUI
-    /// </summary>
-    //private WorldUI worldUI = null;
-
-    /// <summary>
     /// Input
     /// </summary>
     //public BaseInput BaseInput { get; }
 
-    #region World
-
-    private Player      player      = null;
-    private NullObject  nullPlayer  = new NullObject();
-    public IPlayerCtrl  PlayerCtrl
+    private Player     player     = null;
+    private NullObject nullPlayer = new NullObject();
+    public IPlayerCtrl PlayerCtrl
     {
         get
         {
@@ -35,10 +28,8 @@ public class WorldScene : BaseScene<WorldScene, WorldUI>
         }
     }
 
-    private Dictionary<GameObject, int>     fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
-    private Dictionary<int, WorldSpawner>   worldSpawner_dic  = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
-
-    #endregion World
+    private Dictionary<GameObject, int>   fieldSpawning_dic = new Dictionary<GameObject, int>(); /// <EnemyGO, SpawnerID>
+    private Dictionary<int, WorldSpawner> worldSpawner_dic  = new Dictionary<int, WorldSpawner>(); /// <SpawnerID, WorldSpawner>
 
 
     protected override void OnAwake()
@@ -54,7 +45,7 @@ public class WorldScene : BaseScene<WorldScene, WorldUI>
         /// Spawner
         {
             /// Player
-            Manager.UserMng.LoadUserData();
+            User.LoadUserData();
 
             Vector3 spawnPos = new Vector3(7.5f, 0f, 1f);
             Vector3 spawnRot = Quaternion.identity.eulerAngles; 
@@ -97,23 +88,44 @@ public class WorldScene : BaseScene<WorldScene, WorldUI>
         CamCtrl.SwitchQuarterViewMoed = true;
     }
 
-    protected override void onDestroy()
-    {
-        //if(instance != null && instance.gameObject != null)
-        //{
-        //    ResourceManager.Instance.DestroyGameObject(instance.gameObject);
-        //}
+    protected override void onDestroy() { }
 
-        //instance = null;
+    public void ResetData()
+    {
+        CamCtrl.SwitchQuarterViewMoed = false;
+        SwitchSpawnersPooling(false);
+        player.SaveData_Temp();
     }
 
     public void MoveTitle()
     {
-        //MainUI.Close();
-        CamCtrl.SwitchQuarterViewMoed = false;
-        SwitchSpawnersPooling(false);
+        ResetData();
 
-        Manager.SceneMng.LoadBaseScene<TitleScene>();
+        SceneLoader.LoadBaseScene<TitleScene>();
+    }
+
+    public ITarget GetTargetCharacter(GameObject pTarget)
+    {
+        if (pTarget == null)
+        {
+            Util.LogWarning();
+            return null;
+        }
+
+        BaseActor baseActor = pTarget.GetComponent<BaseActor>();
+        if (baseActor == null)
+        {
+            Util.LogWarning();
+            return null;
+        }
+
+        return baseActor;
+    }
+
+    [Obsolete("임시")]
+    public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
+    {
+        return UILoader.CreateBaseSpaceUI<TSpaceUI>(pParent);
     }
 
     #region Spawner
@@ -158,7 +170,7 @@ public class WorldScene : BaseScene<WorldScene, WorldUI>
             case Actor.Player:
                 {
                     /// Respawn
-                    Manager.SceneMng.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
+                    SceneLoader.LoadBaseScene<WorldScene>(); // WorldScene을 재로드 합니다.
                 }
                 break;
             case Actor.Enemy:
@@ -193,38 +205,11 @@ public class WorldScene : BaseScene<WorldScene, WorldUI>
         }
     }
 
-    #endregion Spawner
-
     private void OnPlayerDeadEvent()
     {
-        //MainUI.Close();
         CamCtrl.SwitchQuarterViewMoed = false;
         SwitchSpawnersPooling(false);
     }
 
-    public ITarget GetTargetCharacter(GameObject pTarget)
-    {
-        if (pTarget == null)
-        {
-            Util.LogWarning();
-            return null;
-        }
-
-        BaseActor baseActor = pTarget.GetComponent<BaseActor>();
-        if (baseActor == null)
-        {
-            Util.LogWarning();
-            return null;
-        }
-
-        return baseActor;
-    }
-
-    [Obsolete("임시")]
-    public TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
-    {
-        return UILoader.CreateBaseSpaceUI<TSpaceUI>(pParent);
-    }
-
-
+    #endregion Spawner
 }

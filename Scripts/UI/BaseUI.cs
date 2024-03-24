@@ -17,8 +17,8 @@ public static class UILoader
         }
 
         TBaseUI baseUI = null;
-        string uiName = typeof(TBaseUI).Name;
-        string path = $"Prefabs/UI/{uiName}";
+        string  uiName = typeof(TBaseUI).Name;
+        string  path   = $"Prefabs/UI/{uiName}";
         baseUI =  ResourceLoader.Instantiate(path, pCanvas.transform).GetOrAddComponent<TBaseUI>();
         baseUI.gameObject.name = uiName;
 
@@ -29,11 +29,11 @@ public static class UILoader
 
     public static TSpaceUI CreateBaseSpaceUI<TSpaceUI>(Transform pParent = null) where TSpaceUI : Component, IBaseUI
     {
-        string name = typeof(TSpaceUI).Name;
-        GameObject go = ResourceLoader.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
+        string     name = typeof(TSpaceUI).Name;
+        GameObject go   = ResourceLoader.Instantiate($"Prefabs/UI/WorldSpace/{name}", pParent);
 
-        Canvas canvas = go.GetOrAddComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
+        Canvas canvas      = go.GetOrAddComponent<Canvas>();
+        canvas.renderMode  = RenderMode.WorldSpace;
         canvas.worldCamera = Camera.main;
 
         TSpaceUI baseUI = go.GetOrAddComponent<TSpaceUI>();
